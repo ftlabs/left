@@ -1,0 +1,7 @@
+.DS_Store
+.env
+keyfile.json
+
+/node_modules/*
+
+test_output.json

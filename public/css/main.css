@@ -1,0 +1,39 @@
+body {
+	background: #fff1e5;
+	font-family: "MetricWeb", sans-serif;
+}
+
+h1, h2 {
+	padding: 0 10px;
+	font-family: "FinancierDisplayWeb", serif;
+}
+
+.cape {
+	display: none!important;
+}
+
+#output {
+	display: flex;
+}
+
+#output > div {
+	flex-basis: 50%;
+	padding: 10px;
+}
+
+.text-body {
+	white-space: pre-line;
+    font-weight: 300;
+    line-height: 1.5;
+    background: #E6D9CE;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+input, textarea {
+	margin-bottom: 15px;
+}
+
+.o-buttons--primary {
+	margin-top: 12px;
+}
