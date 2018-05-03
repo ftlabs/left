@@ -22,6 +22,7 @@ const translatorMap = [
 async function translate(translators, options) {
 	const results = {};
 	
+	//TODO: refactor with Map
 	for(let i = 0; i < translators.length; ++i) {
 		if(translators[i] === 'deepl') {
 			const translate = await Deepl.translate(options);
@@ -47,7 +48,7 @@ function getSettings(user) {
 		mixLang = mixLang.concat(support);
 	}
 
-	return SETTINGS.languages(mixLang);
+	return {translators: translators, lang: SETTINGS.languages(mixLang)};
 }
 
 function getEntitySupport(translatorName) {

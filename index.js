@@ -15,14 +15,15 @@ const Utils = require('./bin/lib/utils/utils');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get('/article/:uuid/:lang', (req,res) => {
+app.post('/article/:uuid/:lang', (req,res) => {
 	const uuid = req.params.uuid;
 	const lang = req.params.lang;
+	const translators = req.body.translators;
 
 	return CAPI.get(uuid)
 	.then(async data => {
 		const text = extract(data.bodyXML);
-		const translate = await Translator.translate(['deepl', 'google'], {text: text, to: lang});
+		const translate = await Translator.translate(translators, {text: text, to: lang});
 
 		translate.original = text;
 		translate.article = uuid;
@@ -38,19 +39,14 @@ app.get('/article/:uuid/:lang', (req,res) => {
 app.post('/translation/:lang', (req, res) => {
 	const text = req.body.text;
 	const lang = req.params.lang;
+	const translators = req.body.translators;
 
-	Translator.translate(['deepl', 'google'], {text: text, to: lang})
+	Translator.translate(translators, {text: text, to: lang})
 	.then(data => {
 		data.original = text;
 		res.json(data);
 	})
 	.catch(err => console.log(err));
-});
-
-app.get('/support', (req, res) => {
-	const settings = Translator.settings(Utils.extractUser(req.headers.cookie));
-	
-	res.json({lang: settings});
 });
 
 
@@ -60,7 +56,8 @@ app.set('view engine', 'hbs');
 app.use('/client', express.static(path.resolve(__dirname + "/public")));
 
 app.get('/', (req, res) => {
-	res.render('index');
+	const settings = Translator.settings(Utils.extractUser(req.headers.cookie));
+	res.render('index', settings);
 });
 
 console.log(`Server is running locally on port ${PORT}`);
