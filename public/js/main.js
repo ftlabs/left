@@ -1,25 +1,8 @@
 var rootUrl = window.location.href;
 
 function init() {
-	fetch(rootUrl +'support')
-		.then(res => res.json())
-		.then(data => setupLangs(data))
-		.catch(err => console.log(err));
-
 	var form = document.getElementById('translateForm');
 	form.addEventListener('submit', getTranslation);
-}
-
-function setupLangs(data) {
-	var selection = document.getElementById('langSelect');
-
-	for(var i =0; i < data.lang.length; ++i) {
-		var option = document.createElement('option');
-		option.value = data.lang[i];
-		option.textContent = data.lang[i];
-
-		selection.append(option);
-	}
 }
 
 function getTranslation(e) {
@@ -30,6 +13,14 @@ function getTranslation(e) {
 	var uuidMatch = /^([a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})/g;
 	var language = e.target.querySelector('#langSelect');
 	var isFreeText = false;
+
+	var fetchOptions = {
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		method: 'POST',
+		credentials: 'same-origin'
+	};
 
 	if(textArea.value !== '') {
 		isFreeText = true;
@@ -47,14 +38,8 @@ function getTranslation(e) {
 	}
 
 	if(isFreeText) {
-		var fetchOptions = {
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			method: 'POST',
-			body: JSON.stringify({ text: textArea.value }),
-			credentials: 'same-origin'
-		};
+		//TODO: translators should be checkboxes
+		fetchOptions.body = JSON.stringify({ text: textArea.value, translators: window.FTLabs.translators.split(',') });
 
 		return fetch(rootUrl + 'translation/' + language.value, fetchOptions)
 			.then(res => res.json())
@@ -64,7 +49,9 @@ function getTranslation(e) {
 			.catch(err => console.log(err));
 	}
 
-	fetch(rootUrl + 'article/' + input.value +'/' + language.value)
+	fetchOptions.body = JSON.stringify({translators: window.FTLabs.translators.split(',') });
+
+	fetch(rootUrl + 'article/' + input.value +'/' + language.value, fetchOptions)
 		.then(res => res.json())
 		.then(data => {
 			displayText(data);
@@ -75,15 +62,10 @@ function getTranslation(e) {
 function displayText(data) {
 	var original = document.querySelector('#original .text-body');
 	var deepl_tr = document.querySelector('#deepl .text-body');
-	var deepl_txt = data.deepl;
+	var deepl_txt = data.deepl.toString();
 
 	var google_tr = document.querySelector('#google .text-body');
 	var google_txt = data.google;
-
-	if(deepl_txt !== undefined && deepl_txt.charAt(0) === '\"') {
-		//Quick hack to fix rogue strarting quote: to be checked on articles that actually start with quotes
-		deepl_txt = deepl_txt.substr(1);
-	}
 
 	original.textContent = data.original;
 	deepl_tr.textContent = deepl_txt;
