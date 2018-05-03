@@ -8,7 +8,7 @@ function init(apiKey) {
 }
 
 async function translate(options) {
-	const formattedBody = `text=${JSON.stringify(encodeURIComponent(options.text))}&target_lang=${options.to}&auth_key=${this.apiKey}`;
+	const formattedBody = `text=${encodeURIComponent(options.text)}&target_lang=${options.to}&auth_key=${this.apiKey}`;
 
 	const postOptions = {
 		headers: {

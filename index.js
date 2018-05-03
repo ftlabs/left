@@ -1,19 +1,19 @@
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
+const s3o = require('@financial-times/s3o-middleware');
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 2018;
 const extract = require('./bin/lib/utils/extract-text');
+const hbs = require('hbs');
 
 const CAPI = require('./bin/lib/api').init(process.env.FT_API_KEY);
 const Translator = require('./bin/lib/multi-translator');
+const Utils = require('./bin/lib/utils/utils');
 
-
-app.use(express.static(path.resolve(__dirname + "/public")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
 
 app.get('/article/:uuid/:lang', (req,res) => {
 	const uuid = req.params.uuid;
@@ -48,8 +48,19 @@ app.post('/translation/:lang', (req, res) => {
 });
 
 app.get('/support', (req, res) => {
-	res.json({lang: ['EN', 'DE', 'FR', 'ES', 'IT', 'NL', 'PL']});
-	//TODO: move to support module
+	const settings = Translator.settings(Utils.extractUser(req.headers.cookie));
+	
+	res.json({lang: settings});
+});
+
+
+app.use(s3o);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
+app.use('/client', express.static(path.resolve(__dirname + "/public")));
+
+app.get('/', (req, res) => {
+	res.render('index');
 });
 
 console.log(`Server is running locally on port ${PORT}`);
