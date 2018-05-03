@@ -12,6 +12,7 @@
   "dependencies": {
     "@financial-times/s3o-middleware": "^2.0.6",
     "@google-cloud/translate": "^1.1.0",
+    "aws-sdk": "^2.231.1",
     "cheerio": "^1.0.0-rc.2",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",

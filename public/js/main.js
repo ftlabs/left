@@ -67,9 +67,13 @@ function displayText(data) {
 	var google_tr = document.querySelector('#google .text-body');
 	var google_txt = data.google;
 
+	var aws_tr = document.querySelector('#aws .text-body');
+	var aws_txt = data.aws;
+
 	original.textContent = data.original;
 	deepl_tr.textContent = deepl_txt;
 	google_tr.textContent = google_txt;
+	aws_tr.textContent = aws_txt;
 
 	document.getElementById('output').classList.remove('cape');
 }
