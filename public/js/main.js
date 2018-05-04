@@ -60,7 +60,6 @@ function getTranslation(e) {
 }
 
 function displayText(data) {
-	console.log(data);
 	var container = document.getElementById('output');
 	container.innerHTML = '';
 
@@ -78,20 +77,6 @@ function displayText(data) {
 
 		container.appendChild(output);
 	}
-	// var original = document.querySelector('#original .text-body');
-	// var deepl_tr = document.querySelector('#deepl .text-body');
-	// var deepl_txt = data.deepl.toString();
-
-	// var google_tr = document.querySelector('#google .text-body');
-	// var google_txt = data.google;
-
-	// var aws_tr = document.querySelector('#aws .text-body');
-	// var aws_txt = data.aws;
-
-	// original.textContent = data.original;
-	// deepl_tr.textContent = deepl_txt;
-	// google_tr.textContent = google_txt;
-	// aws_tr.textContent = aws_txt;
 
 	document.getElementById('output').classList.remove('cape');
 }
