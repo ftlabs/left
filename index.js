@@ -27,6 +27,7 @@ app.post('/article/:uuid/:lang', (req,res) => {
 
 		translate.original = text;
 		translate.article = uuid;
+		translate.outputs = ['original'].concat(translators);
 
 		res.json(translate);
 	})
@@ -44,6 +45,7 @@ app.post('/translation/:lang', (req, res) => {
 	Translator.translate(translators, {text: text, to: lang})
 	.then(data => {
 		data.original = text;
+		data.outputs = ['original'].concat(translators);
 		res.json(data);
 	})
 	.catch(err => console.log(err));

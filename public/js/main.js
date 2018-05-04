@@ -60,16 +60,23 @@ function getTranslation(e) {
 }
 
 function displayText(data) {
-	var original = document.querySelector('#original .text-body');
-	var deepl_tr = document.querySelector('#deepl .text-body');
-	var deepl_txt = data.deepl.toString();
+	var container = document.getElementById('output');
+	container.innerHTML = '';
 
-	var google_tr = document.querySelector('#google .text-body');
-	var google_txt = data.google;
+	for(var i = 0; i < data.outputs.length; ++i) {
+		var output = document.createElement('div');
+		output.setAttribute('id', data.outputs[i]);
+		var title = document.createElement('h2');
+		title.textContent = data.outputs[i];
+		var bodyText = document.createElement('div');
+		bodyText.classList.add('text-body');
+		bodyText.textContent = data[data.outputs[i]];
 
-	original.textContent = data.original;
-	deepl_tr.textContent = deepl_txt;
-	google_tr.textContent = google_txt;
+		output.appendChild(title);
+		output.appendChild(bodyText);
+
+		container.appendChild(output);
+	}
 
 	document.getElementById('output').classList.remove('cape');
 }
