@@ -36,8 +36,7 @@ async function translate(translators, options) {
 
 			case 'deepl':
 			default:
-				const translate = await Deepl.translate(options)
-				results.deepl = translate.translations[0].text;
+				results.deepl = await Deepl.translate(options);
 		}
 	}
 

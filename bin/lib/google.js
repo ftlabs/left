@@ -1,5 +1,5 @@
 const Translate = require('@google-cloud/translate');
-const supportedLang = ['TEST','EN', 'DE', 'FR', 'ES', 'IT', 'NL', 'PL'];
+const supportedLang = ['EN', 'DE', 'FR', 'ES', 'IT', 'NL', 'PL'];
 //TODO: find a way to get the list from Google
 
 function init(projectId) {
