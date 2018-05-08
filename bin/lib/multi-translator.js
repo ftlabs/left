@@ -59,7 +59,12 @@ function getSettings(user) {
 function getEntitySupport(translatorName) {
 	for (let i = 0; i < translatorMap.length; ++i) {
 		if(translatorMap[i].name === translatorName) {
-			return translatorMap[i].entity.support;
+			const support = translatorMap[i].entity.support();
+			for(let j = 0; j < support.length; ++j) {
+				support[j]['translator'] = translatorMap[i].name;
+			}
+
+			return support;
 		}
 	}
 

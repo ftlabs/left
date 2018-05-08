@@ -1,6 +1,16 @@
 const fetch = require('node-fetch');
 const DEEPL_URL = 'https://api.deepl.com/v1/translate';
-const supportedLang = ['EN', 'DE', 'FR', 'ES', 'IT', 'NL', 'PL'];
+const supportedLang = [
+	{code: 'EN', name: 'English'},
+	{code: 'DE', name: 'German'},
+	{code: 'FR', name: 'French'},
+	{code: 'ES', name: 'Spanish'},
+	{code: 'IT', name: 'Italian'},
+	{code: 'NL', name: 'Dutch'},
+	{code: 'PL', name: 'Polish'}
+];
+//TODO: use ISO 639-1 instead of hard-coded names
+
 const BYTE_LIMIT = 30000;
 const THROTTLE_LIMIT = 1*1000 // 1 second
 
@@ -49,9 +59,8 @@ async function sendRequest(options) {
 		.catch(err => console.log('ERR', err));
 }
 
-
 module.exports = {
 	init: init,
 	translate: translate,
-	support: supportedLang
+	support: () => { return supportedLang }
 };

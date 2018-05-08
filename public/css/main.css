@@ -36,7 +36,7 @@ h1, h2 {
     border-radius: 8px;
 }
 
-input, textarea {
+input, textarea, select {
 	margin-bottom: 15px;
 }
 

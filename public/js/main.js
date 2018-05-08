@@ -2,7 +2,27 @@ var rootUrl = window.location.href;
 
 function init() {
 	var form = document.getElementById('translateForm');
+	var language = document.getElementById('langSelect');
+
+	language.addEventListener('change', updateTranslators);
 	form.addEventListener('submit', getTranslation);
+}
+
+function updateTranslators(e) {
+	var selected = e.currentTarget.options.selectedIndex;
+	var translators = e.currentTarget.options[selected].getAttribute('data-translators').split(',');
+
+	var translatorSelection = document.querySelectorAll('#translators input');
+	Array.from(translatorSelection).forEach(function(checkbox) {
+		checkbox.checked = false;
+		checkbox.disabled = true;
+	});
+
+	for(var i = 0; i < translators.length; ++i) {
+		var translator = document.querySelector('#' + translators[i]);
+		translator.checked = true;
+		translator.disabled = false;
+	}
 }
 
 function getTranslation(e) {
@@ -37,9 +57,20 @@ function getTranslation(e) {
 		return;
 	}
 
+	var translatorOptions = document.querySelectorAll('#translators input:checked');
+	var translatorSelection = [];
+
+	Array.from(translatorOptions).forEach(function(checkbox) {
+		translatorSelection.push(checkbox.value);
+	});
+
+	if(translatorSelection.length < 1) {
+		alert('You must select at least one translation service');
+		return;
+	}
+
 	if(isFreeText) {
-		//TODO: translators should be checkboxes
-		fetchOptions.body = JSON.stringify({ text: textArea.value, translators: window.FTLabs.translators.split(',') });
+		fetchOptions.body = JSON.stringify({ text: textArea.value, translators: translatorSelection });
 
 		return fetch(rootUrl + 'translation/' + language.value, fetchOptions)
 			.then(res => res.json())
@@ -49,7 +80,7 @@ function getTranslation(e) {
 			.catch(err => console.log(err));
 	}
 
-	fetchOptions.body = JSON.stringify({translators: window.FTLabs.translators.split(',') });
+	fetchOptions.body = JSON.stringify({translators: translatorSelection });
 
 	fetch(rootUrl + 'article/' + input.value +'/' + language.value, fetchOptions)
 		.then(res => res.json())

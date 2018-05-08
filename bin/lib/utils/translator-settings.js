@@ -14,11 +14,33 @@ function getAllowedTranslators(user) {
 }
 
 function getAvailableLanguages(languages) {
-	let flatLang = languages.filter((elem, index, self) => {
-        return index === self.indexOf(elem);
-    });
+	const filteredSettings = [];
 
-	return flatLang;
+ 	for(let i = 0; i < languages.length; ++i) {
+ 		const duplicate = filteredSettings.findIndex((element) => {
+ 			return element.name.toLowerCase() === languages[i].name.toLowerCase();
+ 		});
+
+ 		if(duplicate === -1) {
+ 			filteredSettings.push(languages[i]);
+ 		} else {
+ 			filteredSettings[duplicate].translator += `,${languages[i].translator}`;
+ 		}
+ 	}
+
+ 	filteredSettings.sort(sortName);
+
+ 	console.log(filteredSettings);
+
+	return filteredSettings;
+}
+
+function sortName(a,b) {
+	if (a.name < b.name)
+		return -1;
+	if (a.name > b.name)
+		return 1;
+	return 0;
 }
 
 module.exports = {
