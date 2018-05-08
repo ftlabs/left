@@ -14,7 +14,7 @@ h1, h2 {
 
 #output {
 	display: flex;
-	flex-wrap: wrap;
+	/*flex-wrap: wrap;*/
 }
 
 #output > div {
@@ -42,4 +42,16 @@ input, textarea, select {
 
 .o-buttons--primary {
 	margin-top: 12px;
+}
+
+.o-forms {
+	display: none;
+}
+
+.o-toggle--active {
+	display: inherit;
+}
+
+.o-buttons-icon--arrow-down[aria-expanded="true"] {
+	display: none;
 }

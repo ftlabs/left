@@ -35,7 +35,7 @@ async function translate(options) {
 	};
 
 	for(let i = 0; i < text.length; ++i) {
-		const formattedBody = `text=${text[i]}&target_lang=${options.to}&auth_key=${this.apiKey}`;
+		const formattedBody = `text=${text[i]}&target_lang=${options.to.toUpperCase()}&auth_key=${this.apiKey}`;
 		postOptions.body = formattedBody;
 
 		const textPart = await sendRequest(postOptions);

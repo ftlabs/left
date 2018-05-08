@@ -1,6 +1,7 @@
 var rootUrl = window.location.href;
 
 function init() {
+	toggleSettings();
 	var form = document.getElementById('translateForm');
 	var language = document.getElementById('langSelect');
 
@@ -75,6 +76,7 @@ function getTranslation(e) {
 		return fetch(rootUrl + 'translation/' + language.value, fetchOptions)
 			.then(res => res.json())
 			.then(data => {
+				toggleSettings();
 				displayText(data);
 			})
 			.catch(err => console.log(err));
@@ -85,6 +87,7 @@ function getTranslation(e) {
 	fetch(rootUrl + 'article/' + input.value +'/' + language.value, fetchOptions)
 		.then(res => res.json())
 		.then(data => {
+			toggleSettings();
 			displayText(data);
 		})
 		.catch(err => console.log(err));
@@ -110,6 +113,11 @@ function displayText(data) {
 	}
 
 	document.getElementById('output').classList.remove('cape');
+}
+
+function toggleSettings() {
+	var toggle = document.querySelector('.o-buttons-icon--arrow-down');
+	toggle.click();
 }
 
 document.addEventListener('DOMContentLoaded', init);

@@ -30,8 +30,6 @@ function getAvailableLanguages(languages) {
 
  	filteredSettings.sort(sortName);
 
- 	console.log(filteredSettings);
-
 	return filteredSettings;
 }
 
