@@ -2,18 +2,23 @@ if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 const s3o = require('@financial-times/s3o-middleware');
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 const app = express();
 const PORT = process.env.PORT || 2018;
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+const googleTokenPath = path.resolve(`${__dirname}/keyfile.json`);
+fs.writeFileSync(googleTokenPath , process.env.GOOGLE_CREDS);
+
 const CAPI = require('./bin/lib/api').init(process.env.FT_API_KEY);
 const Translator = require('./bin/lib/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
 app.post('/article/:uuid/:lang', (req,res) => {
 	const uuid = req.params.uuid;
