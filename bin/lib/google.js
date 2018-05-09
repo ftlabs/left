@@ -20,7 +20,8 @@ async function translate(options) {
 			return translation;
 		})
 		.catch(err => {
-			console.log(err);
+			console.log('Translate error', err);
+			return { error: `Error from Google Translate, please try again later.`};
 		});
 }
 

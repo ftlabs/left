@@ -110,7 +110,12 @@ function displayText(data) {
 		}
 		var bodyText = document.createElement('div');
 		bodyText.classList.add('text-body');
-		bodyText.textContent = data[data.outputs[i]];
+		if(data[data.outputs[i]]['error']) {
+			bodyText.classList.add('is-error');
+			bodyText.textContent = data[data.outputs[i]]['error'];
+		} else {
+			bodyText.textContent = data[data.outputs[i]];	
+		}
 
 		output.appendChild(title);
 		output.appendChild(bodyText);

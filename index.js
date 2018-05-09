@@ -33,7 +33,7 @@ app.post('/article/:uuid/:lang', (req,res) => {
 	})
 	.catch(err => {
 		console.log('CAPI ERROR', err);
-		res.json({err: err});
+		res.json({ original: { error: `Error, cannot find article with uuid ${uuid}`}, outputs: ['original']});
 	});
 });
 

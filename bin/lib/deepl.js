@@ -23,7 +23,7 @@ function init(apiKey) {
 
 async function translate(options) {
 	const text = await Utils.checkTextLength(encodeURIComponent(options.text), BYTE_LIMIT, true);
-	const results = [];
+	let results = [];
 
 	const postOptions = {
 		headers: {
@@ -39,7 +39,11 @@ async function translate(options) {
 		postOptions.body = formattedBody;
 
 		const textPart = await sendRequest(postOptions);
-		results.push(textPart.translations[0].text);
+		if(textPart.error) {
+			return textPart;
+		} else {
+			results.push(textPart.translations[0].text);	
+		}
 	}
 
 	return results.join('\n\n');
@@ -51,12 +55,13 @@ async function sendRequest(options) {
 			if(res.ok) {
 				return res.json();
 			} else {
-				console.log(res);
 				throw res;
 			}
 		})
 		.then(data => data)
-		.catch(err => console.log('ERR', err));
+		.catch(err => {
+			return { error: `Error ${err.status}: ${err.statusText}`};
+		});
 }
 
 module.exports = {
