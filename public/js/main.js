@@ -70,6 +70,8 @@ function getTranslation(e) {
 		return;
 	}
 
+	toggleLoadingState();
+
 	if(isFreeText) {
 		fetchOptions.body = JSON.stringify({ text: textArea.value, translators: translatorSelection });
 
@@ -101,7 +103,11 @@ function displayText(data) {
 		var output = document.createElement('div');
 		output.setAttribute('id', data.outputs[i]);
 		var title = document.createElement('h2');
-		title.textContent = data.outputs[i];
+		if(i === 0 && data.article) {
+			title.innerHTML = data.outputs[i] + ' <a href="https://ft.com/content/' + data.article + '" target="_blank" class="ft-link"><img src="https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:outside-page?format=svg&source=ftlabs&tint=%23990F3D" /></a>';
+		} else {
+			title.textContent = data.outputs[i];	
+		}
 		var bodyText = document.createElement('div');
 		bodyText.classList.add('text-body');
 		bodyText.textContent = data[data.outputs[i]];
@@ -112,12 +118,29 @@ function displayText(data) {
 		container.appendChild(output);
 	}
 
+	toggleLoadingState();
+
 	document.getElementById('output').classList.remove('cape');
 }
 
 function toggleSettings() {
 	var toggle = document.querySelector('.o-buttons-icon--arrow-down');
 	toggle.click();
+}
+
+function toggleLoadingState(form) {
+	var form = document.getElementById('translateForm');
+	var submit = document.querySelector('.o-buttons--primary');
+	submit.getAttribute('disabled') ? submit.removeAttribute('disabled') : submit.setAttribute('disabled', 'disabled');
+
+
+	form.classList.toggle('loading');
+
+	var loader = document.querySelector('.loading-card');
+	var invertVisibility = (loader.getAttribute('aria-hidden') === "true")? false : true;
+	loader.setAttribute('aria-hidden', invertVisibility);
+	loader.classList.toggle('cape');
+
 }
 
 document.addEventListener('DOMContentLoaded', init);
