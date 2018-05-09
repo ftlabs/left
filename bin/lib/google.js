@@ -1,12 +1,13 @@
 const Translate = require('@google-cloud/translate');
-const supportedLang = ['EN', 'DE', 'FR', 'ES', 'IT', 'NL', 'PL'];
-//TODO: find a way to get the list from Google
+let supportedLang;
 
 function init(projectId) {
 	this.translator = new Translate({
 		projectId: projectId,
 		keyFilename: 'keyfile.json'
 	});
+
+	setLanguages(this.translator);
 
 	return this;
 }
@@ -23,8 +24,19 @@ async function translate(options) {
 		});
 }
 
+function setLanguages(translator) {
+	translator
+		.getLanguages()
+		.then(results => {
+			supportedLang = results[0];
+		})
+		.catch(err => {
+			console.error('ERROR:', err);
+		});
+}
+
 module.exports = {
 	init: init,
 	translate: translate,
-	support: supportedLang
+	support: () => { return supportedLang }
 };

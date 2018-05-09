@@ -5,8 +5,17 @@ const Utils = require('./utils/utils');
 const BYTE_LIMIT = 5000;
 const THROTTLE_LIMIT = 10*1000 // 10 seconds
 
-const supportedLang = ['EN', 'AR', 'ZH', 'FR', 'DE', 'PT', 'ES'];
-//TODO: find a way to get the list from AWS
+const supportedLang = [
+	{code: 'EN', name: 'English'},
+	{code: 'AR', name: 'Arabic'},
+	{code: 'ZH', name: 'Chinese (Simplified)'},
+	{code: 'FR', name: 'French'},
+	{code: 'DE', name: 'German'},
+	{code: 'PT', name: 'Portuguese'},
+	{code: 'ES', name: 'Spanish'}
+];
+//TODO: try to get these dynamically from AWS
+//TODO: use ISO 639-1 instead of hard-coded names
 
 function init() {
 	this.translator = new AWS.Translate({apiVersion: '2017-07-01'});
@@ -15,8 +24,8 @@ function init() {
 
 async function translate(options) {
 	const text = await Utils.checkTextLength(options.text, BYTE_LIMIT);
+	const results = [];
 	
-
 	const params = {
 		SourceLanguageCode: "auto",
 		TargetLanguageCode: options.to.toLowerCase()
@@ -50,5 +59,5 @@ async function sendRequest(translator, params) {
 module.exports = {
 	init: init,
 	translate: translate,
-	support: supportedLang
+	support: () => { return supportedLang }
 };

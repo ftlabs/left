@@ -1,8 +1,29 @@
 var rootUrl = window.location.href;
 
 function init() {
+	toggleSettings();
 	var form = document.getElementById('translateForm');
+	var language = document.getElementById('langSelect');
+
+	language.addEventListener('change', updateTranslators);
 	form.addEventListener('submit', getTranslation);
+}
+
+function updateTranslators(e) {
+	var selected = e.currentTarget.options.selectedIndex;
+	var translators = e.currentTarget.options[selected].getAttribute('data-translators').split(',');
+
+	var translatorSelection = document.querySelectorAll('#translators input');
+	Array.from(translatorSelection).forEach(function(checkbox) {
+		checkbox.checked = false;
+		checkbox.disabled = true;
+	});
+
+	for(var i = 0; i < translators.length; ++i) {
+		var translator = document.querySelector('#' + translators[i]);
+		translator.checked = true;
+		translator.disabled = false;
+	}
 }
 
 function getTranslation(e) {
@@ -37,23 +58,38 @@ function getTranslation(e) {
 		return;
 	}
 
+	var translatorOptions = document.querySelectorAll('#translators input:checked');
+	var translatorSelection = [];
+
+	Array.from(translatorOptions).forEach(function(checkbox) {
+		translatorSelection.push(checkbox.value);
+	});
+
+	if(translatorSelection.length < 1) {
+		alert('You must select at least one translation service');
+		return;
+	}
+
+	toggleLoadingState();
+
 	if(isFreeText) {
-		//TODO: translators should be checkboxes
-		fetchOptions.body = JSON.stringify({ text: textArea.value, translators: window.FTLabs.translators.split(',') });
+		fetchOptions.body = JSON.stringify({ text: textArea.value, translators: translatorSelection });
 
 		return fetch(rootUrl + 'translation/' + language.value, fetchOptions)
 			.then(res => res.json())
 			.then(data => {
+				toggleSettings();
 				displayText(data);
 			})
 			.catch(err => console.log(err));
 	}
 
-	fetchOptions.body = JSON.stringify({translators: window.FTLabs.translators.split(',') });
+	fetchOptions.body = JSON.stringify({translators: translatorSelection });
 
 	fetch(rootUrl + 'article/' + input.value +'/' + language.value, fetchOptions)
 		.then(res => res.json())
 		.then(data => {
+			toggleSettings();
 			displayText(data);
 		})
 		.catch(err => console.log(err));
@@ -67,7 +103,11 @@ function displayText(data) {
 		var output = document.createElement('div');
 		output.setAttribute('id', data.outputs[i]);
 		var title = document.createElement('h2');
-		title.textContent = data.outputs[i];
+		if(i === 0 && data.article) {
+			title.innerHTML = data.outputs[i] + ' <a href="https://ft.com/content/' + data.article + '" target="_blank" class="ft-link"><img src="https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:outside-page?format=svg&source=ftlabs&tint=%23990F3D" /></a>';
+		} else {
+			title.textContent = data.outputs[i];	
+		}
 		var bodyText = document.createElement('div');
 		bodyText.classList.add('text-body');
 		bodyText.textContent = data[data.outputs[i]];
@@ -78,7 +118,29 @@ function displayText(data) {
 		container.appendChild(output);
 	}
 
+	toggleLoadingState();
+
 	document.getElementById('output').classList.remove('cape');
+}
+
+function toggleSettings() {
+	var toggle = document.querySelector('.o-buttons-icon--arrow-down');
+	toggle.click();
+}
+
+function toggleLoadingState(form) {
+	var form = document.getElementById('translateForm');
+	var submit = document.querySelector('.o-buttons--primary');
+	submit.getAttribute('disabled') ? submit.removeAttribute('disabled') : submit.setAttribute('disabled', 'disabled');
+
+
+	form.classList.toggle('loading');
+
+	var loader = document.querySelector('.loading-card');
+	var invertVisibility = (loader.getAttribute('aria-hidden') === "true")? false : true;
+	loader.setAttribute('aria-hidden', invertVisibility);
+	loader.classList.toggle('cape');
+
 }
 
 document.addEventListener('DOMContentLoaded', init);

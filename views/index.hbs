@@ -2,12 +2,13 @@
 <html>
 	<head>
 		<title>FT Labs Translation dashboard</title>
-		<link rel="stylesheet" href="https://build.origami.ft.com/v2/bundles/css?modules=o-fonts@^3.0.4,o-buttons@^5.10.3,o-forms@^5.2.4,o-table@^6.7.0" />
+		<link rel="stylesheet" href="https://build.origami.ft.com/v2/bundles/css?modules=o-fonts@^3.0.4,o-buttons@^5.10.3,o-forms@^5.2.4,o-table@^6.7.0,o-toggle@^1.1.10,o-loading@^2.2.1" />
 		<link rel="stylesheet" type="text/css" href="client/css/main.css">
 	</head>
 	<body>
 		<h1>LeFT</h1>
-		<p>Available translators {{{translators}}}</p>
+		<button class="o-buttons o-buttons-icon o-buttons-icon--arrow-down" data-o-component="o-toggle" data-o-toggle-target=".o-forms" aria-expanded="false">Show settings</button>
+
 		<form class="o-forms" id="translateForm">
 			<label aria-describedby="text-box-info" for="articleUUID" class="o-forms__label">Article UUID</label>
 			<input class="o-forms__text" id="articleUUID" />
@@ -17,19 +18,29 @@
 			
 			<label aria-describedby="text-box-info" for="langSelect" class="o-forms__label">Translate to</label>
 			<select id="langSelect" class="o-forms__select">
+				<option value="" disabled selected>Select a language</div>
 				{{#each lang}}
-				    <option value="{{this}}">{{this}}</div>
+				    <option value="{{this.code}}" data-translators="{{this.translator}}">{{this.name}}</div>
 				{{/each}}
 			</select>
-
+			<legend class="o-forms__label">Translators</legend>
+			<div class="o-forms__group o-forms__group--inline" id="translators">
+				{{#each translators}}
+					<input type="checkbox" name="{{this}}" value="{{this}}" class="o-forms__checkbox" id="{{this}}" checked="checked">
+					<label for="{{this}}" class="o-forms__label">{{this}}</label>
+				{{/each}}
+			</div>
 			<button type="submit" class="o-buttons o-buttons--primary o-buttons--big">Translate</button>
 		</form>
+
+		<div class="loading-card loading-card--light cape" aria-hidden="true">
+			<p>Fetching translation, please wait.<p>
+			<div class="o-loading o-loading--dark o-loading--large"></div>
+		</div>
 	
 		<section id="output" class="cape"></section>
+		<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
 		<script type="text/javascript" src="client/js/main.js"></script>
-		<script src="https://build.origami.ft.com/v2/bundles/js?modules=o-fonts@^3.0.4,o-buttons@^5.10.3,o-forms@^5.2.4,o-table@^6.7.0"></script>
-		<script>
-			window.FTLabs = {'translators': "{{{ translators }}}"}
-		</script>
+		<script src="https://build.origami.ft.com/v2/bundles/js?modules=o-fonts@^3.0.4,o-buttons@^5.10.3,o-forms@^5.2.4,o-table@^6.7.0,o-toggle@^1.1.10,o-loading@^2.2.1"></script>
 	</body>
 </html>

@@ -6,6 +6,7 @@ body {
 h1, h2 {
 	padding: 0 10px;
 	font-family: "FinancierDisplayWeb", serif;
+	text-transform: capitalize;
 }
 
 .cape {
@@ -14,13 +15,14 @@ h1, h2 {
 
 #output {
 	display: flex;
-	flex-wrap: wrap;
+	/*flex-wrap: wrap;*/
 }
 
 #output > div {
 	flex-basis: 50%;
 	padding: 10px;
 	box-sizing: border-box;
+	position: relative;
 }
 
 /*#output > div:first-child {
@@ -36,10 +38,52 @@ h1, h2 {
     border-radius: 8px;
 }
 
-input, textarea {
+input, textarea, select {
 	margin-bottom: 15px;
+}
+
+.ft-link {
+	position: absolute;
+    right: 10px;
+    vertical-align: top;
+}
+
+.ft-link img {
+	width: 40px;
+}
+
+.loading {
+	opacity: 0.4;
+    filter: blur(2px);
+}
+
+.loading-card {
+	position: absolute;
+	width: 100%;
+	top: 50%;
+}
+
+.loading-card p {
+	text-align: center;
+}
+
+.o-loading {
+	display: block;
+	margin: 0 auto;
 }
 
 .o-buttons--primary {
 	margin-top: 12px;
+}
+
+.o-forms {
+	display: none;
+}
+
+.o-toggle--active {
+	display: inherit;
+}
+
+.o-buttons-icon--arrow-down[aria-expanded="true"] {
+	display: none;
 }
