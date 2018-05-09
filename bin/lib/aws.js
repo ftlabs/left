@@ -35,6 +35,9 @@ async function translate(options) {
 		params.Text = text[i];
 
 		const textPart = await sendRequest(this.translator, params);
+		if(textPart.error) {
+			return textPart;
+		}
 		results.push(textPart.TranslatedText);
 	}
 
@@ -45,7 +48,7 @@ async function sendRequest(translator, params) {
 	return new Promise((resolve, reject) => {
 		translator.translateText(params, (err, data) => {
 			if(err) {
-				reject(err);
+				resolve({ error: `Error ${err.statusCode}: ${err.message}`});
 			} else {
 				//TODO: hacky way of handling throttling, find a better fix.
 				setTimeout(() => {

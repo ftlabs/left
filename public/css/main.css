@@ -38,6 +38,11 @@ h1, h2 {
     border-radius: 8px;
 }
 
+.is-error {
+	background: #CC0000;
+	color: white;
+}
+
 input, textarea, select {
 	margin-bottom: 15px;
 }
