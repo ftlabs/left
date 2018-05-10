@@ -28,9 +28,13 @@ app.post('/article/:uuid/:lang', (req,res) => {
 	return CAPI.get(uuid)
 	.then(async data => {
 		const text = extract(data.bodyXML);
-		const translate = await Translator.translate(translators, {text: text, to: lang});
+		const title = extract(data.title) + '.';
+		const standfirst = extract(data.standfirst) + '.'; // adding a closing . improves the translation
+		const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
 
-		translate.original = text;
+		const translate = await Translator.translate(translators, {text: combinedText, to: lang});
+
+		translate.original = combinedText;
 		translate.article = uuid;
 		translate.outputs = ['original'].concat(translators);
 
