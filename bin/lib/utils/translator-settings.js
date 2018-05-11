@@ -2,6 +2,7 @@ if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 const ALLOWED_USERS = process.env.ALLOWED_USERS.split(',');
 const PUBLIC_TRANSLATORS = process.env.PUBLIC_TRANSLATORS.split(',');
 const RESTRICTED_TRANSLATORS = process.env.RESTRICTED_TRANSLATORS.split(',');
+const DEFAULT_LANG = 'French';
 
 function getAllowedTranslators(user) {
 	let translators = PUBLIC_TRANSLATORS;
@@ -22,6 +23,7 @@ function getAvailableLanguages(languages) {
  		});
 
  		if(duplicate === -1) {
+			languages[i].isDefault = (languages[i].name === DEFAULT_LANG);
  			filteredSettings.push(languages[i]);
  		} else {
  			filteredSettings[duplicate].translator += `,${languages[i].translator}`;
