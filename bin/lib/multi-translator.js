@@ -25,19 +25,8 @@ async function translate(translators, options) {
 
 	//TODO: refactor with Map
 	for(let i = 0; i < translators.length; ++i) {
-		switch(translators[i]) {
-			case 'aws':
-				results.aws = await AWS.translate(options);
-			break;
-
-			case 'google':
-				results.google = await Google.translate(options);
-			break;
-
-			case 'deepl':
-			default:
-				results.deepl = await Deepl.translate(options);
-		}
+		const translatorName = translators[i];
+		results[translatorName] = await translatorMap[translatorName].entity.translate(options);
 	}
 
 	return results;
