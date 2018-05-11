@@ -12,17 +12,27 @@ translatorEntities.map( entity => {
 	translatorMap[entity.name()] = {
 		name  : entity.name(),
 		entity: entity,
+		cache : {}, // [options-as-json-string]->translation
 	};
 });
 
 async function translate(translatorNames, options) {
 	const results = {};
 
-	//TODO: refactor with Map
+	//TODO: refactor with Map <- made awkward by async
 	for(let i = 0; i < translatorNames.length; ++i) {
 		const name = translatorNames[i];
 		const translator = translatorMap[name];
-		results[name] = await translator.entity.translate(options);
+		const cacheKey = JSON.stringify(options);
+
+		if (! translator.cache.hasOwnProperty(cacheKey) ) {
+			translator.cache[cacheKey] = await translator.entity.translate(options);
+			console.log(`multi-translator: translate: name=${name}, cache MISS`);
+		} else {
+			console.log(`multi-translator: translate: name=${name}, cache HIT`);
+		}
+
+		results[name] = translator.cache[cacheKey];
 	}
 
 	return results;
