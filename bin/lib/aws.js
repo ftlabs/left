@@ -25,7 +25,7 @@ function init() {
 async function translate(options) {
 	const text = await Utils.checkTextLength(options.text, BYTE_LIMIT);
 	const results = [];
-	
+
 	const params = {
 		SourceLanguageCode: "auto",
 		TargetLanguageCode: options.to.toLowerCase()
@@ -52,7 +52,7 @@ async function sendRequest(translator, params) {
 			} else {
 				//TODO: hacky way of handling throttling, find a better fix.
 				setTimeout(() => {
-					resolve(data);	
+					resolve(data);
 				}, THROTTLE_LIMIT)
 			}
 		});
@@ -62,5 +62,6 @@ async function sendRequest(translator, params) {
 module.exports = {
 	init: init,
 	translate: translate,
-	support: () => { return supportedLang }
+	support: () => { return supportedLang },
+	name: () => { return 'aws'; },
 };

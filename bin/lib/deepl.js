@@ -42,7 +42,7 @@ async function translate(options) {
 		if(textPart.error) {
 			return textPart;
 		} else {
-			results.push(textPart.translations[0].text);	
+			results.push(textPart.translations[0].text);
 		}
 	}
 
@@ -67,5 +67,6 @@ async function sendRequest(options) {
 module.exports = {
 	init: init,
 	translate: translate,
-	support: () => { return supportedLang }
+	support: () => { return supportedLang },
+	name: () => { return 'deepl'; },
 };

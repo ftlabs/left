@@ -5,20 +5,15 @@ const Google = require('./google').init(process.env.GOOGLE_PROJECT_ID);
 const AWS = require('./aws').init();
 const SETTINGS = require('./utils/translator-settings');
 
-const translatorMap = {
-	deepl: {
-		entity: Deepl,
-		name: 'deepl'
-	},
-	google: {
-		entity: Google,
-		name: 'google'
-	},
-	aws: {
-		entity: AWS,
-		name: 'aws'
-	}
-};
+const translatorEntities = [Deepl, Google, AWS];
+const translatorMap = {}; // unpack entity info into useful structure
+
+translatorEntities.map( entity => {
+	translatorMap[entity.name()] = {
+		name  : entity.name(),
+		entity: entity,
+	};
+});
 
 async function translate(translators, options) {
 	const results = {};

@@ -39,5 +39,6 @@ function setLanguages(translator) {
 module.exports = {
 	init: init,
 	translate: translate,
-	support: () => { return supportedLang }
+	support: () => { return supportedLang },
+	name: () => { return 'google'; },
 };
