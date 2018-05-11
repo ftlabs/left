@@ -19,6 +19,9 @@ const CAPI = require('./bin/lib/api').init(process.env.FT_API_KEY);
 const Translator = require('./bin/lib/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
 
+function maybeAppendDot( text ){
+	return text + (text.endsWith('?')? '' : '.');
+}
 
 app.post('/article/:uuid/:lang', (req,res) => {
 	const uuid = req.params.uuid;
@@ -28,8 +31,8 @@ app.post('/article/:uuid/:lang', (req,res) => {
 	return CAPI.get(uuid)
 	.then(async data => {
 		const text = extract(data.bodyXML);
-		const title = extract(data.title) + '.';
-		const standfirst = extract(data.standfirst) + '.'; // adding a closing . improves the translation
+		const title = maybeAppendDot( extract(data.title) );
+		const standfirst = maybeAppendDot( extract(data.standfirst) ); // adding a closing . improves the translation
 		const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
 
 		const translate = await Translator.translate(translators, {text: combinedText, to: lang});
