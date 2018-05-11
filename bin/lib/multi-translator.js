@@ -5,24 +5,24 @@ const Google = require('./google').init(process.env.GOOGLE_PROJECT_ID);
 const AWS = require('./aws').init();
 const SETTINGS = require('./utils/translator-settings');
 
-const translatorMap = [
-	{ 
+const translatorMap = {
+	deepl: {
 		entity: Deepl,
 		name: 'deepl'
 	},
-	{
+	google: {
 		entity: Google,
 		name: 'google'
 	},
-	{
+	aws: {
 		entity: AWS,
 		name: 'aws'
 	}
-]; 
+};
 
 async function translate(translators, options) {
 	const results = {};
-	
+
 	//TODO: refactor with Map
 	for(let i = 0; i < translators.length; ++i) {
 		switch(translators[i]) {
@@ -57,16 +57,14 @@ function getSettings(user) {
 }
 
 function getEntitySupport(translatorName) {
-	for (let i = 0; i < translatorMap.length; ++i) {
-		if(translatorMap[i].name === translatorName) {
-			const support = translatorMap[i].entity.support();
+		if(translatorMap.hasOwnProperty(translatorName) ){
+			const support = translatorMap[translatorName].entity.support();
 			for(let j = 0; j < support.length; ++j) {
-				support[j]['translator'] = translatorMap[i].name;
+				support[j]['translator'] = translatorName;
 			}
 
 			return support;
 		}
-	}
 
 	return [];
 }
