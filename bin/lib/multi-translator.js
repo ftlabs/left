@@ -13,27 +13,45 @@ translatorEntities.map( entity => {
 		name  : entity.name(),
 		entity: entity,
 		cache : {}, // [options-as-json-string]->translation
+		durations: [],
 	};
 });
 
-async function translate(translatorNames, options) {
-	const results = {};
+var translationEventId = 0;
 
-	//TODO: refactor with Map <- made awkward by async
-	for(let i = 0; i < translatorNames.length; ++i) {
-		const name = translatorNames[i];
+async function translate(translatorNames, options) {
+	translationEventId++;
+	const results = {};
+	console.log(`multi-translator: translate: eventId=${translationEventId}, names=${translatorNames}.`);
+
+	const promises = translatorNames.map( name => {
 		const translator = translatorMap[name];
 		const cacheKey = JSON.stringify(options);
 
-		if (! translator.cache.hasOwnProperty(cacheKey) ) {
-			translator.cache[cacheKey] = await translator.entity.translate(options);
-			console.log(`multi-translator: translate: name=${name}, cache MISS`);
+		if (translator.cache.hasOwnProperty(cacheKey) ) {
+			console.log(`multi-translator: translate: eventId=${translationEventId}, name=${name}, cache HIT`);
+			results[name] = translator.cache[cacheKey];
+			return Promise.resolve( translator.cache[cacheKey] );
 		} else {
-			console.log(`multi-translator: translate: name=${name}, cache HIT`);
+			const startTranslatingMillis = Date.now();
+			return translator.entity.translate(options)
+			.then( translation => {
+				translator.cache[cacheKey] = translation;
+				results[name] = translation;
+				const translationDurationMillis = Date.now() - startTranslatingMillis;
+				console.log(`multi-translator: translate: eventId=${translationEventId}, name=${name}, cache MISS, translationDurationMillis=${translationDurationMillis}`);
+				translator.durations.push({
+					numChars       : options.text.length,
+					lang           : options.to,
+					durationMillis : translationDurationMillis,
+					translationEventId : translationEventId,
+				});
+				return translation;
+			})
 		}
+	});
 
-		results[name] = translator.cache[cacheKey];
-	}
+	await Promise.all( promises );
 
 	return results;
 }
