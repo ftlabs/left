@@ -15,13 +15,14 @@ translatorEntities.map( entity => {
 	};
 });
 
-async function translate(translators, options) {
+async function translate(translatorNames, options) {
 	const results = {};
 
 	//TODO: refactor with Map
-	for(let i = 0; i < translators.length; ++i) {
-		const translatorName = translators[i];
-		results[translatorName] = await translatorMap[translatorName].entity.translate(options);
+	for(let i = 0; i < translatorNames.length; ++i) {
+		const name = translatorNames[i];
+		const translator = translatorMap[name];
+		results[name] = await translator.entity.translate(options);
 	}
 
 	return results;
