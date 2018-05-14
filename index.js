@@ -28,7 +28,7 @@ app.post('/article/:uuid/:lang', (req,res) => {
 	const lang = req.params.lang;
 	const translators = req.body.translators;
 	// default is firstChunkOnly=true
-	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly')) || Boolean(req.query.firstChunkOnly);
+	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
 
 	return CAPI.get(uuid)
 	.then(async data => {
@@ -55,7 +55,7 @@ app.post('/translation/:lang', (req, res) => {
 	const text = req.body.text;
 	const lang = req.params.lang;
 	const translators = req.body.translators;
-	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly')) || Boolean(req.query.firstChunkOnly);
+	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
 
 	Translator.translate(translators, {text: text, to: lang, firstChunkOnly: firstChunkOnly})
 	.then(data => {

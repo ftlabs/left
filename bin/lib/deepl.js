@@ -22,7 +22,7 @@ function init(apiKey) {
 }
 
 async function translate(options) {
-	var textChunks = await Utils.splitTextIntoChunks(encodeURIComponent(options.text), BYTE_LIMIT, true);
+	let textChunks = await Utils.splitTextIntoChunks(encodeURIComponent(options.text), BYTE_LIMIT, true);
 	if (options.firstChunkOnly && textChunks.length > 1) {
 		console.log(`Deepl.translate: eventId=${options.translationEventId}, firstChunkOnly, so discarding ${textChunks.length -1} (of ${textChunks.length}) chunks`);
 		textChunks = textChunks.slice(0,1);

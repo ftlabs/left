@@ -54,7 +54,19 @@ function chunkText(strings, index, splitter) {
 	return {string: string, index: index, length: Buffer.byteLength(string, 'utf8')};
 }
 
+function pauseForMillis( millis ){
+	if (millis < 0) {
+		millis = 2000;
+	}
+	return new Promise( resolve => {
+		setTimeout( () => {
+			resolve();
+		}, millis);
+	});
+}
+
 module.exports = {
 	extractUser: getS3OUserFromCookie,
-	splitTextIntoChunks: checkAndSplitText
+	splitTextIntoChunks: checkAndSplitText,
+	pauseForMillis: pauseForMillis,
 };
