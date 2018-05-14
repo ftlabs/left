@@ -15,12 +15,11 @@
 
 			<label aria-describedby="text-box-info" for="freeText" class="o-forms__label">Some text to translate</label>
 			<textarea class="o-forms__textarea" id="freeText"></textarea>
-			
+
 			<label aria-describedby="text-box-info" for="langSelect" class="o-forms__label">Translate to</label>
 			<select id="langSelect" class="o-forms__select">
-				<option value="" disabled selected>Select a language</div>
 				{{#each lang}}
-				    <option value="{{this.code}}" data-translators="{{this.translator}}">{{this.name}}</div>
+				    <option value="{{this.code}}" data-translators="{{this.translator}}" {{#if isDefault}} selected {{/if}}>{{this.name}}</option>
 				{{/each}}
 			</select>
 			<legend class="o-forms__label">Translators</legend>
@@ -37,7 +36,7 @@
 			<p>Fetching translation, please wait.<p>
 			<div class="o-loading o-loading--dark o-loading--large"></div>
 		</div>
-	
+
 		<section id="output" class="cape"></section>
 		<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
 		<script type="text/javascript" src="client/js/main.js"></script>

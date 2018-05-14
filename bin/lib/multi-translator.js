@@ -5,40 +5,53 @@ const Google = require('./google').init(process.env.GOOGLE_PROJECT_ID);
 const AWS = require('./aws').init();
 const SETTINGS = require('./utils/translator-settings');
 
-const translatorMap = [
-	{ 
-		entity: Deepl,
-		name: 'deepl'
-	},
-	{
-		entity: Google,
-		name: 'google'
-	},
-	{
-		entity: AWS,
-		name: 'aws'
-	}
-]; 
+const translatorEntities = [Deepl, Google, AWS];
+const translatorMap = {}; // unpack entity info into useful structure
 
-async function translate(translators, options) {
+translatorEntities.map( entity => {
+	translatorMap[entity.name()] = {
+		name  : entity.name(),
+		entity: entity,
+		cache : {}, // [options-as-json-string]->translation
+		durations: [],
+	};
+});
+
+var translationEventId = 0;
+
+async function translate(translatorNames, options) {
+	translationEventId++;
 	const results = {};
-	
-	//TODO: refactor with Map
-	for(let i = 0; i < translators.length; ++i) {
-		switch(translators[i]) {
-			case 'aws':
-				results.aws = await AWS.translate(options);
-			break;
+	console.log(`multi-translator: translate: eventId=${translationEventId}, names=${translatorNames}.`);
 
-			case 'google':
-				results.google = await Google.translate(options);
-			break;
+	const promises = translatorNames.map( name => {
+		const translator = translatorMap[name];
+		const cacheKey = JSON.stringify(options);
 
-			case 'deepl':
-			default:
-				results.deepl = await Deepl.translate(options);
+		if (translator.cache.hasOwnProperty(cacheKey) ) {
+			console.log(`multi-translator: translate: eventId=${translationEventId}, name=${name}, cache HIT`);
+			results[name] = translator.cache[cacheKey];
+			return Promise.resolve( translator.cache[cacheKey] );
+		} else {
+			const startTranslatingMillis = Date.now();
+			return translator.entity.translate(options)
+			.then( translation => {
+				translator.cache[cacheKey] = translation;
+				results[name] = translation;
+				const translationDurationMillis = Date.now() - startTranslatingMillis;
+				console.log(`multi-translator: translate: eventId=${translationEventId}, name=${name}, cache MISS, translationDurationMillis=${translationDurationMillis}`);
+				translator.durations.push({
+					numChars       : options.text.length,
+					lang           : options.to,
+					durationMillis : translationDurationMillis,
+					translationEventId : translationEventId,
+				});
+				return translation;
+			})
 		}
-	}
+	});
+
+	await Promise.all( promises );
 
 	return results;
 }
@@ -57,16 +70,14 @@ function getSettings(user) {
 }
 
 function getEntitySupport(translatorName) {
-	for (let i = 0; i < translatorMap.length; ++i) {
-		if(translatorMap[i].name === translatorName) {
-			const support = translatorMap[i].entity.support();
+		if(translatorMap.hasOwnProperty(translatorName) ){
+			const support = translatorMap[translatorName].entity.support();
 			for(let j = 0; j < support.length; ++j) {
-				support[j]['translator'] = translatorMap[i].name;
+				support[j]['translator'] = translatorName;
 			}
 
 			return support;
 		}
-	}
 
 	return [];
 }
