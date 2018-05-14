@@ -22,7 +22,7 @@ function init(apiKey) {
 }
 
 async function translate(options) {
-	const text = await Utils.checkTextLength(encodeURIComponent(options.text), BYTE_LIMIT, true);
+	const textChunks = await Utils.splitTextIntoChunks(encodeURIComponent(options.text), BYTE_LIMIT, true);
 	let results = [];
 
 	const postOptions = {
@@ -34,15 +34,15 @@ async function translate(options) {
 		mode: 'cors'
 	};
 
-	for(let i = 0; i < text.length; ++i) {
-		const formattedBody = `text=${text[i]}&target_lang=${options.to.toUpperCase()}&auth_key=${this.apiKey}`;
+	for(let i = 0; i < textChunks.length; ++i) {
+		const formattedBody = `text=${textChunks[i]}&target_lang=${options.to.toUpperCase()}&auth_key=${this.apiKey}`;
 		postOptions.body = formattedBody;
 
-		const textPart = await sendRequest(postOptions);
-		if(textPart.error) {
-			return textPart;
+		const translationResponse = await sendRequest(postOptions);
+		if(translationResponse.error) {
+			return translationResponse;
 		} else {
-			results.push(textPart.translations[0].text);
+			results.push(translationResponse.translations[0].text);
 		}
 	}
 

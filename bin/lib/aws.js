@@ -23,7 +23,7 @@ function init() {
 }
 
 async function translate(options) {
-	const text = await Utils.checkTextLength(options.text, BYTE_LIMIT);
+	const textChunks = await Utils.splitTextIntoChunks(options.text, BYTE_LIMIT);
 	const results = [];
 
 	const params = {
@@ -31,14 +31,14 @@ async function translate(options) {
 		TargetLanguageCode: options.to.toLowerCase()
 	};
 
-	for (let i = 0; i < text.length; ++i) {
-		params.Text = text[i];
+	for (let i = 0; i < textChunks.length; ++i) {
+		params.Text = textChunks[i];
 
-		const textPart = await sendRequest(this.translator, params);
-		if(textPart.error) {
-			return textPart;
+		const translationResponse = await sendRequest(this.translator, params);
+		if(translationResponse.error) {
+			return translationResponse;
 		}
-		results.push(textPart.TranslatedText);
+		results.push(translationResponse.TranslatedText);
 	}
 
 	return results.join('\n\n');

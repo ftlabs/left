@@ -2,7 +2,7 @@ function getS3OUserFromCookie(cookies) {
 	let user = null;
 
 	const cookieList = cookies.split(';');
-	
+
 	for(let i = 0; i < cookieList.length; ++i) {
 		let cookiePair = cookieList[i].replace(' ', '');
 		if(cookiePair.startsWith('s3o_username')) {
@@ -56,5 +56,5 @@ function chunkText(strings, index, splitter) {
 
 module.exports = {
 	extractUser: getS3OUserFromCookie,
-	checkTextLength: checkAndSplitText
+	splitTextIntoChunks: checkAndSplitText
 };
