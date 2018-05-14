@@ -19,7 +19,7 @@
 			<label aria-describedby="text-box-info" for="langSelect" class="o-forms__label">Translate to</label>
 			<select id="langSelect" class="o-forms__select">
 				{{#each lang}}
-				    <option value="{{this.code}}" data-translators="{{this.translator}}" {{#if isDefault}} selected {{/if}}>{{this.name}}</option>
+				    <option value="{{this.code}}" data-translators="{{this.translatorNamesCSV}}" {{#if isDefault}} selected {{/if}}>{{this.nameWithTranslators}}</option>
 				{{/each}}
 			</select>
 			<legend class="o-forms__label">Translators</legend>

@@ -16,21 +16,39 @@ function getAllowedTranslators(user) {
 
 function getAvailableLanguages(languages) {
 	const filteredSettings = [];
+	const knownTranslators = {};
 
  	languages.map( language => {
  		const duplicate = filteredSettings.findIndex((element) => {
  			return element.name.toLowerCase() === language.name.toLowerCase();
  		});
 
+		knownTranslators[language.translator] = true;
+
  		if(duplicate === -1) {
 			language.isDefault = (language.name.toLowerCase() === DEFAULT_LANG.toLowerCase());
+			language.translatorNames = [language.translator];
  			filteredSettings.push(language);
  		} else {
- 			filteredSettings[duplicate].translator += `,${language.translator}`;
+			filteredSettings[duplicate].translatorNames.push(language.translator);
  		}
  	} );
 
  	filteredSettings.sort(sortName);
+
+	// embellish the langs with displayable details of their translators
+	const numTranslators = Object.keys(knownTranslators).length;
+
+	filteredSettings.map( language => {
+		language.translatorNames;
+		language.translatorNamesCSV = language.translatorNames.join(',');
+		language.translatorNamesInitialsCSV = language.translatorNames.map(name=>{ return name.charAt(0); }).join(',');
+		if (numTranslators > 1) {
+			language.nameWithTranslators = `${language.name} [${language.translatorNamesInitialsCSV}]`;
+		} else {
+			language.nameWithTranslators = language.name;
+		}
+	});
 
 	return filteredSettings;
 }
