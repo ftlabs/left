@@ -17,18 +17,18 @@ function getAllowedTranslators(user) {
 function getAvailableLanguages(languages) {
 	const filteredSettings = [];
 
- 	for(let i = 0; i < languages.length; ++i) {
+ 	languages.map( language => {
  		const duplicate = filteredSettings.findIndex((element) => {
- 			return element.name.toLowerCase() === languages[i].name.toLowerCase();
+ 			return element.name.toLowerCase() === language.name.toLowerCase();
  		});
 
  		if(duplicate === -1) {
-			languages[i].isDefault = (languages[i].name.toLowerCase() === DEFAULT_LANG.toLowerCase());
- 			filteredSettings.push(languages[i]);
+			language.isDefault = (language.name.toLowerCase() === DEFAULT_LANG.toLowerCase());
+ 			filteredSettings.push(language);
  		} else {
- 			filteredSettings[duplicate].translator += `,${languages[i].translator}`;
+ 			filteredSettings[duplicate].translator += `,${language.translator}`;
  		}
- 	}
+ 	} );
 
  	filteredSettings.sort(sortName);
 
