@@ -22,8 +22,23 @@ function init() {
 	return this;
 }
 
+function pauseForMillis( millis ){
+	if (millis < 0) {
+		millis = 2000;
+	}
+	return new Promise( resolve => {
+		setTimeout( () => {
+			resolve(millis);
+		}, millis);
+	});
+}
+
 async function translate(options) {
-	const textChunks = await Utils.splitTextIntoChunks(options.text, BYTE_LIMIT);
+	var textChunks = await Utils.splitTextIntoChunks(options.text, BYTE_LIMIT);
+	if (options.firstChunkOnly && textChunks.length > 1) {
+		console.log(`AWS.translate: eventId=${options.translationEventId}, firstChunkOnly, so discarding ${textChunks.length -1} (of ${textChunks.length}) chunks`);
+		textChunks = textChunks.slice(0,1);
+	}
 	const results = [];
 
 	const params = {
@@ -32,6 +47,12 @@ async function translate(options) {
 	};
 
 	for (let i = 0; i < textChunks.length; ++i) {
+
+		if (i>0) { // pause before 2nd (and each subsequent) chunk
+			console.log(`AWS.translate: eventId=${options.translationEventId}, waiting ${THROTTLE_LIMIT} millis before submitting chunk=${i+1} (of ${textChunks.length}).`);
+			await pauseForMillis( THROTTLE_LIMIT );
+		}
+
 		params.Text = textChunks[i];
 
 		const translationResponse = await sendRequest(this.translator, params);
@@ -50,10 +71,7 @@ async function sendRequest(translator, params) {
 			if(err) {
 				resolve({ error: `Error ${err.statusCode}: ${err.message}`});
 			} else {
-				//TODO: hacky way of handling throttling, find a better fix.
-				setTimeout(() => {
-					resolve(data);
-				}, THROTTLE_LIMIT)
+				resolve(data);
 			}
 		});
 	});

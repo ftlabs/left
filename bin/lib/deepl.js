@@ -22,7 +22,11 @@ function init(apiKey) {
 }
 
 async function translate(options) {
-	const textChunks = await Utils.splitTextIntoChunks(encodeURIComponent(options.text), BYTE_LIMIT, true);
+	var textChunks = await Utils.splitTextIntoChunks(encodeURIComponent(options.text), BYTE_LIMIT, true);
+	if (options.firstChunkOnly && textChunks.length > 1) {
+		console.log(`Deepl.translate: eventId=${options.translationEventId}, firstChunkOnly, so discarding ${textChunks.length -1} (of ${textChunks.length}) chunks`);
+		textChunks = textChunks.slice(0,1);
+	}
 	let results = [];
 
 	const postOptions = {
@@ -35,6 +39,9 @@ async function translate(options) {
 	};
 
 	for(let i = 0; i < textChunks.length; ++i) {
+		if (i>0) {
+			console.log(`Deepl.translate: eventId=${options.translationEventId}, submitting chunk=${i+1} (of ${textChunks.length}).`);
+		}
 		const formattedBody = `text=${textChunks[i]}&target_lang=${options.to.toUpperCase()}&auth_key=${this.apiKey}`;
 		postOptions.body = formattedBody;
 
