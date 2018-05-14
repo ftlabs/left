@@ -23,7 +23,7 @@ function getAvailableLanguages(languages) {
  		});
 
  		if(duplicate === -1) {
-			languages[i].isDefault = (languages[i].name === DEFAULT_LANG);
+			languages[i].isDefault = (languages[i].name.toLowerCase() === DEFAULT_LANG.toLowerCase());
  			filteredSettings.push(languages[i]);
  		} else {
  			filteredSettings[duplicate].translator += `,${languages[i].translator}`;
