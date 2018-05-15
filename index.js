@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const googleTokenPath = path.resolve(`${__dirname}/keyfile.json`);
 fs.writeFileSync(googleTokenPath , process.env.GOOGLE_CREDS);
 
-const CAPI = require('./bin/lib/api').init(process.env.FT_API_KEY);
+const CAPI = require('./bin/lib/capi').init(process.env.FT_API_KEY);
 const Translator = require('./bin/lib/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
 
