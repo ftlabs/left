@@ -22,7 +22,11 @@ function init(apiKey) {
 }
 
 async function translate(options) {
-	const text = await Utils.checkTextLength(encodeURIComponent(options.text), BYTE_LIMIT, true);
+	let textChunks = await Utils.splitTextIntoChunks(encodeURIComponent(options.text), BYTE_LIMIT, true);
+	if (options.firstChunkOnly && textChunks.length > 1) {
+		console.log(`Deepl.translate: eventId=${options.translationEventId}, firstChunkOnly, so discarding ${textChunks.length -1} (of ${textChunks.length}) chunks`);
+		textChunks = textChunks.slice(0,1);
+	}
 	let results = [];
 
 	const postOptions = {
@@ -34,15 +38,18 @@ async function translate(options) {
 		mode: 'cors'
 	};
 
-	for(let i = 0; i < text.length; ++i) {
-		const formattedBody = `text=${text[i]}&target_lang=${options.to.toUpperCase()}&auth_key=${this.apiKey}`;
+	for(let i = 0; i < textChunks.length; ++i) {
+		if (i>0) {
+			console.log(`Deepl.translate: eventId=${options.translationEventId}, submitting chunk=${i+1} (of ${textChunks.length}).`);
+		}
+		const formattedBody = `text=${textChunks[i]}&target_lang=${options.to.toUpperCase()}&auth_key=${this.apiKey}`;
 		postOptions.body = formattedBody;
 
-		const textPart = await sendRequest(postOptions);
-		if(textPart.error) {
-			return textPart;
+		const translationResponse = await sendRequest(postOptions);
+		if(translationResponse.error) {
+			return translationResponse;
 		} else {
-			results.push(textPart.translations[0].text);
+			results.push(translationResponse.translations[0].text);
 		}
 	}
 

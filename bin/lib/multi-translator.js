@@ -20,14 +20,14 @@ translatorEntities.map( entity => {
 var translationEventId = 0;
 
 async function translate(translatorNames, options) {
+	const cacheKey = JSON.stringify(options); // NB, created before adding translationEventId. Each different translator has its own cache, using the shared key.
 	translationEventId++;
+	options.translationEventId = translationEventId;
 	const results = {};
 	console.log(`multi-translator: translate: eventId=${translationEventId}, names=${translatorNames}.`);
 
 	const promises = translatorNames.map( name => {
 		const translator = translatorMap[name];
-		const cacheKey = JSON.stringify(options);
-
 		if (translator.cache.hasOwnProperty(cacheKey) ) {
 			console.log(`multi-translator: translate: eventId=${translationEventId}, name=${name}, cache HIT`);
 			results[name] = translator.cache[cacheKey];

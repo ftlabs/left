@@ -27,6 +27,8 @@ app.post('/article/:uuid/:lang', (req,res) => {
 	const uuid = req.params.uuid;
 	const lang = req.params.lang;
 	const translators = req.body.translators;
+	// default is firstChunkOnly=true
+	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
 
 	return CAPI.get(uuid)
 	.then(async data => {
@@ -35,7 +37,7 @@ app.post('/article/:uuid/:lang', (req,res) => {
 		const standfirst = maybeAppendDot( extract(data.standfirst) ); // adding a closing . improves the translation
 		const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
 
-		const translate = await Translator.translate(translators, {text: combinedText, to: lang});
+		const translate = await Translator.translate(translators, {text: combinedText, to: lang, firstChunkOnly: firstChunkOnly});
 
 		translate.original = combinedText;
 		translate.article = uuid;
@@ -53,8 +55,9 @@ app.post('/translation/:lang', (req, res) => {
 	const text = req.body.text;
 	const lang = req.params.lang;
 	const translators = req.body.translators;
+	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
 
-	Translator.translate(translators, {text: text, to: lang})
+	Translator.translate(translators, {text: text, to: lang, firstChunkOnly: firstChunkOnly})
 	.then(data => {
 		data.original = text;
 		data.outputs = ['original'].concat(translators);
