@@ -121,8 +121,8 @@ async function search(query) {
   "timeGenerated": "2018-05-15T09:41:50"
 };
 
-	if (data && data.items) {
-		data.items.map( item => {
+	if (data && data.data && data.data.items) {
+		data.data.items.map( item => {
 			if (item.definition && !item.definition.startsWith('See ')) {
 				results.push(`name: ${item.name}`);
 				results.push(`definition: ${item.definition}`);
@@ -130,14 +130,14 @@ async function search(query) {
 		});
 	}
 
-	console.log(`lexicon.search: data=${data}`);
-
-	return results.join('\n\n');
+	console.log(`lexicon.search: data=${JSON.stringify(data, null, 2)}`);
+	const resultsText = results.join('\n\n');
+	return resultsText;
 }
 
 async function sendRequest(url, options) {
 	return fetch(url, options)
-		.then(res => { 
+		.then(res => {
 			if(res.ok) {
 				return res.json();
 			} else {

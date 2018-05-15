@@ -72,15 +72,21 @@ app.post('/lexicon/:lang', (req, res) => {
 	const lang = req.params.lang;
 	const translators = req.body.translators;
 	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
-	const lexiconResultsText = Lexicon.search(text);
+	return Lexicon.search(text)
+	.then( async lexText => {
+		const extractedLexText = extract(lexText);
+		console.log(`index: /lexicon: extractedLexText=${extractedLexText}`);
+		const combinedText = 'search term: ' + text + '\n\n' + extractedLexText;
 
-	Translator.translate(translators, {text: lexiconResultsText, to: lang, firstChunkOnly: firstChunkOnly})
-	.then(data => {
-		data.original = text;
-		data.outputs = ['original'].concat(translators);
-		res.json(data);
-	})
-	.catch(err => console.log(err));
+		const translate = await Translator.translate(translators, {text: combinedText, to: lang, firstChunkOnly: firstChunkOnly});
+
+		translate.original = combinedText;
+		translate.outputs = ['original'].concat(translators);
+		res.json(translate);
+	}).catch(err => {
+		console.log('CAPI ERROR', err);
+		res.json({ original: { error: `Error, cannot find article with uuid ${uuid}`}, outputs: ['original']});
+	});
 });
 
 
