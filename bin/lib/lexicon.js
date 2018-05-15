@@ -124,8 +124,9 @@ async function search(query) {
 	if (data && data.data && data.data.items) {
 		data.data.items.map( item => {
 			if (item.definition && !item.definition.startsWith('See ')) {
-				results.push(`name: ${item.name}`);
-				results.push(`definition: ${item.definition}`);
+				results.push(`Name: ${item.name}`);
+				results.push(`Definition: ${item.definition}`);
+				results.push(`---`);
 			}
 		});
 	}

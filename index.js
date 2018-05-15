@@ -76,7 +76,7 @@ app.post('/lexicon/:lang', (req, res) => {
 	.then( async lexText => {
 		const extractedLexText = extract(lexText);
 		console.log(`index: /lexicon: extractedLexText=${extractedLexText}`);
-		const combinedText = 'search term: ' + text + '\n\n' + extractedLexText;
+		const combinedText = 'Lexicon Search Term: ' + text + '\n\n---\n\n' + extractedLexText;
 
 		const translate = await Translator.translate(translators, {text: combinedText, to: lang, firstChunkOnly: firstChunkOnly});
 
