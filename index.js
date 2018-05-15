@@ -18,6 +18,7 @@ fs.writeFileSync(googleTokenPath , process.env.GOOGLE_CREDS);
 const CAPI = require('./bin/lib/capi').init(process.env.FT_API_KEY);
 const Translator = require('./bin/lib/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
+const Lexicon = require('./bin/lib/lexicon').init(process.env.LEXICON_API_KEY);
 
 function maybeAppendDot( text ){
 	return text + (text.endsWith('?')? '' : '.');
@@ -58,6 +59,22 @@ app.post('/translation/:lang', (req, res) => {
 	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
 
 	Translator.translate(translators, {text: text, to: lang, firstChunkOnly: firstChunkOnly})
+	.then(data => {
+		data.original = text;
+		data.outputs = ['original'].concat(translators);
+		res.json(data);
+	})
+	.catch(err => console.log(err));
+});
+
+app.post('/lexicon/:lang', (req, res) => {
+	const text = req.body.text;
+	const lang = req.params.lang;
+	const translators = req.body.translators;
+	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
+	const lexiconResultsText = Lexicon.search(text);
+
+	Translator.translate(translators, {text: lexiconResultsText, to: lang, firstChunkOnly: firstChunkOnly})
 	.then(data => {
 		data.original = text;
 		data.outputs = ['original'].concat(translators);
