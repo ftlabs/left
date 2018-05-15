@@ -15,9 +15,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const googleTokenPath = path.resolve(`${__dirname}/keyfile.json`);
 fs.writeFileSync(googleTokenPath , process.env.GOOGLE_CREDS);
 
-const CAPI = require('./bin/lib/api').init(process.env.FT_API_KEY);
+const CAPI = require('./bin/lib/capi').init(process.env.FT_API_KEY);
 const Translator = require('./bin/lib/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
+const Lexicon = require('./bin/lib/lexicon').init(process.env.LEXICON_API_KEY);
 
 function maybeAppendDot( text ){
 	return text + (text.endsWith('?')? '' : '.');
@@ -64,6 +65,28 @@ app.post('/translation/:lang', (req, res) => {
 		res.json(data);
 	})
 	.catch(err => console.log(err));
+});
+
+app.post('/lexicon/:lang', (req, res) => {
+	const text = req.body.text;
+	const lang = req.params.lang;
+	const translators = req.body.translators;
+	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
+	return Lexicon.search(text)
+	.then( async lexText => {
+		const extractedLexText = extract(lexText);
+		console.log(`index: /lexicon: extractedLexText=${extractedLexText}`);
+		const combinedText = 'Lexicon Search Term: ' + text + '\n\n---\n\n' + extractedLexText;
+
+		const translate = await Translator.translate(translators, {text: combinedText, to: lang, firstChunkOnly: firstChunkOnly});
+
+		translate.original = combinedText;
+		translate.outputs = ['original'].concat(translators);
+		res.json(translate);
+	}).catch(err => {
+		console.log('CAPI ERROR', err);
+		res.json({ original: { error: `Error, cannot find article with uuid ${uuid}`}, outputs: ['original']});
+	});
 });
 
 

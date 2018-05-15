@@ -11,7 +11,6 @@ const PARAGRAPH_MARK = '¶¶';
 // This will greedily find any whitespace around the marks so we can remove it.
 // There will often be whitespace as the .text() method works recursively on each el.
 const PARAGRAPH_FIND = new RegExp(`\\s*${PARAGRAPH_MARK}\\s*`, 'g');
-
 const PARAGRAPH_REPLACE = '\n\n';
 
 module.exports = (xml) => {
@@ -37,5 +36,11 @@ module.exports = (xml) => {
 		}
 	});
 
-	return $('body').text().replace(PARAGRAPH_FIND, PARAGRAPH_REPLACE).trim();
+	const text = $('body').text()
+		.replace(PARAGRAPH_FIND, PARAGRAPH_REPLACE)
+		.replace(/\[ref url=\"\"\]/g, ' (reference: ') // tidy up [ref ] malarky in lexicon responses
+		.replace(/\[\/ref\]/g, ')')
+		.trim();
+
+	return text;
 };
