@@ -29,7 +29,7 @@ function updateTranslators(e) {
 function getTranslation(e) {
 	e.preventDefault();
 
-	var input = e.target.querySelector('#articleUUID');
+	var uuidElement = e.target.querySelector('#articleUUID');
 	var textArea = e.target.querySelector('#freeText');
 	var uuidMatch = /^([a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})/g;
 	var language = e.target.querySelector('#langSelect');
@@ -45,10 +45,10 @@ function getTranslation(e) {
 
 	if(textArea.value !== '') {
 		isFreeText = true;
-	} else if(input.value === '') {
+	} else if(uuidElement.value === '') {
 		alert('UUID is required');
 		return;
-	} else if(!uuidMatch.test(input.value)) {
+	} else if(!uuidMatch.test(uuidElement.value)) {
 		alert('Invalid UUID');
 		return;
 	}
@@ -86,7 +86,7 @@ function getTranslation(e) {
 
 	fetchOptions.body = JSON.stringify({translators: translatorSelection });
 
-	fetch(rootUrl + 'article/' + input.value +'/' + language.value, fetchOptions)
+	fetch(rootUrl + 'article/' + uuidElement.value +'/' + language.value, fetchOptions)
 		.then(res => res.json())
 		.then(data => {
 			toggleSettings();
@@ -106,7 +106,7 @@ function displayText(data) {
 		if(i === 0 && data.article) {
 			title.innerHTML = data.outputs[i] + ' <a href="https://ft.com/content/' + data.article + '" target="_blank" class="ft-link"><img src="https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:outside-page?format=svg&source=ftlabs&tint=%23990F3D" /></a>';
 		} else {
-			title.textContent = data.outputs[i];	
+			title.textContent = data.outputs[i];
 		}
 		var bodyText = document.createElement('div');
 		bodyText.classList.add('text-body');
@@ -114,7 +114,7 @@ function displayText(data) {
 			bodyText.classList.add('is-error');
 			bodyText.textContent = data[data.outputs[i]]['error'];
 		} else {
-			bodyText.textContent = data[data.outputs[i]];	
+			bodyText.textContent = data[data.outputs[i]];
 		}
 
 		output.appendChild(title);
