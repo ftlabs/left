@@ -56,7 +56,7 @@ function chunkText(strings, index, splitter) {
 
 function pauseForMillis( millis ){
 	if (millis < 0) {
-		millis = 2000;
+		millis = 0;
 	}
 	return new Promise( resolve => {
 		setTimeout( () => {
