@@ -32,6 +32,23 @@ function maybeAppendDot( text ){
 	return text + (text.endsWith('?')? '' : '.');
 }
 
+async function generateTranslations( translatorNames, text, lang, firstChunkOnly ){
+	const translations = await Translator.translate(translatorNames, {text: text, to: lang, firstChunkOnly: firstChunkOnly});
+
+	translations.original = text;
+	translations.outputs = ['original'].concat(translatorNames);
+
+	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
+	translations.outputs.map( translatorName => {
+		const textWithBackslashNs = translations[translatorName];
+		const paras = textWithBackslashNs.split('\n\n').map( para => { return `<p>${para}</p>`});
+		const textWithParas = paras.join('\n');
+		translations[translatorName] = textWithParas;
+	});
+
+	return translations;
+}
+
 app.post('/article/:uuid/:lang', (req,res) => {
 	const uuid = req.params.uuid;
 	const lang = req.params.lang;
@@ -84,21 +101,8 @@ app.post('/lexicon/:lang', (req, res) => {
 	.then( async lexText => {
 		const extractedLexText = extract(lexText);
 		const combinedText = 'Lexicon Search Term: ' + text + '\n\n---\n\n' + extractedLexText;
-
-		const translate = await Translator.translate(translators, {text: combinedText, to: lang, firstChunkOnly: firstChunkOnly});
-
-		translate.original = combinedText;
-		translate.outputs = ['original'].concat(translators);
-
-		// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
-		translate.outputs.map( translatorName => {
-			const textWithBackslashNs = translate[translatorName];
-			const paras = textWithBackslashNs.split('\n\n').map( para => { return `<p>${para}</p>`});
-			const textWithParas = paras.join('\n');
-			translate[translatorName] = textWithParas;
-		});
-
-		res.json(translate);
+		const translations = await generateTranslations( translators, combinedText, lang, firstChunkOnly );
+		res.json(translations);
 	}).catch(err => {
 		console.log('CAPI ERROR', err);
 		res.json({ original: { error: `Error, cannot find article with uuid ${uuid}`}, outputs: ['original']});
