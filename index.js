@@ -84,11 +84,9 @@ app.post('/translation/:lang', (req, res) => {
 	const translators = req.body.translators;
 	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
 
-	Translator.translate(translators, {text: text, to: lang, firstChunkOnly: firstChunkOnly})
-	.then(data => {
-		data.original = text;
-		data.outputs = ['original'].concat(translators);
-		res.json(data);
+	generateTranslations( translators, text, lang, firstChunkOnly )
+	.then( translations => {
+		res.json(translations);
 	})
 	.catch(err => console.log(err));
 });
