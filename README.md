@@ -9,7 +9,7 @@ This [dashboard (behind SSO)](https://ftlabs-left.herokuapp.com/) lets us have a
 ```
 $ git clone THIS_REPO_URL
 $ cd left
-$ vi .env                 # specify all the config vars (see below)
+$ vi .env                  # specify all the config vars (see below)
 $ npm install
 $ npm run start
 ```
