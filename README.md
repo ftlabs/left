@@ -17,9 +17,9 @@ $ npm run start
 ## Configure (via the .env file, or environment params)
 
 ```
-ALLOWED_USERS=...          # those who can see the extra goodies
+ALLOWED_USERS=...          # a CSV of those who can see the extra goodies
 PUBLIC_TRANSLATORS=...     # a CSV, e.g. deepl
-RESTRICTED_TRANSLATORS=... # a CSV, e.g. amz,googl
+RESTRICTED_TRANSLATORS=... # a CSV, e.g. amz,google
 FT_API_KEY=...             # for FT article content
 LEXICON_API_KEY=...        # for FT Lexicon content
 DEEPL_API_KEY=...          # for Deepl access
