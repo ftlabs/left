@@ -89,6 +89,15 @@ app.post('/lexicon/:lang', (req, res) => {
 
 		translate.original = combinedText;
 		translate.outputs = ['original'].concat(translators);
+
+		// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
+		translate.outputs.map( translatorName => {
+			const textWithBackslashNs = translate[translatorName];
+			const paras = textWithBackslashNs.split('\n\n').map( para => { return `<p>${para}</p>`});
+			const textWithParas = paras.join('\n');
+			translate[translatorName] = textWithParas;
+		});
+
 		res.json(translate);
 	}).catch(err => {
 		console.log('CAPI ERROR', err);
