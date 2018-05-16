@@ -33,7 +33,8 @@ function maybeAppendDot( text ){
 }
 
 async function generateTranslations( translatorNames, text, lang, firstChunkOnly ){
-	const translations = await Translator.translate(translatorNames, {text: text, to: lang, firstChunkOnly: firstChunkOnly});
+	const extractedText = extract(text);
+	const translations = await Translator.translate(translatorNames, {text: extractedText, to: lang, firstChunkOnly: firstChunkOnly});
 
 	translations.original = text;
 	translations.outputs = ['original'].concat(translatorNames);
@@ -93,14 +94,13 @@ app.post('/translation/:lang', (req, res) => {
 });
 
 app.post('/lexicon/:lang', (req, res) => {
-	const text = req.body.text;
+	const lexQuery = req.body.text;
 	const lang = req.params.lang;
 	const translators = req.body.translators;
 	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
-	return Lexicon.search(text)
-	.then( async lexText => {
-		const extractedLexText = extract(lexText);
-		const combinedText = 'Lexicon Search Term: ' + text + '\n\n---\n\n' + extractedLexText;
+	return Lexicon.search(lexQuery)
+	.then( async text => {
+		const combinedText = 'Lexicon Search Term: ' + lexQuery + '\n\n---\n\n' + text;
 		const translations = await generateTranslations( translators, combinedText, lang, firstChunkOnly );
 		res.json(translations);
 	}).catch(err => {
