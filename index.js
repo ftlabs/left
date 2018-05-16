@@ -36,7 +36,7 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 	const extractedText = extract(text);
 	const translations = await Translator.translate(translatorNames, {text: extractedText, to: lang, firstChunkOnly: firstChunkOnly});
 
-	translations.original = text;
+	translations.original = extractedText;
 	translations.outputs = ['original'].concat(translatorNames);
 
 	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
@@ -54,23 +54,19 @@ app.post('/article/:uuid/:lang', (req,res) => {
 	const uuid = req.params.uuid;
 	const lang = req.params.lang;
 	const translators = req.body.translators;
-	// default is firstChunkOnly=true
-	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
+	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly); // default is firstChunkOnly=true
 
-	return CAPI.get(uuid)
+	CAPI.get(uuid)
 	.then(async data => {
-		const text = extract(data.bodyXML);
-		const title = maybeAppendDot( extract(data.title) );
-		const standfirst = maybeAppendDot( extract(data.standfirst) ); // adding a closing . improves the translation
-		const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
+		const text = data.bodyXML;
+		const title = maybeAppendDot(data.title);
+		const standfirst = maybeAppendDot(data.standfirst); // adding a closing . improves the translation
+		const combinedText = 'Title: ' + title + '\n\n' + 'Standfirst: ' + standfirst + '\n\n' + text;
 
-		const translate = await Translator.translate(translators, {text: combinedText, to: lang, firstChunkOnly: firstChunkOnly});
-
-		translate.original = combinedText;
-		translate.article = uuid;
-		translate.outputs = ['original'].concat(translators);
-
-		res.json(translate);
+		generateTranslations( translators, combinedText, lang, firstChunkOnly )
+		.then( translations => {
+			res.json(translations);
+		})
 	})
 	.catch(err => {
 		console.log('CAPI ERROR', err);
@@ -82,20 +78,22 @@ app.post('/translation/:lang', (req, res) => {
 	const text = req.body.text;
 	const lang = req.params.lang;
 	const translators = req.body.translators;
-	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
+	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly); // default is firstChunkOnly=true
 
 	generateTranslations( translators, text, lang, firstChunkOnly )
 	.then( translations => {
 		res.json(translations);
-	})
-	.catch(err => console.log(err));
+	}).catch(err => {
+		console.log('Translation ERROR', err);
+		res.json({ original: { error: `Error, cannot translate text`}, outputs: err});
+	});
 });
 
 app.post('/lexicon/:lang', (req, res) => {
 	const lexQuery = req.body.text;
 	const lang = req.params.lang;
 	const translators = req.body.translators;
-	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly);
+	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly); // default is firstChunkOnly=true
 	return Lexicon.search(lexQuery)
 	.then( async text => {
 		const combinedText = 'Lexicon Search Term: ' + lexQuery + '\n\n---\n\n' + text;
@@ -103,10 +101,9 @@ app.post('/lexicon/:lang', (req, res) => {
 		res.json(translations);
 	}).catch(err => {
 		console.log('CAPI ERROR', err);
-		res.json({ original: { error: `Error, cannot find article with uuid ${uuid}`}, outputs: ['original']});
+		res.json({ original: { error: `Error, cannot translate lexicon query ${lexQuery}`}, outputs: err});
 	});
 });
-
 
 app.use(s3o);
 app.set('views', path.join(__dirname, 'views'));
