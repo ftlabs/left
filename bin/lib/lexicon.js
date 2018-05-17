@@ -27,7 +27,6 @@ async function search(query) {
 			if (item.definition && !item.definition.startsWith('See ')) {
 				results.push(`Name: ${item.name}`);
 				results.push(`Definition: ${item.definition}`);
-				results.push(`---`);
 			}
 		});
 	}

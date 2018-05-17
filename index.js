@@ -97,7 +97,7 @@ app.post('/lexicon/:lang', (req, res) => {
 	const firstChunkOnly = (!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly); // default is firstChunkOnly=true
 	return Lexicon.search(lexQuery)
 	.then( async text => {
-		const combinedText = 'Lexicon Search Term: ' + lexQuery + '\n\n---\n\n' + text;
+		const combinedText = 'Lexicon Search Term: ' + lexQuery + '\n\n' + text;
 		const translations = await generateTranslations( translators, combinedText, lang, firstChunkOnly );
 		res.json(translations);
 	}).catch(err => {
