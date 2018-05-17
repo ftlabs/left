@@ -65,6 +65,7 @@ app.post('/article/:uuid/:lang', (req,res) => {
 
 		generateTranslations( translators, combinedText, lang, firstChunkOnly )
 		.then( translations => {
+			translations.article = uuid;
 			res.json(translations);
 		})
 	})
