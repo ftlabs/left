@@ -6,17 +6,24 @@
 		<link rel="stylesheet" type="text/css" href="client/css/main.css">
 	</head>
 	<body>
-		<h1>LeFT</h1>
+		<h1>LeFT - Exploring Automated Text Translation</h1>
+		<p class="context">Deepl is just one of several providers of automated translation services,
+			where the quality is really rather good.
+			Good enough, in fact, to be worth considering how we might use translations on FT.com or associated properties?
+			Feel free to try it out.
+		</p>
+		<p class="context">Any thoughts/comments/feedback: email or slack #ftlabs</a>.
+		</p>
 		<button class="o-buttons o-buttons-icon o-buttons-icon--arrow-down" data-o-component="o-toggle" data-o-toggle-target=".o-forms" aria-expanded="false">Show settings</button>
 
 		<form class="o-forms" id="translateForm">
 			<label aria-describedby="text-box-info" for="articleUUID" class="o-forms__label">Article UUID</label>
 			<input class="o-forms__text" id="articleUUID" />
 
-			<label aria-describedby="text-box-info" for="freeText" class="o-forms__label">Some text to translate</label>
+			<label aria-describedby="text-box-info" for="freeText" class="o-forms__label">... or some text to translate</label>
 			<textarea class="o-forms__textarea" id="freeText"></textarea>
 
-			<label aria-describedby="text-box-info" for="lexicon" class="o-forms__label">Lexicon term</label>
+			<label aria-describedby="text-box-info" for="lexicon" class="o-forms__label">... or a Lexicon term</label>
 			<textarea class="o-forms__textarea" id="lexiconTerm"></textarea>
 
 			<label aria-describedby="text-box-info" for="langSelect" class="o-forms__label">Translate to</label>

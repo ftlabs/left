@@ -92,3 +92,7 @@ input, textarea, select {
 .o-buttons-icon--arrow-down[aria-expanded="true"] {
 	display: none;
 }
+
+.context {
+	max-width: 800px;
+}
