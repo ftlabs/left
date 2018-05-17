@@ -135,10 +135,8 @@ function displayText(data) {
 		if(sourceData['error']) {
 			bodyText.classList.add('is-error');
 			bodyText.textContent = sourceData['error'];
-		} else if(sourceData.includes('<p>')){
-			bodyText.innerHTML = sourceData;
 		} else {
-			bodyText.textContent = sourceData;
+			bodyText.innerHTML = sourceData;
 		}
 
 		output.appendChild(title);
