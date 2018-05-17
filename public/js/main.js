@@ -121,20 +121,24 @@ function displayText(data) {
 
 	for(var i = 0; i < data.outputs.length; ++i) {
 		var output = document.createElement('div');
-		output.setAttribute('id', data.outputs[i]);
+		const sourceName = data.outputs[i];
+		const sourceData = data[sourceName];
+		output.setAttribute('id', sourceName);
 		var title = document.createElement('h2');
 		if(i === 0 && data.article) {
-			title.innerHTML = data.outputs[i] + ' <a href="https://ft.com/content/' + data.article + '" target="_blank" class="ft-link"><img src="https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:outside-page?format=svg&source=ftlabs&tint=%23990F3D" /></a>';
+			title.innerHTML = sourceName + ' <a href="https://ft.com/content/' + data.article + '" target="_blank" class="ft-link"><img src="https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:outside-page?format=svg&source=ftlabs&tint=%23990F3D" /></a>';
 		} else {
-			title.textContent = data.outputs[i];
+			title.textContent = sourceName;
 		}
 		var bodyText = document.createElement('div');
 		bodyText.classList.add('text-body');
-		if(data[data.outputs[i]]['error']) {
+		if(sourceData['error']) {
 			bodyText.classList.add('is-error');
-			bodyText.textContent = data[data.outputs[i]]['error'];
+			bodyText.textContent = sourceData['error'];
+		} else if(sourceData.includes('<p>')){
+			bodyText.innerHTML = sourceData;
 		} else {
-			bodyText.textContent = data[data.outputs[i]];
+			bodyText.textContent = sourceData;
 		}
 
 		output.appendChild(title);
