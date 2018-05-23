@@ -1,5 +1,7 @@
 var rootUrl = window.location.href;
 
+var Utils = Origami['o-utils']
+
 function init() {
 	toggleSettings();
 	var form = document.getElementById('translateForm');
