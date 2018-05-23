@@ -181,8 +181,9 @@ function setElementsHeight() {
 	for (let i = 0; i < textBody[0].children.length; i++) {
 	  let largest;
 	  applyToAllElements(i, element => {
-		if (!largest || largest.offsetHeight < element.offsetHeight)
+		if (!largest || largest.offsetHeight < element.offsetHeight) {
 		  largest = element;
+		}
 	  });
   
 	  applyToAllElements(i, element => {
