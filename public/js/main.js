@@ -218,7 +218,6 @@ function applyToAllElements(index, func) {
 	);
 	Array.from(elements).forEach(func);
 }
-  
 
 function toggleSettings() {
 	var toggle = document.querySelector('.o-buttons-icon--arrow-down');
