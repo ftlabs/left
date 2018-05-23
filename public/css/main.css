@@ -38,6 +38,10 @@ h1, h2 {
     border-radius: 8px;
 }
 
+.text-body > p {
+	margin: 0;
+}
+
 .is-error {
 	background: #CC0000;
 	color: white;
