@@ -67,6 +67,7 @@ async function sendRequest(options) {
 		})
 		.then(data => data)
 		.catch(err => {
+			console.log(`Deepl.sendRequest: Error ${err.status}: ${err.statusText}`);
 			return { error: `Error ${err.status}: ${err.statusText}`};
 		});
 }
