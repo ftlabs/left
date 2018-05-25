@@ -41,9 +41,14 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 
 	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
 	translations.outputs.map( translatorName => {
-		const textWithBackslashNs = translations[translatorName];
-		const paras = textWithBackslashNs.split('\n\n').map( para => { return `<p>${para}</p>`});
-		const textWithParas = paras.join('\n');
+		let textWithParas;
+		if(typeof translations[translatorName] != "string"){
+			textWithParas = translations[translatorName];
+		} else {
+			const textWithBackslashNs = translations[translatorName];
+			const paras = textWithBackslashNs.split('\n\n').map( para => { return `<p>${para}</p>`});
+			textWithParas = paras.join('\n');
+		}
 		translations[translatorName] = textWithParas;
 	});
 
