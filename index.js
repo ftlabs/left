@@ -42,7 +42,7 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
 	translations.outputs.map( translatorName => {
 		let textWithParas;
-		if(typeof translations[translatorName] != "string"){
+		if( translations[translatorName].hasOwnProperty('error') ){
 			textWithParas = translations[translatorName];
 		} else {
 			const textWithBackslashNs = translations[translatorName];
