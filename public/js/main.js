@@ -118,13 +118,14 @@ function getTranslation(e) {
 }
 
 function displayText(data) {
+	console.log(`DEBUG: displayText: data=${JSON.stringify(data, null, 2)}`);
 	var container = document.getElementById('output');
 	container.innerHTML = '';
 
-	for(var i = 0; i < data.outputs.length; ++i) {
+	for(var i = 0; i < data.translatorNames.length; ++i) {
 		var output = document.createElement('div');
-		const sourceName = data.outputs[i];
-		const sourceData = data[sourceName];
+		const sourceName = data.translatorNames[i];
+		const sourceData = data.texts[sourceName];
 		output.setAttribute('id', sourceName);
 		var title = document.createElement('h2');
 		if(i === 0 && data.article) {
@@ -140,9 +141,13 @@ function displayText(data) {
 		} else {
 			bodyText.innerHTML = sourceData;
 		}
+		const audioUrl = data.audioUrls[sourceName];
+		const audioUrlElt = document.createElement('div');
+		audioUrlElt.innerHTML = `<a href="${audioUrl}" target="_blank" class="ft-link">AUDIO</a>`;
 
 		output.appendChild(title);
 		output.appendChild(bodyText);
+		output.appendChild(audioUrlElt);
 
 		container.appendChild(output);
 	}
@@ -150,9 +155,9 @@ function displayText(data) {
 	setChildrenDataAttributes();
 
 	toggleLoadingState();
-  
+
 	document.getElementById("output").classList.remove("cape");
-  
+
 	formatChildElements();
 }
 
@@ -160,11 +165,11 @@ function formatChildElements() {
 	setElementsHeight();
 	window.addEventListener("resize", Utils.debounce(setElementsHeight, 250));
 }
-  
+
 function setElementsHeight() {
 	var textBody = document.getElementsByClassName("text-body");
 	resetElementHeight(textBody);
-  
+
 	for (let i = 0; i < textBody[0].children.length; i++) {
 	  let largest;
 	  applyToAllElements(i, element => {
@@ -172,7 +177,7 @@ function setElementsHeight() {
 		  largest = element;
 		}
 	  });
-  
+
 	  applyToAllElements(i, element => {
 		element.setAttribute(
 		  "style",
@@ -181,7 +186,7 @@ function setElementsHeight() {
 	  });
 	}
 }
-  
+
 function resetElementHeight(parentElement) {
 	Array.from(parentElement).forEach(element =>
 	  Array.from(element.children).forEach((element, index) => {
@@ -189,17 +194,17 @@ function resetElementHeight(parentElement) {
 	  })
 	);
 }
-  
+
 function setChildrenDataAttributes() {
 	var textBody = document.getElementsByClassName("text-body");
-  
+
 	Array.from(textBody).forEach(element =>
 	  Array.from(element.children).forEach((element, index) => {
 		element.setAttribute("data-element-number", index);
 	  })
 	);
 }
-  
+
 function applyToAllElements(index, func) {
 	var elements = document.querySelectorAll(
 	  '[data-element-number="' + index + '"]'

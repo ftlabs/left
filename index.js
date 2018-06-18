@@ -11,6 +11,10 @@ const PORT = process.env.PORT || 2018;
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
 
+const AUDIO_RENDER_URL   = process.env.AUDIO_RENDER_URL;
+const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
+
+
 if(process.env.NODE_ENV === 'production') {
 	app.use(helmet());
 	app.enable('trust proxy');
@@ -34,22 +38,41 @@ function maybeAppendDot( text ){
 
 async function generateTranslations( translatorNames, text, lang, firstChunkOnly ){
 	const extractedText = extract(text);
-	const translations = await Translator.translate(translatorNames, {text: extractedText, to: lang, firstChunkOnly: firstChunkOnly});
+	const translations = {
+		texts : {}, // name -> text
+		translatorNames : [], // names
+		audioUrls : {}, // name -> url
+	};
 
-	translations.original = extractedText;
-	translations.outputs = ['original'].concat(translatorNames);
+	translations.texts = await Translator.translate(translatorNames, {text: extractedText, to: lang, firstChunkOnly: firstChunkOnly});
+
+	translations.texts['original'] = extractedText;
+	translations.translatorNames = ['original'].concat(translatorNames);
 
 	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
-	translations.outputs.map( translatorName => {
+	translations.translatorNames.map( translatorName => {
 		let textWithParas;
-		if( translations[translatorName].hasOwnProperty('error') ){
-			textWithParas = translations[translatorName];
+		if( translations.texts[translatorName].hasOwnProperty('error') ){
+			textWithParas = translations.texts[translatorName];
 		} else {
-			const textWithBackslashNs = translations[translatorName];
+			const textWithBackslashNs = translations.texts[translatorName];
 			const paras = textWithBackslashNs.split('\n\n').map( para => { return `<p>${para}</p>`});
 			textWithParas = paras.join('\n');
 		}
-		translations[translatorName] = textWithParas;
+		translations.texts[translatorName] = textWithParas;
+	});
+
+	const audioVoice = 'Celine';
+	const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
+
+	translations.translatorNames.map( translatorName => {
+		var audioBody;
+		if( translations.texts[translatorName].hasOwnProperty('error') ){
+			audioBody = 'Je ne regret rien';
+		} else {
+			audioBody = translations.texts[translatorName];
+		}
+		translations.audioUrls[translatorName] = `${audioBaseUrl}${encodeURIComponent(audioBody)}`;
 	});
 
 	return translations;
