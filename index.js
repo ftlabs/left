@@ -62,10 +62,17 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 		translations.texts[translatorName] = textWithParas;
 	});
 
-	const audioVoice = 'Celine';
-	const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
+	const originalVoice = 'Amy';
+	var translationVoice = originalVoice;
+	if (lang === 'fr') {
+		translationVoice = 'Celine';
+	} else if (lang === 'de') {
+		translationVoice = 'Marlene';
+	}
 
 	translations.translatorNames.map( translatorName => {
+		const audioVoice = (translatorName === 'original')? originalVoice : translationVoice;
+		const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
 		var audioBody;
 		if( translations.texts[translatorName].hasOwnProperty('error') ){
 			audioBody = 'Je ne regret rien';
