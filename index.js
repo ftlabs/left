@@ -66,9 +66,9 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 
 	const originalVoice = 'Amy';
 	const originalLang  = 'en';
-	var translationVoice     = originalVoice;
-	var translationVoiceLang = originalLang;
-	var langLC = lang.toLowerCase();
+	let translationVoice     = originalVoice;
+	let translationVoiceLang = originalLang;
+	let langLC = lang.toLowerCase();
 
 	if (langLC === 'fr') {
 		translationVoice = 'Celine';
@@ -78,9 +78,10 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 		translationVoiceLang = langLC;
 	}
 
+	// construct the audio-related info
 	translations.translatorNames.map( translatorName => {
-		var audioVoice;
-		var audioButtonDesc;
+		let audioVoice;
+		let audioButtonDesc;
 		if (translatorName === 'original') {
 			audioVoice = originalVoice;
 			audioButtonDesc = `${originalVoice}(${originalLang}) -> en`;
@@ -89,9 +90,9 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 			audioButtonDesc = `${translationVoice} (${translationVoiceLang}) -> ${langLC}`;
 		}
 		const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
-		var audioBody;
+		let audioBody;
 		if( translations.texts[translatorName].hasOwnProperty('error') ){
-			audioBody = 'Je ne regret rien';
+			audioBody = 'Je ne regrette rien';
 		} else {
 			audioBody = translations.texts[translatorName];
 		}

@@ -118,7 +118,7 @@ function getTranslation(e) {
 }
 
 function displayText(data) {
-	console.log(`DEBUG: displayText: data=${JSON.stringify(data, null, 2)}`);
+	// console.log(`DEBUG: displayText: data=${JSON.stringify(data, null, 2)}`);
 	var container = document.getElementById('output');
 	container.innerHTML = '';
 
