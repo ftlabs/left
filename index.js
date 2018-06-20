@@ -68,13 +68,14 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 	const originalLang  = 'en';
 	var translationVoice     = originalVoice;
 	var translationVoiceLang = originalLang;
+	var langLC = lang.toLowerCase();
 
-	if (lang === 'fr') {
+	if (langLC === 'fr') {
 		translationVoice = 'Celine';
-		translationVoiceLang = lang;
-	} else if (lang === 'de') {
+		translationVoiceLang = langLC;
+	} else if (langLC === 'de') {
 		translationVoice = 'Marlene';
-		translationVoiceLang = lang;
+		translationVoiceLang = langLC;
 	}
 
 	translations.translatorNames.map( translatorName => {
@@ -85,7 +86,7 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 			audioButtonDesc = `${originalVoice}(${originalLang}) -> en`;
 		} else {
 			audioVoice = translationVoice;
-			audioButtonDesc = `${translationVoice} (${translationVoiceLang}) -> ${lang}`;
+			audioButtonDesc = `${translationVoice} (${translationVoiceLang}) -> ${langLC}`;
 		}
 		const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
 		var audioBody;
