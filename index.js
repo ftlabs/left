@@ -42,6 +42,7 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 		texts : {}, // name -> text
 		translatorNames : [], // names
 		audioUrls : {}, // name -> url
+		audioButtonText : {}, // name -> text
 	};
 
 	translations.texts = await Translator.translate(translatorNames, {text: extractedText, to: lang, firstChunkOnly: firstChunkOnly});
@@ -63,15 +64,28 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 	});
 
 	const originalVoice = 'Amy';
-	var translationVoice = originalVoice;
+	const originalLang  = 'en';
+	var translationVoice     = originalVoice;
+	var translationVoiceLang = originalLang;
+
 	if (lang === 'fr') {
 		translationVoice = 'Celine';
+		translationVoiceLang = lang;
 	} else if (lang === 'de') {
 		translationVoice = 'Marlene';
+		translationVoiceLang = lang;
 	}
 
 	translations.translatorNames.map( translatorName => {
-		const audioVoice = (translatorName === 'original')? originalVoice : translationVoice;
+		var audioVoice;
+		var audioButtonDesc;
+		if (translatorName === 'original') {
+			audioVoice = originalVoice;
+			audioButtonDesc = `${originalVoice}(${originalLang}) -> en`;
+		} else {
+			audioVoice = translationVoice;
+			audioButtonDesc = `${translationVoice} (${translationVoiceLang}) -> ${lang}`;
+		}
 		const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
 		var audioBody;
 		if( translations.texts[translatorName].hasOwnProperty('error') ){
@@ -80,6 +94,7 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 			audioBody = translations.texts[translatorName];
 		}
 		translations.audioUrls[translatorName] = `${audioBaseUrl}${encodeURIComponent(audioBody)}`;
+		translations.audioButtonText[translatorName] = `AUDIO: ${audioButtonDesc}`;
 	});
 
 	return translations;
