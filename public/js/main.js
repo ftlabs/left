@@ -144,7 +144,7 @@ function displayText(data) {
 		const audioUrl = data.audioUrls[sourceName];
 		const audioButtonText = data.audioButtonText[sourceName];
 		const audioUrlElt = document.createElement('div');
-		audioUrlElt.innerHTML = `<a href="${audioUrl}" target="_blank" class="ft-link">${audioButtonText}</a>`;
+		audioUrlElt.innerHTML = `<a href="${audioUrl}" target="_blank" class="o-buttons o-buttons--mono">${audioButtonText}</a>`;
 
 		output.appendChild(title);
 		output.appendChild(bodyText);
