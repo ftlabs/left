@@ -14,6 +14,7 @@ const hbs = require('hbs');
 const AUDIO_RENDER_URL   = process.env.AUDIO_RENDER_URL;
 const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
 
+const MAX_CHARS_FOR_AUDIO=1500;
 
 if(process.env.NODE_ENV === 'production') {
 	app.use(helmet());
@@ -93,6 +94,8 @@ async function generateTranslations( translatorNames, text, lang, firstChunkOnly
 		} else {
 			audioBody = translations.texts[translatorName];
 		}
+		audioBody = audioBody.slice(0,MAX_CHARS_FOR_AUDIO);
+
 		translations.audioUrls[translatorName] = `${audioBaseUrl}${encodeURIComponent(audioBody)}`;
 		translations.audioButtonText[translatorName] = `AUDIO: ${audioButtonDesc}`;
 	});
