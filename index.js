@@ -169,5 +169,9 @@ app.get('/demo/:uuid', (req, res) => {
 	});
 });
 
+app.get('/demo-static', (req, res) => {
+	res.render('demoStatic');
+});
+
 console.log(`Server is running locally on port ${PORT}`);
 app.listen(PORT);
