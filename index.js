@@ -152,6 +152,7 @@ app.post('/lexicon/:lang', (req, res) => {
 app.use(s3o);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
+hbs.registerPartials(__dirname + '/views/partials');
 app.use('/client', express.static(path.resolve(__dirname + '/public')));
 
 app.get('/', (req, res) => {
@@ -161,7 +162,7 @@ app.get('/', (req, res) => {
 
 app.get('/demo/:uuid', (req, res) => {
 	CAPI.get(req.params.uuid).then(data => {
-		const text = extract(data.bodyXML);
+		const text = data.bodyXML;
 		const { title, byline, standfirst } = data;
 		console.log(data);
 		res.render('demo', { text, title, byline, standfirst });

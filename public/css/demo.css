@@ -1,0 +1,33 @@
+body {
+	background: #fff1e5;
+	font-family: 'MetricWeb', sans-serif;
+}
+
+h1,
+h2 {
+	font-family: 'FinancierDisplayWeb', serif;
+	text-transform: capitalize;
+}
+
+.article-content {
+	position: relative;
+	margin-left: 12%;
+	margin-right: 32%;
+	min-width: 240px;
+	max-width: 600px;
+	padding-left: 10px;
+	padding-right: 10px;
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 20px;
+
+	font-family: Georgia, serif;
+	font-size: 18px;
+	line-height: 28px;
+	margin-top: 0px;
+	margin-bottom: 28px;
+	color: #33302e;
+}
+
+.main-image {
+}
