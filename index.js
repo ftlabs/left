@@ -171,9 +171,18 @@ app.get('/demo/:uuid', (req, res) => {
 
 app.get('/demo-static/:demoType', (req, res) => {
 	const demoType = req.params.demoType;
-	console.log('DEMO TYPE', demoType);
-	// error if not expected type
-	res.render('demoStatic', { demoType });
+	const availableDemos = ['side-by-side'];
+	if (availableDemos.includes(demoType)) {
+		res.render('demoStatic', { demoType });
+	} else {
+		res
+			.status(500)
+			.send(
+				`Demo type not recognised. The available types are: ${availableDemos.join(
+					', '
+				)}`
+			);
+	}
 });
 
 console.log(`Server is running locally on port ${PORT}`);
