@@ -2,6 +2,10 @@
 	display: flex;
 }
 
+.text-body {
+	flex-basis: 50%;
+}
+
 .divider {
 	margin: 12px;
 	padding: 1px;
@@ -11,7 +15,6 @@
 .article-grid .article__content {
 	margin-bottom: 20px;
 	grid-area: content;
-	/* max-width: 868px; */
 	max-width: 700px;
 	width: 100%;
 	position: relative;

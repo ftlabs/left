@@ -164,13 +164,16 @@ app.get('/demo/:uuid', (req, res) => {
 	CAPI.get(req.params.uuid).then(data => {
 		const text = data.bodyXML;
 		const { title, byline, standfirst } = data;
-		console.log(data);
+
 		res.render('demo', { text, title, byline, standfirst });
 	});
 });
 
-app.get('/demo-static', (req, res) => {
-	res.render('demoStatic');
+app.get('/demo-static/:demoType', (req, res) => {
+	const demoType = req.params.demoType;
+	console.log('DEMO TYPE', demoType);
+	// error if not expected type
+	res.render('demoStatic', { demoType });
 });
 
 console.log(`Server is running locally on port ${PORT}`);
