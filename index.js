@@ -171,7 +171,7 @@ app.get('/demo/:uuid', (req, res) => {
 
 app.get('/demo-static/:demoType', (req, res) => {
 	const demoType = req.params.demoType;
-	const availableDemos = ['side-by-side'];
+	const availableDemos = ['side-by-side', 'toggle'];
 	if (availableDemos.includes(demoType)) {
 		res.render('demoStatic', { demoType });
 	} else {
