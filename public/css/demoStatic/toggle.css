@@ -1,3 +1,24 @@
 .hidden {
 	display: none;
 }
+
+.translation-accordion {
+	background-color: #f3e0ce;
+	font-family: MetricWeb, sans-serif;
+	padding: 7px;
+	padding-left: 23px;
+}
+
+.translation-prompt {
+	font-weight: 500;
+	margin-top: 6px;
+}
+
+.accordion-button {
+	min-width: 97px;
+}
+
+.collapsed {
+	display: flex;
+	justify-content: space-between;
+}

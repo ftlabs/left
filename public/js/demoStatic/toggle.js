@@ -1,15 +1,34 @@
-function init() {}
+var accordionButton = document.querySelector('.accordion-button');
 
-function toggleTranslation() {
-	Array.from(document.getElementsByClassName('text-body')).forEach(e => {
-		Array.from(e.classList).includes('hidden')
-			? (e.className = 'text-body')
-			: (e.className = 'text-body hidden');
+function init() {
+	document.querySelector('.translation-body').classList.add('hidden');
+}
+
+function toggleTranslationAccordion() {
+	document.querySelector('.demo-target').classList.toggle('hidden');
+
+	accordionButton.innerText =
+		accordionButton.innerText == 'Hide' ? 'Try it' : 'Hide';
+
+	accordionButton.classList.toggle('o-buttons-icon--arrow-down');
+	accordionButton.classList.toggle('o-buttons-icon--arrow-up');
+}
+
+function toggleTranslation(e) {
+	e.preventDefault();
+	Array.from(document.getElementsByClassName('text-body')).forEach(function(e) {
+		e.classList.toggle('hidden');
 	});
+
+	toggleTranslationAccordion();
 }
 
 document
-	.getElementById('translateButton')
+	.querySelector('.translate-button')
 	.addEventListener('click', toggleTranslation);
+
+accordionButton.addEventListener('click', () =>
+	toggleTranslationAccordion(accordionButton)
+);
 
 document.addEventListener('DOMContentLoaded', init);
