@@ -1,11 +1,10 @@
-var accordionButton = document.querySelector('.accordion-button');
-
 function init() {
-	document.querySelector('.translation-body').classList.add('hidden');
+	document.querySelector('.translation-text').classList.add('hidden');
 }
 
 function toggleTranslationAccordion() {
 	document.querySelector('.demo-target').classList.toggle('hidden');
+	var accordionButton = document.querySelector('.accordion-button');
 
 	accordionButton.innerText =
 		accordionButton.innerText == 'Hide' ? 'Try it' : 'Hide';
@@ -14,21 +13,36 @@ function toggleTranslationAccordion() {
 	accordionButton.classList.toggle('o-buttons-icon--arrow-up');
 }
 
-function toggleTranslation(e) {
+function showTranslation(e) {
 	e.preventDefault();
-	Array.from(document.getElementsByClassName('text-body')).forEach(function(e) {
-		e.classList.toggle('hidden');
-	});
-
+	document.querySelector('.article-text').classList.add('hidden');
+	document.querySelector('.translation-text').classList.remove('hidden');
+	document.querySelector('.turn-off-button').classList.remove('hidden');
 	toggleTranslationAccordion();
+	document.querySelector('.translation-prompt').innerHTML =
+		'This article has been translated into French';
+	document.querySelector('.accordion-button').innerText = 'Change';
+}
+
+function removeTranslation() {
+	document.querySelector('.article-text').classList.remove('hidden');
+	document.querySelector('.translation-text').classList.add('hidden');
+	document.querySelector('.turn-off-button').classList.add('hidden');
+	document.querySelector('.language-select').selectedIndex = 0;
+	document.querySelector('.translation-prompt').innerHTML =
+		'Now you can translate articles on the FT';
 }
 
 document
-	.querySelector('.translate-button')
-	.addEventListener('click', toggleTranslation);
+	.querySelector('.language-select')
+	.addEventListener('change', showTranslation);
 
-accordionButton.addEventListener('click', () =>
-	toggleTranslationAccordion(accordionButton)
-);
+document
+	.querySelector('.turn-off-button')
+	.addEventListener('click', removeTranslation);
+
+document
+	.querySelector('.accordion-button')
+	.addEventListener('click', toggleTranslationAccordion);
 
 document.addEventListener('DOMContentLoaded', init);

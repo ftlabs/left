@@ -3,22 +3,95 @@
 }
 
 .translation-accordion {
-	background-color: #f3e0ce;
+	background-color: #f2dfce;
 	font-family: MetricWeb, sans-serif;
-	padding: 7px;
-	padding-left: 23px;
+	padding: 10px;
+	padding-left: 32px;
+	padding-right: 32px;
 }
 
 .translation-prompt {
-	font-weight: 500;
 	margin-top: 6px;
+	font-size: 20px;
 }
 
 .accordion-button {
-	min-width: 97px;
+	width: 105px;
 }
 
 .collapsed {
 	display: flex;
 	justify-content: space-between;
+}
+
+.selection {
+	display: flex;
+}
+
+.feature-disclaimer {
+	font-size: 15px;
+	line-height: 17px;
+}
+
+.o-forms.select-language-form {
+	max-width: 700px;
+	margin-bottom: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+}
+
+.o-forms.translate-tickbox {
+	min-width: 260px;
+	margin-top: 7px;
+	margin-bottom: 17px;
+	margin-left: 11px;
+}
+
+.translation-selector {
+	min-width: 321px;
+}
+
+.demo-target {
+	margin-top: 8px;
+}
+
+@media (max-width: 1219px) {
+	.collapsed {
+		flex-direction: column;
+	}
+
+	.selection {
+		display: block;
+	}
+
+	.translation-accordion {
+		padding: 0px;
+		padding-left: 12px;
+		padding-right: 12px;
+
+		padding-bottom: 11px;
+	}
+
+	.translation-prompt {
+		margin-bottom: 7px;
+	}
+
+	.demo-target {
+		margin-top: 13px;
+	}
+
+	.translation-selector {
+		min-width: 0px;
+	}
+
+	.o-forms.translate-tickbox {
+		margin-left: 0px;
+		padding-right: 0px;
+		padding-left: 0px;
+	}
+
+	.translation-prompt {
+		margin-top: 6px;
+		font-size: 18px;
+	}
 }

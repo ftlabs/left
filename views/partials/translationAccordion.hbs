@@ -1,26 +1,31 @@
 <div class="translation-accordion">
     <div class="collapsed">
         <div class="translation-prompt">Now you can translate articles on the FT</div>
-        <button class="o-buttons o-buttons--big o-buttons-icon o-buttons-icon--arrow-down accordion-button" data-o-component="o-toggle">Try it</button>
+        <div>
+            <button class="o-buttons o-buttons--primary o-buttons--mono o-buttons--big turn-off-button hidden">Turn off</button>
+            <button class="o-buttons o-buttons--mono o-buttons--big o-buttons-icon o-buttons-icon--arrow-down accordion-button" data-o-component="o-toggle">Try it</button>
+        </div>
     </div>
     <div class="demo-target hidden">
-        <div>This is an experimental feature. Translations might not be accurate.</div>
-        <div class="o-forms">
-            <label aria-describedby="select-box-info" for="select-standard" class="o-forms__label">Translate to</label>
+        <div class="select-language-form o-forms">
             <form>
-                <div>
-                    <select id="select-standard" class="o-forms__select">
-                        <option value="" disabled selected>Choose your language</option>
-                        <option value="option2">French</option>
-                    </select>
-                    <button class="o-buttons o-buttons--primary o-buttons--big translate-button">Show translation for current page</button>
-                </div>
-                <fieldset class="o-forms">
-                    <div class="o-forms__group o-forms__group--inline">
-                        <input type="checkbox" name="checkbox" value="1" class="o-forms__checkbox" id="checkbox61">
-                        <label for="checkbox61" class="o-forms__label">Translate all articles from now on.</label>
+                <div class="selection">
+                    <div class="translation-selector">
+                        <select id="select-standard" class="o-forms__select language-select">
+                            <option value="" disabled selected>Choose your language</option>
+                            <option value="option2">French</option>
+                        </select>
                     </div>
-                </fieldset>
+                    <fieldset class="translate-tickbox o-forms">
+                        <div class="o-forms__group o-forms__group--inline">
+                            <input type="checkbox" name="checkbox" value="1" class="o-forms__checkbox" id="checkbox61">
+                            <label for="checkbox61" class="o-forms__label">Translate all articles from now on.</label>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="feature-disclaimer">This is an experimental feature, and translations might not be accurate. Please provide your feedback
+                    <a>here.</a>
+                </div>
             </form>
         </div>
     </div>
