@@ -3,7 +3,7 @@ function init() {
 }
 
 function toggleTranslationAccordion() {
-	document.querySelector('.demo-target').classList.toggle('hidden');
+	document.querySelector('.translation-expanded').classList.toggle('hidden');
 	var accordionButton = document.querySelector('.accordion-button');
 
 	accordionButton.innerText =
