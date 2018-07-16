@@ -15,11 +15,12 @@ function init() {
 function httpGet(url, callback, errorCallback) {
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function() {
-		if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-			callback(xmlHttp.responseText);
-		} else {
-			// error handling
-			errorCallback();
+		if (xmlHttp.readyState === 4) {
+			if (xmlHttp.status === 200) {
+				callback(xmlHttp.responseText);
+			} else {
+				errorCallback();
+			}
 		}
 	};
 	xmlHttp.open('GET', url, true);
@@ -38,7 +39,7 @@ function toggleTranslationAccordion() {
 
 function showTranslation(e) {
 	var language = e.target.options[1].value;
-	translationError.classList.add('translation-hidden');
+	// translationError.classList.add('translation-hidden');
 	e.preventDefault();
 	articleText.classList.add('translation-blur');
 	translationLoading.classList.remove('translation-hidden');
@@ -51,6 +52,7 @@ function showTranslation(e) {
 }
 
 function unsuccessfulTranslationRequest() {
+	console.log('got into error translation');
 	articleText.classList.remove('translation-blur');
 	translationLoading.classList.add('translation-hidden');
 	translationError.classList.remove('translation-hidden');

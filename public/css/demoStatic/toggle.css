@@ -6,6 +6,10 @@
 	display: none;
 }
 
+.o-buttons.translation-hidden {
+	display: none;
+}
+
 .translation-accordion {
 	background-color: #f2dfce;
 	font-family: MetricWeb, sans-serif;
