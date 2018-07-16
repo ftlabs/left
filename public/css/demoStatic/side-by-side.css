@@ -1,0 +1,25 @@
+.articles {
+	display: flex;
+}
+
+.text-body {
+	flex-basis: 50%;
+}
+
+.divider {
+	margin: 12px;
+	padding: 1px;
+	border-left: 1px solid #ccc1b7;
+}
+
+.article-grid .article__content {
+	margin-bottom: 20px;
+	grid-area: content;
+	max-width: 700px;
+	width: 100%;
+	position: relative;
+	grid-row-start: content;
+	grid-column-start: content;
+	grid-row-end: rhr-top;
+	grid-column-end: rhr-top;
+}

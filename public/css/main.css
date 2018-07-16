@@ -1,16 +1,16 @@
 body {
 	background: #fff1e5;
-	font-family: "MetricWeb", sans-serif;
+	font-family: 'MetricWeb', sans-serif;
 }
 
-h1, h2 {
-	padding: 0 10px;
-	font-family: "FinancierDisplayWeb", serif;
+h1,
+h2 {
+	font-family: 'FinancierDisplayWeb', serif;
 	text-transform: capitalize;
 }
 
 .cape {
-	display: none!important;
+	display: none !important;
 }
 
 #output {
@@ -31,11 +31,11 @@ h1, h2 {
 
 .text-body {
 	white-space: pre-line;
-    font-weight: 300;
-    line-height: 1.5;
-    background: #E6D9CE;
-    padding: 10px;
-    border-radius: 8px;
+	font-weight: 300;
+	line-height: 1.5;
+	background: #e6d9ce;
+	padding: 10px;
+	border-radius: 8px;
 }
 
 .text-body > p {
@@ -43,18 +43,20 @@ h1, h2 {
 }
 
 .is-error {
-	background: #CC0000;
+	background: #cc0000;
 	color: white;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
 	margin-bottom: 15px;
 }
 
 .ft-link {
 	position: absolute;
-    right: 10px;
-    vertical-align: top;
+	right: 10px;
+	vertical-align: top;
 }
 
 .ft-link img {
@@ -63,7 +65,7 @@ input, textarea, select {
 
 .loading {
 	opacity: 0.4;
-    filter: blur(2px);
+	filter: blur(2px);
 }
 
 .loading-card {
@@ -98,7 +100,7 @@ input, textarea, select {
 	display: inherit;
 }
 
-.o-buttons-icon--arrow-down[aria-expanded="true"] {
+.o-buttons-icon--arrow-down[aria-expanded='true'] {
 	display: none;
 }
 

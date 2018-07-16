@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>FT Labs Translation dashboard</title>
+    <link rel="stylesheet" href="https://build.origami.ft.com/v2/bundles/css?modules=o-fonts@^3.0.4,o-topper@^2.1.2,o-header@^7.5.9,o-footer@^6.0.10,o-comments@^4.1.0"
+    />
+    <link rel="stylesheet" type="text/css" href="../client/css/demo.css">
+</head>
+
+<body>
+    {{> header}}
+    <div class="content">
+        <div class="o-topper o-topper--basic o-topper--color-paper">
+            <div class="o-topper__content">
+                <div class="o-topper__tags">
+                    <a href="https://www.ft.com/german-election" class="o-topper__topic">Article topic</a>
+                </div>
+                <h1 class="o-topper__headline">
+                    {{title}}
+                </h1>
+                <div class="o-topper__standfirst">{{standfirst}}</div>
+            </div>
+
+            <div class="o-topper__background"></div>
+
+        </div>
+        <div class="article-content">
+            <img src="https://www.ft.com/__origami/service/image/v2/images/raw/http%3A%2F%2Fcom.ft.imagepublish.upp-prod-eu.s3.amazonaws.com%2Fb7eb0dea-73d9-11e8-bab2-43bd4ae655dd?source=next&fit=scale-down&width=700"
+                alt="Ministry of Defence firefighters tackle a blaze">
+            <div class="article">
+                {{{ text}}}
+            </div>
+
+        </div>
+    </div>
+    {{> comments}} {{> footer}}
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <script src="https://build.origami.ft.com/v2/bundles/js?modules=o-fonts@^3.0.4,o-header@^7.5.9,o-footer@^6.0.10,o-comments@^4.1.0"></script>
+
+</body>
+
+</html>
