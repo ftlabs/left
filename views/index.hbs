@@ -27,6 +27,7 @@
 			<textarea class="o-forms__textarea" id="lexiconTerm"></textarea>
 
 			<label aria-describedby="text-box-info" for="langSelect" class="o-forms__label">Translate to</label>
+			<p>(We have language-specific voices for german and french.)</p>
 			<select id="langSelect" class="o-forms__select">
 				{{#each lang}}
 				    <option value="{{this.code}}" data-translators="{{this.translatorNamesCSV}}" {{#if isDefault}} selected {{/if}}>{{this.nameWithTranslators}}</option>
