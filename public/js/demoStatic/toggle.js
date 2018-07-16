@@ -39,14 +39,16 @@ function toggleTranslationAccordion() {
 
 function showTranslation(e) {
 	var language = e.target.options[1].value;
-	// translationError.classList.add('translation-hidden');
+	translationError.classList.add('translation-hidden');
 	e.preventDefault();
 	articleText.classList.add('translation-blur');
 	translationLoading.classList.remove('translation-hidden');
 	httpGet(
 		'../get-translation/37d9219e-73b3-11e8-aa31-31da4279a601/' +
 			language.toLowerCase(),
-		successfulTranslationRequest,
+		function(res) {
+			successfulTranslationRequest(res, language);
+		},
 		unsuccessfulTranslationRequest
 	);
 }
@@ -58,7 +60,7 @@ function unsuccessfulTranslationRequest() {
 	translationError.classList.remove('translation-hidden');
 }
 
-function successfulTranslationRequest(data) {
+function successfulTranslationRequest(data, language) {
 	translationText.innerHTML = JSON.parse(data).body;
 	articleText.classList.add('translation-hidden');
 	articleText.classList.remove('translation-blur');
@@ -66,7 +68,8 @@ function successfulTranslationRequest(data) {
 	translationText.classList.remove('translation-hidden');
 	turnOffButton.classList.remove('translation-hidden');
 	toggleTranslationAccordion();
-	translationPrompt.innerHTML = 'This article has been translated into French';
+	translationPrompt.innerHTML =
+		'This article has been translated into ' + language;
 	accordionButton.innerText = 'Change';
 }
 
@@ -78,16 +81,10 @@ function removeTranslation() {
 	translationPrompt.innerHTML = 'Now you can translate articles on the FT';
 }
 
-document
-	.querySelector('.language-select')
-	.addEventListener('change', showTranslation);
+languageSelect.addEventListener('change', showTranslation);
 
-document
-	.querySelector('.turn-off-button')
-	.addEventListener('click', removeTranslation);
+turnOffButton.addEventListener('click', removeTranslation);
 
-document
-	.querySelector('.accordion-button')
-	.addEventListener('click', toggleTranslationAccordion);
+accordionButton.addEventListener('click', toggleTranslationAccordion);
 
 document.addEventListener('DOMContentLoaded', init);
