@@ -206,6 +206,14 @@ app.post('/lexicon/:lang', (req, res) => {
 		});
 });
 
+app.get('/get-translation/:uuid/:language', (req, res) => {
+	const uuid = req.params.uuid;
+	const language = req.params.language;
+	fs.readFile(`./public/demoTranslations/${uuid}.json`, (err, data) => {
+		res.json(JSON.parse(data)[language]);
+	});
+});
+
 app.use(s3o);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
@@ -242,14 +250,6 @@ app.get('/demo-static/:demoType', (req, res) => {
 				)}`
 			);
 	}
-});
-
-app.get('/get-translation/:uuid/:language', (req, res) => {
-	const uuid = req.params.uuid;
-	const language = req.params.language;
-	fs.readFile(`./public/demoTranslations/${uuid}.json`, (err, data) => {
-		res.json(JSON.parse(data)[language]);
-	});
 });
 
 console.log(`Server is running locally on port ${PORT}`);
