@@ -214,11 +214,12 @@ app.get('/get-translation/:uuid/:language', (req, res) => {
 	});
 });
 
+
+app.use('/client', express.static(path.resolve(__dirname + '/public')));
 app.use(s3o);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials');
-app.use('/client', express.static(path.resolve(__dirname + '/public')));
 
 app.get('/', (req, res) => {
 	const settings = Translator.settings(Utils.extractUser(req.headers.cookie));
