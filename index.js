@@ -11,7 +11,12 @@ const PORT = process.env.PORT || 2018;
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
 
-if (process.env.NODE_ENV === 'production') {
+const AUDIO_RENDER_URL   = process.env.AUDIO_RENDER_URL;
+const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
+
+const MAX_CHARS_FOR_AUDIO=1500;
+
+if(process.env.NODE_ENV === 'production') {
 	app.use(helmet());
 	app.enable('trust proxy');
 	app.use(express_enforces_ssl());
@@ -39,23 +44,66 @@ async function generateTranslations(
 	firstChunkOnly
 ) {
 	const extractedText = extract(text);
-	const translations = await Translator.translate(translatorNames, {
-		text: extractedText,
-		to: lang,
-		firstChunkOnly: firstChunkOnly
-	});
+	const translations = {
+		texts : {}, // name -> text
+		translatorNames : [], // names
+		audioUrls : {}, // name -> url
+		audioButtonText : {}, // name -> text
+	};
 
-	translations.original = extractedText;
-	translations.outputs = ['original'].concat(translatorNames);
+	translations.texts = await Translator.translate(translatorNames, {text: extractedText, to: lang, firstChunkOnly: firstChunkOnly});
+	translations.texts['original'] = extractedText;
+	translations.translatorNames = ['original'].concat(translatorNames);
 
 	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
-	translations.outputs.map(translatorName => {
-		const textWithBackslashNs = translations[translatorName];
-		const paras = textWithBackslashNs.split('\n\n').map(para => {
-			return `<p>${para}</p>`;
-		});
-		const textWithParas = paras.join('\n');
-		translations[translatorName] = textWithParas;
+	translations.translatorNames.map(translatorName => {
+		let textWithParas;
+		if( translations.texts[translatorName].hasOwnProperty('error') ){
+			textWithParas = translations.texts[translatorName];
+		} else {
+			const textWithBackslashNs = translations.texts[translatorName];
+			const paras = textWithBackslashNs.split('\n\n').map( para => { return `<p>${para}</p>`});
+			textWithParas = paras.join('\n');
+		}
+		translations.texts[translatorName] = textWithParas;
+	});
+
+	const originalVoice = 'Amy';
+	const originalLang  = 'en';
+	let translationVoice     = originalVoice;
+	let translationVoiceLang = originalLang;
+	let langLC = lang.toLowerCase();
+
+	if (langLC === 'fr') {
+		translationVoice = 'Celine';
+		translationVoiceLang = langLC;
+	} else if (langLC === 'de') {
+		translationVoice = 'Marlene';
+		translationVoiceLang = langLC;
+	}
+
+	// construct the audio-related info
+	translations.translatorNames.map( translatorName => {
+		let audioVoice;
+		let audioButtonDesc;
+		if (translatorName === 'original') {
+			audioVoice = originalVoice;
+			audioButtonDesc = `${originalVoice}(${originalLang}) -> en`;
+		} else {
+			audioVoice = translationVoice;
+			audioButtonDesc = `${translationVoice} (${translationVoiceLang}) -> ${langLC}`;
+		}
+		const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
+		let audioBody;
+		if( translations.texts[translatorName].hasOwnProperty('error') ){
+			audioBody = 'Je ne regrette rien';
+		} else {
+			audioBody = translations.texts[translatorName];
+		}
+		audioBody = audioBody.slice(0,MAX_CHARS_FOR_AUDIO);
+
+		translations.audioUrls[translatorName] = `${audioBaseUrl}${encodeURIComponent(audioBody)}`;
+		translations.audioButtonText[translatorName] = `AUDIO: ${audioButtonDesc}`;
 	});
 
 	return translations;

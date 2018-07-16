@@ -28,4 +28,6 @@ GOOGLE_CREDS={"...         # ditto, a JSON-encoded string of the keyfile
 AWS_ACCESS_KEY_ID=...      # for AWS access
 AWS_REGION=...             # ditto
 AWS_SECRET_ACCESS_KEY=...  # ditto
+AUDIO_RENDER_URL=...       # for generating the audio version of the translations
+AUDIO_RENDER_TOKEN=...     # ditto (lifted from the renderer's settings)
 ```

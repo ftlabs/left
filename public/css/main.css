@@ -87,6 +87,11 @@ select {
 	margin-top: 12px;
 }
 
+.o-buttons--mono {
+	float: right;
+	margin: 10px;
+}
+
 .o-forms {
 	display: none;
 }

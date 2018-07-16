@@ -134,10 +134,10 @@ function displayText(data) {
 	var container = document.getElementById('output');
 	container.innerHTML = '';
 
-	for (var i = 0; i < data.outputs.length; ++i) {
+	for (var i = 0; i < data.translatorNames.length; ++i) {
 		var output = document.createElement('div');
-		const sourceName = data.outputs[i];
-		const sourceData = data[sourceName];
+		const sourceName = data.translatorNames[i];
+		const sourceData = data.texts[sourceName];
 		output.setAttribute('id', sourceName);
 		var title = document.createElement('h2');
 		if (i === 0 && data.article) {
@@ -157,9 +157,14 @@ function displayText(data) {
 		} else {
 			bodyText.innerHTML = sourceData;
 		}
+		const audioUrl = data.audioUrls[sourceName];
+		const audioButtonText = data.audioButtonText[sourceName];
+		const audioUrlElt = document.createElement('div');
+		audioUrlElt.innerHTML = `<a href="${audioUrl}" target="_blank" class="o-buttons o-buttons--mono">${audioButtonText}</a>`;
 
 		output.appendChild(title);
 		output.appendChild(bodyText);
+		output.appendChild(audioUrlElt);
 
 		container.appendChild(output);
 	}
@@ -167,6 +172,7 @@ function displayText(data) {
 	setChildrenDataAttributes();
 
 	toggleLoadingState();
+
 
 	document.getElementById('output').classList.remove('cape');
 
