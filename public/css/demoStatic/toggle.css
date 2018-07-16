@@ -2,6 +2,10 @@
 	display: none;
 }
 
+.translation-hidden {
+	display: none;
+}
+
 .translation-accordion {
 	background-color: #f2dfce;
 	font-family: MetricWeb, sans-serif;
@@ -53,6 +57,19 @@
 
 .translation-expanded {
 	margin-top: 8px;
+}
+
+.translation-loading {
+	position: absolute;
+	right: 50%;
+}
+
+.translation-blur {
+	filter: blur(3px);
+}
+
+.translation-error {
+	color: #bd2031;
 }
 
 @media (max-width: 1219px) {

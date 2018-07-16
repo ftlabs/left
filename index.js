@@ -61,6 +61,15 @@ async function generateTranslations(
 	return translations;
 }
 
+app.use(function(req, res, next) {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-With, Content-Type, Accept'
+	);
+	next();
+});
+
 app.post('/article/:uuid/:lang', (req, res) => {
 	const uuid = req.params.uuid;
 	const lang = req.params.lang;
@@ -185,6 +194,14 @@ app.get('/demo-static/:demoType', (req, res) => {
 				)}`
 			);
 	}
+});
+
+app.get('/get-translation/:uuid/:language', (req, res) => {
+	const uuid = req.params.uuid;
+	const language = req.params.language;
+	fs.readFile(`./public/demoTranslations/${uuid}.json`, (err, data) => {
+		res.json(JSON.parse(data)[language]);
+	});
 });
 
 console.log(`Server is running locally on port ${PORT}`);

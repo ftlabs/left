@@ -1,6 +1,6 @@
 var rootUrl = window.location.href;
 
-var Utils = Origami['o-utils']
+var Utils = Origami['o-utils'];
 
 function init() {
 	toggleSettings();
@@ -13,7 +13,9 @@ function init() {
 
 function updateTranslators(e) {
 	var selected = e.currentTarget.options.selectedIndex;
-	var translators = e.currentTarget.options[selected].getAttribute('data-translators').split(',');
+	var translators = e.currentTarget.options[selected]
+		.getAttribute('data-translators')
+		.split(',');
 
 	var translatorSelection = document.querySelectorAll('#translators input');
 	Array.from(translatorSelection).forEach(function(checkbox) {
@@ -21,7 +23,7 @@ function updateTranslators(e) {
 		checkbox.disabled = true;
 	});
 
-	for(var i = 0; i < translators.length; ++i) {
+	for (var i = 0; i < translators.length; ++i) {
 		var translator = document.querySelector('#' + translators[i]);
 		translator.checked = true;
 		translator.disabled = false;
@@ -31,9 +33,9 @@ function updateTranslators(e) {
 function getTranslation(e) {
 	e.preventDefault();
 
-	var uuidElement     = e.target.querySelector('#articleUUID');
+	var uuidElement = e.target.querySelector('#articleUUID');
 	var freeTextElement = e.target.querySelector('#freeText');
-	var lexiconElement  = e.target.querySelector('#lexiconTerm');
+	var lexiconElement = e.target.querySelector('#lexiconTerm');
 
 	var uuidMatch = /^([a-f\d]{8}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{4}-[a-f\d]{12})/g;
 	var language = e.target.querySelector('#langSelect');
@@ -54,36 +56,43 @@ function getTranslation(e) {
 		whichInput = 'freeText';
 	} else if (uuidElement.value !== '') {
 		whichInput = 'uuid';
-		if(!uuidMatch.test(uuidElement.value)) {
+		if (!uuidMatch.test(uuidElement.value)) {
 			alert('Invalid UUID');
 			return;
 		}
 	} else {
-		alert('Specify something to translate, be it a UUID, free text, or a lexicon term.');
+		alert(
+			'Specify something to translate, be it a UUID, free text, or a lexicon term.'
+		);
 		return;
 	}
 
-	if(language.value === '') {
+	if (language.value === '') {
 		alert('Select a language into which to translate.');
 		return;
 	}
 
-	var translatorOptions = document.querySelectorAll('#translators input:checked');
+	var translatorOptions = document.querySelectorAll(
+		'#translators input:checked'
+	);
 	var translatorSelection = [];
 
 	Array.from(translatorOptions).forEach(function(checkbox) {
 		translatorSelection.push(checkbox.value);
 	});
 
-	if(translatorSelection.length < 1) {
+	if (translatorSelection.length < 1) {
 		alert('You must select at least one translation service');
 		return;
 	}
 
 	toggleLoadingState();
 
-	if(whichInput == 'lexicon') {
-		fetchOptions.body = JSON.stringify({ text: lexiconElement.value, translators: translatorSelection });
+	if (whichInput == 'lexicon') {
+		fetchOptions.body = JSON.stringify({
+			text: lexiconElement.value,
+			translators: translatorSelection
+		});
 
 		return fetch(rootUrl + 'lexicon/' + language.value, fetchOptions)
 			.then(res => res.json())
@@ -92,9 +101,11 @@ function getTranslation(e) {
 				displayText(data);
 			})
 			.catch(err => console.log(err));
-
-	} else if(whichInput == 'freeText') {
-		fetchOptions.body = JSON.stringify({ text: freeTextElement.value, translators: translatorSelection });
+	} else if (whichInput == 'freeText') {
+		fetchOptions.body = JSON.stringify({
+			text: freeTextElement.value,
+			translators: translatorSelection
+		});
 
 		return fetch(rootUrl + 'translation/' + language.value, fetchOptions)
 			.then(res => res.json())
@@ -103,11 +114,13 @@ function getTranslation(e) {
 				displayText(data);
 			})
 			.catch(err => console.log(err));
-
 	} else if (whichInput == 'uuid') {
-		fetchOptions.body = JSON.stringify({translators: translatorSelection });
+		fetchOptions.body = JSON.stringify({ translators: translatorSelection });
 
-		fetch(rootUrl + 'article/' + uuidElement.value +'/' + language.value, fetchOptions)
+		fetch(
+			rootUrl + 'article/' + uuidElement.value + '/' + language.value,
+			fetchOptions
+		)
 			.then(res => res.json())
 			.then(data => {
 				toggleSettings();
@@ -121,20 +134,24 @@ function displayText(data) {
 	var container = document.getElementById('output');
 	container.innerHTML = '';
 
-	for(var i = 0; i < data.outputs.length; ++i) {
+	for (var i = 0; i < data.outputs.length; ++i) {
 		var output = document.createElement('div');
 		const sourceName = data.outputs[i];
 		const sourceData = data[sourceName];
 		output.setAttribute('id', sourceName);
 		var title = document.createElement('h2');
-		if(i === 0 && data.article) {
-			title.innerHTML = sourceName + ' <a href="https://ft.com/content/' + data.article + '" target="_blank" class="ft-link"><img src="https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:outside-page?format=svg&source=ftlabs&tint=%23990F3D" /></a>';
+		if (i === 0 && data.article) {
+			title.innerHTML =
+				sourceName +
+				' <a href="https://ft.com/content/' +
+				data.article +
+				'" target="_blank" class="ft-link"><img src="https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:outside-page?format=svg&source=ftlabs&tint=%23990F3D" /></a>';
 		} else {
 			title.textContent = sourceName;
 		}
 		var bodyText = document.createElement('div');
 		bodyText.classList.add('text-body');
-		if(sourceData['error']) {
+		if (sourceData['error']) {
 			bodyText.classList.add('is-error');
 			bodyText.textContent = sourceData['error'];
 		} else {
@@ -150,59 +167,59 @@ function displayText(data) {
 	setChildrenDataAttributes();
 
 	toggleLoadingState();
-  
-	document.getElementById("output").classList.remove("cape");
-  
+
+	document.getElementById('output').classList.remove('cape');
+
 	formatChildElements();
 }
 
 function formatChildElements() {
 	setElementsHeight();
-	window.addEventListener("resize", Utils.debounce(setElementsHeight, 250));
+	window.addEventListener('resize', Utils.debounce(setElementsHeight, 250));
 }
-  
+
 function setElementsHeight() {
-	var textBody = document.getElementsByClassName("text-body");
+	var textBody = document.getElementsByClassName('text-body');
 	resetElementHeight(textBody);
-  
+
 	for (let i = 0; i < textBody[0].children.length; i++) {
-	  let largest;
-	  applyToAllElements(i, element => {
-		if (!largest || largest.offsetHeight < element.offsetHeight) {
-		  largest = element;
-		}
-	  });
-  
-	  applyToAllElements(i, element => {
-		element.setAttribute(
-		  "style",
-		  "min-height:" + largest.offsetHeight + "px"
-		);
-	  });
+		let largest;
+		applyToAllElements(i, element => {
+			if (!largest || largest.offsetHeight < element.offsetHeight) {
+				largest = element;
+			}
+		});
+
+		applyToAllElements(i, element => {
+			element.setAttribute(
+				'style',
+				'min-height:' + largest.offsetHeight + 'px'
+			);
+		});
 	}
 }
-  
+
 function resetElementHeight(parentElement) {
 	Array.from(parentElement).forEach(element =>
-	  Array.from(element.children).forEach((element, index) => {
-		element.setAttribute("style", "");
-	  })
+		Array.from(element.children).forEach((element, index) => {
+			element.setAttribute('style', '');
+		})
 	);
 }
-  
+
 function setChildrenDataAttributes() {
-	var textBody = document.getElementsByClassName("text-body");
-  
+	var textBody = document.getElementsByClassName('text-body');
+
 	Array.from(textBody).forEach(element =>
-	  Array.from(element.children).forEach((element, index) => {
-		element.setAttribute("data-element-number", index);
-	  })
+		Array.from(element.children).forEach((element, index) => {
+			element.setAttribute('data-element-number', index);
+		})
 	);
 }
-  
+
 function applyToAllElements(index, func) {
 	var elements = document.querySelectorAll(
-	  '[data-element-number="' + index + '"]'
+		'[data-element-number="' + index + '"]'
 	);
 	Array.from(elements).forEach(func);
 }
@@ -215,16 +232,17 @@ function toggleSettings() {
 function toggleLoadingState(form) {
 	var form = document.getElementById('translateForm');
 	var submit = document.querySelector('.o-buttons--primary');
-	submit.getAttribute('disabled') ? submit.removeAttribute('disabled') : submit.setAttribute('disabled', 'disabled');
-
+	submit.getAttribute('disabled')
+		? submit.removeAttribute('disabled')
+		: submit.setAttribute('disabled', 'disabled');
 
 	form.classList.toggle('loading');
 
 	var loader = document.querySelector('.loading-card');
-	var invertVisibility = (loader.getAttribute('aria-hidden') === "true")? false : true;
+	var invertVisibility =
+		loader.getAttribute('aria-hidden') === 'true' ? false : true;
 	loader.setAttribute('aria-hidden', invertVisibility);
 	loader.classList.toggle('cape');
-
 }
 
 document.addEventListener('DOMContentLoaded', init);
