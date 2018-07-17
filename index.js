@@ -11,12 +11,12 @@ const PORT = process.env.PORT || 2018;
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
 
-const AUDIO_RENDER_URL   = process.env.AUDIO_RENDER_URL;
+const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
 const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
 
-const MAX_CHARS_FOR_AUDIO=1500;
+const MAX_CHARS_FOR_AUDIO = 1500;
 
-if(process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production') {
 	app.use(helmet());
 	app.enable('trust proxy');
 	app.use(express_enforces_ssl());
@@ -41,36 +41,46 @@ async function generateTranslations(
 	translatorNames,
 	text,
 	lang,
-	firstChunkOnly
+	firstChunkOnly,
+	hasStandfirst
 ) {
 	const extractedText = extract(text);
 	const translations = {
-		texts : {}, // name -> text
-		translatorNames : [], // names
-		audioUrls : {}, // name -> url
-		audioButtonText : {}, // name -> text
+		texts: {}, // name -> text
+		translatorNames: [], // names
+		audioUrls: {}, // name -> url
+		audioButtonText: {} // name -> text
 	};
 
-	translations.texts = await Translator.translate(translatorNames, {text: extractedText, to: lang, firstChunkOnly: firstChunkOnly});
+	translations.texts = await Translator.translate(translatorNames, {
+		text: extractedText,
+		to: lang,
+		firstChunkOnly: firstChunkOnly
+	});
 	translations.texts['original'] = extractedText;
 	translations.translatorNames = ['original'].concat(translatorNames);
 
 	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
 	translations.translatorNames.map(translatorName => {
 		let textWithParas;
-		if( translations.texts[translatorName].hasOwnProperty('error') ){
+		if (translations.texts[translatorName].hasOwnProperty('error')) {
 			textWithParas = translations.texts[translatorName];
 		} else {
 			const textWithBackslashNs = translations.texts[translatorName];
-			const paras = textWithBackslashNs.split('\n\n').map( para => { return `<p>${para}</p>`});
+			const paras = textWithBackslashNs.split('\n\n').map((para, index) => {
+				if (index === 0) return `<h1>${para}</h1>`;
+				if (index === 1 && hasStandfirst) return `<h2>${para}</h2>`;
+
+				return `<p>${para}</p>`;
+			});
 			textWithParas = paras.join('\n');
 		}
 		translations.texts[translatorName] = textWithParas;
 	});
 
 	const originalVoice = 'Amy';
-	const originalLang  = 'en';
-	let translationVoice     = originalVoice;
+	const originalLang = 'en';
+	let translationVoice = originalVoice;
 	let translationVoiceLang = originalLang;
 	let langLC = lang.toLowerCase();
 
@@ -83,7 +93,7 @@ async function generateTranslations(
 	}
 
 	// construct the audio-related info
-	translations.translatorNames.map( translatorName => {
+	translations.translatorNames.map(translatorName => {
 		let audioVoice;
 		let audioButtonDesc;
 		if (translatorName === 'original') {
@@ -95,14 +105,16 @@ async function generateTranslations(
 		}
 		const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
 		let audioBody;
-		if( translations.texts[translatorName].hasOwnProperty('error') ){
+		if (translations.texts[translatorName].hasOwnProperty('error')) {
 			audioBody = 'Je ne regrette rien';
 		} else {
 			audioBody = translations.texts[translatorName];
 		}
-		audioBody = audioBody.slice(0,MAX_CHARS_FOR_AUDIO);
+		audioBody = audioBody.slice(0, MAX_CHARS_FOR_AUDIO);
 
-		translations.audioUrls[translatorName] = `${audioBaseUrl}${encodeURIComponent(audioBody)}`;
+		translations.audioUrls[
+			translatorName
+		] = `${audioBaseUrl}${encodeURIComponent(audioBody)}`;
 		translations.audioButtonText[translatorName] = `AUDIO: ${audioButtonDesc}`;
 	});
 
@@ -130,21 +142,18 @@ app.post('/article/:uuid/:lang', (req, res) => {
 		.then(async data => {
 			const text = data.bodyXML;
 			const title = maybeAppendDot(data.title);
-			const standfirst = maybeAppendDot(data.standfirst); // adding a closing . improves the translation
-			const combinedText =
-				'Title: ' +
-				title +
-				'\n\n' +
-				'Standfirst: ' +
-				standfirst +
-				'\n\n' +
-				text;
+			let standfirst = '';
+			if (data.standfirst) {
+				standfirst = maybeAppendDot(data.standfirst);
+			} // adding a closing . improves the translation
+			const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
 
 			generateTranslations(
 				translators,
 				combinedText,
 				lang,
-				firstChunkOnly
+				firstChunkOnly,
+				standfirst
 			).then(translations => {
 				translations.article = uuid;
 				res.json(translations);
@@ -214,7 +223,6 @@ app.get('/get-translation/:uuid/:language', (req, res) => {
 		res.json(JSON.parse(data)[language]);
 	});
 });
-
 
 app.use('/client', express.static(path.resolve(__dirname + '/public')));
 app.use(s3o);
