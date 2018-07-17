@@ -70,7 +70,6 @@ async function generateTranslations(
 			const paras = textWithBackslashNs.split('\n\n').map((para, index) => {
 				if (index === 0) return `<h1>${para}</h1>`;
 				if (index === 1 && hasStandfirst) return `<h2>${para}</h2>`;
-
 				return `<p>${para}</p>`;
 			});
 			textWithParas = paras.join('\n');
