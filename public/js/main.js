@@ -43,7 +43,7 @@ function getTranslation(e) {
 
 	var fetchOptions = {
 		headers: {
-			'Content-Type': 'application/json'
+			'Content-Type': 'application/x-www-form-urlencoded'
 		},
 		method: 'POST',
 		credentials: 'same-origin'
@@ -89,10 +89,7 @@ function getTranslation(e) {
 	toggleLoadingState();
 
 	if (whichInput == 'lexicon') {
-		fetchOptions.body = JSON.stringify({
-			text: lexiconElement.value,
-			translators: translatorSelection
-		});
+		fetchOptions.body = 'text=' + lexiconElement.value +'&translators=' + JSON.stringify(translatorSelection);
 
 		return fetch(rootUrl + 'lexicon/' + language.value, fetchOptions)
 			.then(res => res.json())
@@ -102,10 +99,7 @@ function getTranslation(e) {
 			})
 			.catch(err => console.log(err));
 	} else if (whichInput == 'freeText') {
-		fetchOptions.body = JSON.stringify({
-			text: freeTextElement.value,
-			translators: translatorSelection
-		});
+		fetchOptions.body = 'text=' + freeTextElement.value +'&translators=' + JSON.stringify(translatorSelection);
 
 		return fetch(rootUrl + 'translation/' + language.value, fetchOptions)
 			.then(res => res.json())
@@ -115,7 +109,7 @@ function getTranslation(e) {
 			})
 			.catch(err => console.log(err));
 	} else if (whichInput == 'uuid') {
-		fetchOptions.body = JSON.stringify({ translators: translatorSelection });
+		fetchOptions.body = 'translators=' + JSON.stringify(translatorSelection);
 
 		fetch(
 			rootUrl + 'article/' + uuidElement.value + '/' + language.value,
