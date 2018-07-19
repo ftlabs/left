@@ -108,27 +108,6 @@ function updateApiLimitUsed({ articleCharacters, provider }) {
 	});
 }
 
-(async () => {
-	try {
-		const data = await updateApiLimitUsed({
-			articleCharacters: 50,
-			provider: 'google'
-		});
-		console.log(data);
-	} catch (error) {
-		console.log(error);
-	}
-})();
-
-(async () => {
-	try {
-		const data = await withinApiLimit({ provider: 'google' });
-		console.log('resolved', data);
-	} catch (error) {
-		console.log('rejected', error);
-	}
-})();
-
 module.exports = {
 	withinApiLimit,
 	updateApiLimitUsed
