@@ -33,10 +33,6 @@ const Translator = require('./bin/lib/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
 const Lexicon = require('./bin/lib/lexicon').init(process.env.LEXICON_API_KEY);
 
-function maybeAppendDot(text) {
-	return text + (text.endsWith('?') ? '' : '.');
-}
-
 async function generateTranslations(
 	translatorNames,
 	text,
@@ -140,10 +136,10 @@ app.post('/article/:uuid/:lang', (req, res) => {
 	CAPI.get(uuid)
 		.then(async data => {
 			const text = data.bodyXML;
-			const title = maybeAppendDot(data.title);
+			const title = Utils.maybeAppendDot(data.title);
 			let standfirst = '';
 			if (data.standfirst) {
-				standfirst = maybeAppendDot(data.standfirst);
+				standfirst = Utils.maybeAppendDot(data.standfirst);
 			} // adding a closing . improves the translation
 			const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
 
@@ -215,19 +211,11 @@ app.post('/lexicon/:lang', (req, res) => {
 		});
 });
 
-app.get('/get-translation/:uuid/:language', (req, res) => {
-	const uuid = req.params.uuid;
-	const language = req.params.language;
-	fs.readFile(`./public/demoTranslations/${uuid}.json`, (err, data) => {
-		res.json(JSON.parse(data)[language]);
-	});
-});
-
-app.use('/client', express.static(path.resolve(__dirname + '/public')));
 app.use(s3o);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials');
+app.use('/client', express.static(path.resolve(__dirname + '/public')));
 
 app.get('/', (req, res) => {
 	const settings = Translator.settings(Utils.extractUser(req.headers.cookie));
@@ -259,6 +247,14 @@ app.get('/demo-static/:demoType', (req, res) => {
 				)}`
 			);
 	}
+});
+
+app.get('/get-translation/:uuid/:language', (req, res) => {
+	const uuid = req.params.uuid;
+	const language = req.params.language;
+	fs.readFile(`./public/demoTranslations/${uuid}.json`, (err, data) => {
+		res.json(JSON.parse(data)[language]);
+	});
 });
 
 console.log(`Server is running locally on port ${PORT}`);

@@ -65,8 +65,13 @@ function pauseForMillis( millis ){
 	});
 }
 
+function maybeAppendDot(text) {
+	return text + (text.endsWith('?') ? '' : '.');
+}
+
 module.exports = {
 	extractUser: getS3OUserFromCookie,
 	splitTextIntoChunks: checkAndSplitText,
 	pauseForMillis: pauseForMillis,
+	maybeAppendDot: maybeAppendDot
 };
