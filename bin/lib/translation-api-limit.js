@@ -2,7 +2,11 @@ const AWS = require('aws-sdk');
 
 const limitTable = process.env.LIMIT_TABLE;
 const region = process.env.AWS_REGION;
-const translators = process.env.PUBLIC_TRANSLATORS.split(',');
+
+const translators = [
+	...process.env.RESTRICTED_TRANSLATORS.split(','),
+	...process.env.PUBLIC_TRANSLATORS.split(',')
+];
 
 const database = new AWS.DynamoDB.DocumentClient({ region });
 
@@ -155,27 +159,6 @@ function getCurrentDate() {
 		year: new Date().getFullYear()
 	};
 }
-
-// (async () => {
-// 	try {
-// 		const data = await updateApiLimitUsed({
-// 			google: 50,
-// 			deepl: 75
-// 		});
-// 		console.log(data);
-// 	} catch (error) {
-// 		console.log(error);
-// 	}
-// })();
-
-(async () => {
-	try {
-		const data = await withinApiLimit(['deepl', 'google']);
-		console.log('resolved', data);
-	} catch (error) {
-		console.log('rejected', error);
-	}
-})();
 
 module.exports = {
 	withinApiLimit,

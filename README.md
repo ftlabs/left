@@ -33,4 +33,5 @@ AUDIO_RENDER_TOKEN=...     # ditto (lifted from the renderer's settings)
 LIMIT_TABLE=...            # table for checking api limits have not been breached
 DEEPL_API_LIMIT=...        # limit for DEEPL api
 GOOGLE_API_LIMIT=...       # ditto
+AWS_API_LIMIT=...          # ditto
 ```
