@@ -10,7 +10,7 @@ const apiLimits = {
 
 const database = new AWS.DynamoDB.DocumentClient({ region });
 
-function monthCreate({ month, year }) {
+function monthCreate(month, year) {
 	return new Promise((resolve, reject) => {
 		const params = {
 			TableName: limitTable,
@@ -35,7 +35,7 @@ function monthCreate({ month, year }) {
 	});
 }
 
-function withinApiLimit({ provider }) {
+function withinApiLimit(provider) {
 	return new Promise((resolve, reject) => {
 		if (!apiLimits[provider]) {
 			reject(new Error('API provider does not exist'));
@@ -60,7 +60,7 @@ function withinApiLimit({ provider }) {
 
 			if (Object.keys(result).length === 0) {
 				try {
-					await monthCreate({ month, year });
+					await monthCreate(month, year);
 					resolve(true);
 				} catch (error) {
 					reject(error);
@@ -75,7 +75,7 @@ function withinApiLimit({ provider }) {
 	});
 }
 
-function updateApiLimitUsed({ articleCharacters, provider }) {
+function updateApiLimitUsed(articleCharacters, provider) {
 	return new Promise((resolve, reject) => {
 		if (!apiLimits[provider]) {
 			reject(new Error('API provider does not exist'));
