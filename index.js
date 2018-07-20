@@ -211,6 +211,17 @@ app.post('/lexicon/:lang', (req, res) => {
 		});
 });
 
+app.get('/check/:uuid', (req, res) => {
+	console.log(`checking for ${req.params.uuid}`);
+	res.json({
+		displayWidget: true, 
+		languages: [
+			{code: 'DE', name: 'German'},
+			{code: 'FR', name: 'French'},
+			{code: 'ES', name: 'Spanish'}
+	]});
+});
+
 app.use(s3o);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
