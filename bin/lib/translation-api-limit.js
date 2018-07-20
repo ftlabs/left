@@ -2,13 +2,23 @@ const AWS = require('aws-sdk');
 
 const limitTable = process.env.LIMIT_TABLE;
 const region = process.env.AWS_REGION;
-
-const apiLimits = {
-	deepl: process.env.DEEPL_API_LIMIT,
-	google: process.env.GOOGLE_API_LIMIT
-};
+const translators = process.env.PUBLIC_TRANSLATORS.split(',');
 
 const database = new AWS.DynamoDB.DocumentClient({ region });
+
+const apiLimits = (() => {
+	const limits = {};
+	translators.forEach(translator => {
+		const limit = process.env[`${translator.toUpperCase()}_API_LIMIT`];
+		if (!limit) {
+			throw new Error(
+				`${translator} does not have an api limit specified as an environment variable`
+			);
+		}
+		limits[translator] = limit;
+	});
+	return limits;
+})();
 
 function monthCreate(month, year) {
 	return new Promise((resolve, reject) => {
@@ -146,17 +156,17 @@ function getCurrentDate() {
 	};
 }
 
-(async () => {
-	try {
-		const data = await updateApiLimitUsed({
-			google: 50,
-			deepl: 75
-		});
-		console.log(data);
-	} catch (error) {
-		console.log(error);
-	}
-})();
+// (async () => {
+// 	try {
+// 		const data = await updateApiLimitUsed({
+// 			google: 50,
+// 			deepl: 75
+// 		});
+// 		console.log(data);
+// 	} catch (error) {
+// 		console.log(error);
+// 	}
+// })();
 
 (async () => {
 	try {
