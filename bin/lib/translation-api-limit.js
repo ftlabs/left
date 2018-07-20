@@ -1,14 +1,14 @@
 const AWS = require('aws-sdk');
 
 const limitTable = process.env.LIMIT_TABLE;
-const awsRegion = process.env.AWS_REGION;
+const region = process.env.AWS_REGION;
 
 const apiLimits = {
 	deepl: process.env.DEEPL_API_LIMIT,
 	google: process.env.GOOGLE_API_LIMIT
 };
 
-const database = new AWS.DynamoDB.DocumentClient({ region: awsRegion });
+const database = new AWS.DynamoDB.DocumentClient({ region });
 
 function monthCreate({ month, year }) {
 	return new Promise((resolve, reject) => {
@@ -107,6 +107,27 @@ function updateApiLimitUsed({ articleCharacters, provider }) {
 		});
 	});
 }
+
+(async () => {
+	try {
+		const data = await updateApiLimitUsed({
+			articleCharacters: 50,
+			provider: 'google'
+		});
+		console.log(data);
+	} catch (error) {
+		console.log(error);
+	}
+})();
+
+(async () => {
+	try {
+		const data = await withinApiLimit({ provider: 'google' });
+		console.log('resolved', data);
+	} catch (error) {
+		console.log('rejected', error);
+	}
+})();
 
 module.exports = {
 	withinApiLimit,
