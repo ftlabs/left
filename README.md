@@ -31,7 +31,5 @@ AWS_SECRET_ACCESS_KEY=...  # ditto
 AUDIO_RENDER_URL=...       # for generating the audio version of the translations
 AUDIO_RENDER_TOKEN=...     # ditto (lifted from the renderer's settings)
 LIMIT_TABLE=...            # table for checking api limits have not been breached
-DEEPL_API_LIMIT=...        # limit for DEEPL api
-GOOGLE_API_LIMIT=...       # ditto
-AWS_API_LIMIT=...          # ditto
+API_CHAR_LIMITS=...        # JSON object with providers (lowerCase) as key and char limits as (Int) values
 ```
