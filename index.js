@@ -10,6 +10,7 @@ const express_enforces_ssl = require('express-enforces-ssl');
 const PORT = process.env.PORT || 2018;
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
+const limits = require('./bin/lib/aws/translation-api-limit');
 
 const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
 const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
@@ -211,15 +212,21 @@ app.post('/lexicon/:lang', (req, res) => {
 		});
 });
 
-app.get('/check/:uuid', (req, res) => {
+app.get('/check/:uuid/:translator', (req, res) => {
 	console.log(`checking for ${req.params.uuid}`);
-	res.json({
-		displayWidget: true, 
-		languages: [
-			{code: 'DE', name: 'German'},
-			{code: 'FR', name: 'French'},
-			{code: 'ES', name: 'Spanish'}
-	]});
+	const passCheck = limits.withinApiLimit([req.params.translator])[req.params.translator];
+
+	if(passCheck) {
+		return res.json({
+			displayWidget: true, 
+			languages: [
+				{code: 'DE', name: 'German'},
+				{code: 'FR', name: 'French'},
+				{code: 'ES', name: 'Spanish'}
+		]});
+	} else {
+		return res.json({error:  `Limit Exceeded for ${req.params.translator}`, displayWidget: false});
+	}
 });
 
 app.use(s3o);
