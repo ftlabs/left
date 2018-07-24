@@ -28,10 +28,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const googleTokenPath = path.resolve(`${__dirname}/keyfile.json`);
 fs.writeFileSync(googleTokenPath, process.env.GOOGLE_CREDS);
 
-const CAPI = require('./bin/lib/capi').init(process.env.FT_API_KEY);
-const Translator = require('./bin/lib/multi-translator');
+const CAPI = require('./bin/lib/ft/capi').init(process.env.FT_API_KEY);
+const Translator = require('./bin/lib/translators/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
-const Lexicon = require('./bin/lib/lexicon').init(process.env.LEXICON_API_KEY);
+const Lexicon = require('./bin/lib/ft/lexicon').init(process.env.LEXICON_API_KEY);
 
 function maybeAppendDot(text) {
 	return text + (text.endsWith('?') ? '' : '.');
@@ -207,17 +207,9 @@ app.post('/lexicon/:lang', (req, res) => {
 		});
 });
 
-app.get('/get-translation/:uuid/:language', (req, res) => {
-	const uuid = req.params.uuid;
-	const language = req.params.language;
-	fs.readFile(`./public/demoTranslations/${uuid}.json`, (err, data) => {
-		res.json(JSON.parse(data)[language]);
-	});
-});
 
-
-app.use('/client', express.static(path.resolve(__dirname + '/public')));
 app.use(s3o);
+app.use('/client', express.static(path.resolve(__dirname + '/public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials');
@@ -252,6 +244,14 @@ app.get('/demo-static/:demoType', (req, res) => {
 				)}`
 			);
 	}
+});
+
+app.get('/get-translation/:uuid/:language', (req, res) => {
+	const uuid = req.params.uuid;
+	const language = req.params.language;
+	fs.readFile(`./public/demoTranslations/${uuid}.json`, (err, data) => {
+		res.json(JSON.parse(data)[language]);
+	});
 });
 
 console.log(`Server is running locally on port ${PORT}`);

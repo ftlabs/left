@@ -2,27 +2,9 @@ const AWS = require('aws-sdk');
 
 const limitTable = process.env.LIMIT_TABLE;
 const region = process.env.AWS_REGION;
-
-const translators = [
-	...process.env.RESTRICTED_TRANSLATORS.split(','),
-	...process.env.PUBLIC_TRANSLATORS.split(',')
-];
+const apiLimits = JSON.parse(process.env.API_CHAR_LIMITS);
 
 const database = new AWS.DynamoDB.DocumentClient({ region });
-
-const apiLimits = (() => {
-	const limits = {};
-	translators.forEach(translator => {
-		const limit = process.env[`${translator.toUpperCase()}_API_LIMIT`];
-		if (!limit) {
-			throw new Error(
-				`${translator} does not have an api limit specified as an environment variable`
-			);
-		}
-		limits[translator] = limit;
-	});
-	return limits;
-})();
 
 function monthCreate(month, year) {
 	return new Promise((resolve, reject) => {
@@ -84,7 +66,7 @@ function withinApiLimit(providers) {
 			let limitsReached = {};
 
 			providers.forEach(provider => {
-				limitsReached[provider] = result.Item[provider] >= apiLimits[provider];
+				limitsReached[provider] = result.Item[provider] < parseInt(apiLimits[provider]);
 			});
 
 			resolve(limitsReached);

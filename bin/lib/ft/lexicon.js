@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const LEXICON_URL = 'http://markets.ft.com/research/webservices/lexicon/v1/terms';
 
-const Utils = require('./utils/utils');
+const Utils = require('../utils/utils');
 
 function init(apiKey) {
 	this.apiKey = apiKey;
