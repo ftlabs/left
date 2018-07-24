@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 const Deepl = require('./deepl').init(process.env.DEEPL_API_KEY);
 const Google = require('./google').init(process.env.GOOGLE_PROJECT_ID);
 const AWS = require('./aws').init();
-const SETTINGS = require('./utils/translator-settings');
+const SETTINGS = require('../utils/translator-settings');
 
 const translatorEntities = [Deepl, Google, AWS];
 const translatorMap = {}; // unpack entity info into useful structure

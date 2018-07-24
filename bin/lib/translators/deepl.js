@@ -14,7 +14,7 @@ const supportedLang = [
 const BYTE_LIMIT = 30000;
 const THROTTLE_LIMIT = 1*1000 // 1 second
 
-const Utils = require('./utils/utils');
+const Utils = require('../utils/utils');
 
 function init(apiKey) {
 	this.apiKey = apiKey;

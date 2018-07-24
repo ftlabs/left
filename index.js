@@ -28,10 +28,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 const googleTokenPath = path.resolve(`${__dirname}/keyfile.json`);
 fs.writeFileSync(googleTokenPath, process.env.GOOGLE_CREDS);
 
-const CAPI = require('./bin/lib/capi').init(process.env.FT_API_KEY);
-const Translator = require('./bin/lib/multi-translator');
+const CAPI = require('./bin/lib/ft/capi').init(process.env.FT_API_KEY);
+const Translator = require('./bin/lib/translators/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
-const Lexicon = require('./bin/lib/lexicon').init(process.env.LEXICON_API_KEY);
+const Lexicon = require('./bin/lib/ft/lexicon').init(process.env.LEXICON_API_KEY);
 
 async function generateTranslations(
 	translatorNames,
@@ -223,10 +223,10 @@ app.get('/check/:uuid', (req, res) => {
 });
 
 app.use(s3o);
+app.use('/client', express.static(path.resolve(__dirname + '/public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials');
-app.use('/client', express.static(path.resolve(__dirname + '/public')));
 
 app.get('/', (req, res) => {
 	const settings = Translator.settings(Utils.extractUser(req.headers.cookie));
