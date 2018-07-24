@@ -9,6 +9,17 @@ h2 {
 	text-transform: capitalize;
 }
 
+h2 {
+	font-family: 'MetricWeb', sans-serif;
+	font-size: 18px;
+}
+
+.text-body h1,
+.text-body h2 {
+	margin: 0;
+	text-transform: none;
+}
+
 .cape {
 	display: none !important;
 }
