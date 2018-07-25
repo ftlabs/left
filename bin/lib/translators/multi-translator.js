@@ -43,6 +43,7 @@ async function translate(translatorNames, options) {
 				translator.durations.push({
 					numChars       : options.text.length,
 					lang           : options.to,
+					langFrom	   : options.from,
 					durationMillis : translationDurationMillis,
 					translationEventId : translationEventId,
 				});

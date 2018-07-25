@@ -13,8 +13,9 @@ function init(projectId) {
 }
 
 async function translate(options) {
+	const translateOptions = options.from ? {to: options.to.toLowerCase(), from: options.from.toLowerCase()} : options.to.toLowerCase();
 	return this.translator
-		.translate(options.text, `${options.to.toLowerCase()}`)
+		.translate(options.text, translateOptions)
 		.then(results => {
 			const translation = results[0];
 			return translation;

@@ -42,7 +42,7 @@ async function translate(options) {
 		if (i>0) {
 			console.log(`Deepl.translate: eventId=${options.translationEventId}, submitting chunk=${i+1} (of ${textChunks.length}).`);
 		}
-		const formattedBody = `text=${textChunks[i]}&target_lang=${options.to.toUpperCase()}&auth_key=${this.apiKey}`;
+		const formattedBody = `text=${textChunks[i]}&target_lang=${options.to.toUpperCase()}&auth_key=${this.apiKey}${options.from ? '&source_lang=' + options.from.toUpperCase():''}`;
 		postOptions.body = formattedBody;
 
 		const translationResponse = await sendRequest(postOptions);

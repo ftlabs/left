@@ -89,7 +89,7 @@ function getTranslation(e) {
 	toggleLoadingState();
 
 	if (whichInput == 'lexicon') {
-		fetchOptions.body = 'text=' + lexiconElement.value +'&translators=' + JSON.stringify(translatorSelection);
+		fetchOptions.body = 'text=' + lexiconElement.value +'&translators=' + JSON.stringify(translatorSelection) +'&from=en';
 
 		return fetch(rootUrl + 'lexicon/' + language.value, fetchOptions)
 			.then(res => res.json())
@@ -109,7 +109,7 @@ function getTranslation(e) {
 			})
 			.catch(err => console.log(err));
 	} else if (whichInput == 'uuid') {
-		fetchOptions.body = 'translators=' + JSON.stringify(translatorSelection);
+		fetchOptions.body = 'translators=' + JSON.stringify(translatorSelection) + '&from=en';
 
 		fetch(
 			rootUrl + 'article/' + uuidElement.value + '/' + language.value,

@@ -39,7 +39,8 @@ async function generateTranslations(
 	text,
 	lang,
 	firstChunkOnly,
-	hasStandfirst
+	hasStandfirst = false,
+	langFrom = false
 ) {
 	const extractedText = extract(text);
 	const translations = {
@@ -52,6 +53,7 @@ async function generateTranslations(
 	translations.texts = await Translator.translate(translatorNames, {
 		text: extractedText,
 		to: lang,
+		from: langFrom,
 		firstChunkOnly: firstChunkOnly
 	});
 	translations.texts['original'] = extractedText;
@@ -129,6 +131,7 @@ app.use(function(req, res, next) {
 app.post('/article/:uuid/:lang', (req, res) => {
 	const uuid = req.params.uuid;
 	const lang = req.params.lang;
+	const langFrom = req.body.from; 
 
 	const translators = JSON.parse(req.body.translators);
 	const firstChunkOnly =
@@ -149,7 +152,8 @@ app.post('/article/:uuid/:lang', (req, res) => {
 				combinedText,
 				lang,
 				firstChunkOnly,
-				standfirst
+				standfirst,
+				langFrom
 			).then(translations => {
 				translations.article = uuid;
 				res.json(translations);
@@ -167,6 +171,7 @@ app.post('/article/:uuid/:lang', (req, res) => {
 app.post('/translation/:lang', (req, res) => {
 	const text = req.body.text;
 	const lang = req.params.lang;
+
 	const translators = JSON.parse(req.body.translators);
 	const firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
@@ -187,6 +192,8 @@ app.post('/translation/:lang', (req, res) => {
 app.post('/lexicon/:lang', (req, res) => {
 	const lexQuery = req.body.text;
 	const lang = req.params.lang;
+	const langFrom = req.body.from; 
+
 	const translators = JSON.parse(req.body.translators);
 	const firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
@@ -197,7 +204,9 @@ app.post('/lexicon/:lang', (req, res) => {
 				translators,
 				combinedText,
 				lang,
-				firstChunkOnly
+				firstChunkOnly,
+				false,
+				langFrom
 			);
 			res.json(translations);
 		})
