@@ -74,9 +74,9 @@ function withinApiLimit(providers) {
 	});
 }
 
-function updateApiLimitUsed(articleCharacters) {
+function updateApiLimitUsed(translators, charLength) {
 	return new Promise((resolve, reject) => {
-		if (!validProviders(Object.keys(articleCharacters))) {
+		if (!validProviders(translators)) {
 			reject(new Error('API provider does not exist'));
 			return;
 		}
@@ -91,10 +91,8 @@ function updateApiLimitUsed(articleCharacters) {
 			},
 			ReturnValues: 'ALL_NEW'
 		};
-		params.ExpressionAttributeValues = constructAttributeValues(
-			articleCharacters
-		);
-		params.UpdateExpression = constructUpdateExpression(articleCharacters);
+		params.ExpressionAttributeValues = constructAttributeValues(translators, charLength);
+		params.UpdateExpression = constructUpdateExpression(translators);
 
 		database.update(params, (error, result) => {
 			if (error) {
@@ -105,25 +103,24 @@ function updateApiLimitUsed(articleCharacters) {
 	});
 }
 
-function constructUpdateExpression(articleCharacters) {
+function constructUpdateExpression(translators) {
 	let updateExpression = 'SET updatedAt = :updatedAt ADD ';
 
-	Object.keys(articleCharacters).forEach((provider, index) => {
-		updateExpression =
-			updateExpression + `${index === 0 ? '' : ','} ${provider} :${provider}`;
-	});
+	for (let i = 0; i < translators.length; ++i) {
+		updateExpression = updateExpression + `${i === 0 ? '' : ','} ${translators[i]} :${translators[i]}`;
+	}
 
 	return updateExpression;
 }
 
-function constructAttributeValues(articleCharacters) {
+function constructAttributeValues(translators, charLength, articleChars) {
 	let attributeValues = {
 		':updatedAt': Date.now()
 	};
 
-	Object.keys(articleCharacters).forEach(provider => {
-		attributeValues[`:${provider}`] = articleCharacters[provider];
-	});
+	for (let i = 0; i < translators.length; ++i){
+		attributeValues[`:${translators[i]}`] = charLength;
+	}
 
 	return attributeValues;
 }

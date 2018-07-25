@@ -10,7 +10,7 @@ const express_enforces_ssl = require('express-enforces-ssl');
 const PORT = process.env.PORT || 2018;
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
-const limits = require('./bin/lib/aws/translation-api-limit');
+const LIMITS = require('./bin/lib/aws/translation-api-limit');
 
 const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
 const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
@@ -58,6 +58,8 @@ async function generateTranslations(
 	});
 	translations.texts['original'] = extractedText;
 	translations.translatorNames = ['original'].concat(translatorNames);
+
+	LIMITS.updateApiLimitUsed(translatorNames, extractedText.replace(/\s/g, "").length);
 
 	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
 	translations.translatorNames.map(translatorName => {
@@ -223,7 +225,7 @@ app.post('/lexicon/:lang', (req, res) => {
 
 app.get('/check/:uuid/:translator', (req, res) => {
 	console.log(`checking for ${req.params.uuid}`);
-	const passCheck = limits.withinApiLimit([req.params.translator])[req.params.translator];
+	const passCheck = LIMITS.withinApiLimit([req.params.translator])[req.params.translator];
 
 	if(passCheck) {
 		return res.json({
