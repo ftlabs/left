@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 2018;
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
 const LIMITS = require('./bin/lib/aws/translation-api-limit');
+const CACHE = require('./bin/lib/aws/translation-cache-table');
 
 const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
 const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
@@ -136,6 +137,7 @@ app.post('/article/:uuid/:lang', (req, res) => {
 	const langFrom = req.body.from; 
 
 	const translators = JSON.parse(req.body.translators);
+	
 	const firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
 
@@ -148,6 +150,7 @@ app.post('/article/:uuid/:lang', (req, res) => {
 				standfirst = Utils.maybeAppendDot(data.standfirst);
 			} // adding a closing . improves the translation
 			const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
+			const pubDate = data.publishedDate;
 
 			generateTranslations(
 				translators,
@@ -157,6 +160,8 @@ app.post('/article/:uuid/:lang', (req, res) => {
 				standfirst,
 				langFrom
 			).then(translations => {
+				//TODO: do not hardcode deepl
+				CACHE.update({uuid: uuid, lang: lang, lastPubDate: pubDate, translation: translations.texts.deepl});
 				translations.article = uuid;
 				res.json(translations);
 			});
@@ -223,11 +228,13 @@ app.post('/lexicon/:lang', (req, res) => {
 		});
 });
 
-app.get('/check/:uuid/:translator', (req, res) => {
+app.get('/check/:uuid/:translator', async (req, res) => {
 	console.log(`checking for ${req.params.uuid}`);
-	const passCheck = LIMITS.withinApiLimit([req.params.translator])[req.params.translator];
+	//TODO: save translations by translator too
+	const translator = req.params.translator;
+	const passCheck = await LIMITS.withinApiLimit([translator]);
 
-	if(passCheck) {
+	if(passCheck[translator]) {
 		return res.json({
 			displayWidget: true, 
 			languages: [
@@ -271,9 +278,7 @@ app.get('/demo-static/:demoType', (req, res) => {
 		res
 			.status(500)
 			.send(
-				`Demo type not recognised. The available types are: ${availableDemos.join(
-					', '
-				)}`
+				`Demo type not recognised. The available types are: ${availableDemos.join(', ')}`
 			);
 	}
 });

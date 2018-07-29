@@ -66,7 +66,9 @@ function withinApiLimit(providers) {
 			let limitsReached = {};
 
 			providers.forEach(provider => {
+				console.log('result', result.Item[provider], apiLimits[provider]);
 				limitsReached[provider] = result.Item[provider] < parseInt(apiLimits[provider]);
+				console.log('res', limitsReached);
 			});
 
 			resolve(limitsReached);
@@ -113,7 +115,7 @@ function constructUpdateExpression(translators) {
 	return updateExpression;
 }
 
-function constructAttributeValues(translators, charLength, articleChars) {
+function constructAttributeValues(translators, charLength) {
 	let attributeValues = {
 		':updatedAt': Date.now()
 	};
