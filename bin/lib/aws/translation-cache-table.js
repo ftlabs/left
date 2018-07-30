@@ -6,7 +6,7 @@ const region = process.env.AWS_REGION;
 const database = new AWS.DynamoDB.DocumentClient({ region });
 const BUCKET = require('./translation-cache-bucket');
 
-async function queryItemsInDatabase(uuid){
+function queryItemsInDatabase(uuid){
 	const query = {
 		TableName: cacheTable,
 		KeyConditionExpression: "#uuid = :uuid",
@@ -31,21 +31,25 @@ async function queryItemsInDatabase(uuid){
 	});
 }
 
-async function checkItemExists(uuid) {
-	const item = await queryItemsInDatabase(uuid);
+function checkItemExists(uuid) {
+	return new Promise((resolve, reject) => {
+		queryItemsInDatabase(uuid)
+			.then(item => {
+				if(item.Count > 0) {
+					resolve(item.Items[0]);
+				}
 
-	if(item.Count > 0) {
-		return item.Items[0];
-	}
-
-	return false;
+				resolve(false)
+			})
+			.catch(err => reject(false));
+	});
 }
 
-function cacheTranslation({ uuid, lang, lastPubDate, translation }) {
+function cacheTranslation({ uuid, lang, lastPubDate, translation, translator }) {
 	const params = {
 		TableName: cacheTable,
 		Key: {
-			uuid: uuid
+			uuid: `${uuid}_${translator}`
 		},
 		ReturnValues: 'ALL_NEW'
 	};
@@ -56,7 +60,7 @@ function cacheTranslation({ uuid, lang, lastPubDate, translation }) {
 	translationData[`${lang.toLowerCase()}`] = translation;
 
 	return new Promise ((resolve, reject) => {
-		BUCKET.save(uuid, translationData)
+		BUCKET.save(`${uuid}_${translator}`, translationData)
 			.then(data => {
 				console.log('DATA HERE::', data);
 				params.UpdateExpression = `SET lastPubDate = :lastPubDate, lang_${lang.toLowerCase()} = :lang, S3_ETag = :etag`;

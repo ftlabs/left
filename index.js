@@ -12,6 +12,7 @@ const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
 const LIMITS = require('./bin/lib/aws/translation-api-limit');
 const CACHE = require('./bin/lib/aws/translation-cache-table');
+const CHECKS = require('./bin/lib/utils/display-checks');
 
 const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
 const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
@@ -160,8 +161,11 @@ app.post('/article/:uuid/:lang', (req, res) => {
 				standfirst,
 				langFrom
 			).then(translations => {
-				//TODO: do not hardcode deepl
-				CACHE.update({uuid: uuid, lang: lang, lastPubDate: pubDate, translation: translations.texts.deepl});
+				for(let i = 0; i < translators.length; ++i) {
+					if(translators[i] !== 'original') {
+						CACHE.update({uuid: uuid, lang: lang, lastPubDate: pubDate, translation: translations.texts[translators[i]], translator: translators[i]});
+					}
+				}
 				translations.article = uuid;
 				res.json(translations);
 			});
@@ -228,23 +232,16 @@ app.post('/lexicon/:lang', (req, res) => {
 		});
 });
 
-app.get('/check/:uuid/:translator', async (req, res) => {
+app.get('/check/:uuid/:pubDate', async (req, res) => {
 	console.log(`checking for ${req.params.uuid}`);
 	//TODO: save translations by translator too
-	const translator = req.params.translator;
-	const passCheck = await LIMITS.withinApiLimit([translator]);
+	const uuid = req.params.uuid;
+	const translator = process.env.NEXT_TRANSLATOR;
+	const lastPubDate = req.params.pubDate;
 
-	if(passCheck[translator]) {
-		return res.json({
-			displayWidget: true, 
-			languages: [
-				{code: 'DE', name: 'German'},
-				{code: 'FR', name: 'French'},
-				{code: 'ES', name: 'Spanish'}
-		]});
-	} else {
-		return res.json({error:  `Limit Exceeded for ${req.params.translator}`, displayWidget: false});
-	}
+	CHECKS.check(uuid, translator, lastPubDate)
+		.then(data => { return res.json(data) })
+		.catch(err => console.log(err));
 });
 
 app.use(s3o);
