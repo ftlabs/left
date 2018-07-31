@@ -63,10 +63,10 @@ function cacheTranslation({ uuid, lang, lastPubDate, translation, translator }) 
 		BUCKET.save(`${uuid}_${translator}`, translationData)
 			.then(data => {
 				console.log('DATA HERE::', data);
-				params.UpdateExpression = `SET lastPubDate = :lastPubDate, lang_${lang.toLowerCase()} = :lang, S3_ETag = :etag`;
+				params.UpdateExpression = `SET lastPubDate = :lastPubDate, S3_ETag = :etag ADD langs :lang`;
 				params.ExpressionAttributeValues = {
 					':lastPubDate': lastPubDate,
-					':lang': true,
+					':lang': database.createSet([`${lang.toLowerCase()}`]),
 					':etag': data.ETag
 				};
 

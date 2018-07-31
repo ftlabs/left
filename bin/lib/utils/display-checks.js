@@ -11,19 +11,23 @@ function checkArticleAndLimit(uuid, translator, pubDate) {
 		const hasCachedContent = CACHE.exists(`${uuid}_${translator}`);
 
 		Promise.all([isLimitReached, hasCachedContent])
-			.then(data => {
+			.then(async data => {
 				if(data[0][translator]) {
-					displayRules.displayWidget = true,
-					displayRules.languages = getWidgetLanguages();
-
+					displayRules.displayWidget = true;
+					
 					if(data[1] && getLatest(pubDate, data[1].lastPubDate)) {
 						displayRules.cacheRef = data[1]['S3_ETag'];
+						displayRules.cacheFileName = `${uuid}_${translator}`;
+						displayRules.languages = getWidgetLanguages(data[1]);
+					} else {
+						displayRules.languages = getWidgetLanguages();
 					}
 				} else {
 					if(data[1] && getLatest(pubDate, data[1].lastPubDate)) {
 						displayRules.displayWidget = true;
-						displayRules.languages = getWidgetLanguages(data[1]);
+						displayRules.languages = getWidgetLanguages(data[1], true);
 						displayRules.cacheRef = data[1]['S3_ETag'];
+						displayRules.cacheFileName = `${uuid}_${translator}`;
 					} else {
 						displayRules.displayWidget = false;	
 					}
@@ -34,7 +38,7 @@ function checkArticleAndLimit(uuid, translator, pubDate) {
 	});
 }
 
-function getWidgetLanguages(data) {
+function getWidgetLanguages(data, restricted = false) {
 	const default_languages =  [
 			{code: 'DE', name: 'German'},
 			{code: 'FR', name: 'French'},
@@ -42,36 +46,35 @@ function getWidgetLanguages(data) {
 	];
 
 	if(data) {
-		const cached = extractLanguages(data);
+		const cached = data.langs.values;
 		const available_languages = [];
 
-		for(let i = 0; i < cached.length; ++i) {
-			available_languages.push(default_languages.find(lang => { return lang.code === cached[i] } ));
-		}
+		if(restricted) {
+			for(let i = 0; i < cached.length; ++i) {
+				const language = default_languages.find(lang => { return lang.code === cached[i].toUpperCase() } );
+				if(language !== null  && language !== undefined) {
+					language.cached = true;
+					available_languages.push(language);
+				}
+			}
 
-		return available_languages;
+			return available_languages;
+		} else {
+			for (lang in default_languages) {
+				const isCached = cached.find(cache => cache.toUpperCase() === default_languages[lang].code);
+				default_languages[lang].cached = !!isCached;
+			}
+		}
+		
 	}
+
+	console.log(default_languages);
 
 	return default_languages;
 }
 
-function extractLanguages(data) {
-	const langs = [];
-
-	for(let key in data) {
-		if(key.startsWith('lang_')) {
-			if(data[key]) {
-				langs.push(key.split('_')[1].toUpperCase());
-			}
-		}
-	}
-
-	console.log('LANGS::', langs);
-	return langs;
-}
-
 function getLatest(pubDate, cachedPubDate) {
-	return Date.parse(cachedPubDate) >= pubDate;
+	return Date.parse(cachedPubDate) >= Date.parse(pubDate);
 }
 
 module.exports = {

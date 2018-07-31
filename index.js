@@ -163,6 +163,7 @@ app.post('/article/:uuid/:lang', (req, res) => {
 			).then(translations => {
 				for(let i = 0; i < translators.length; ++i) {
 					if(translators[i] !== 'original') {
+						//TODO: check lang is from Next selection, or save as string.
 						CACHE.update({uuid: uuid, lang: lang, lastPubDate: pubDate, translation: translations.texts[translators[i]], translator: translators[i]});
 					}
 				}
@@ -233,8 +234,6 @@ app.post('/lexicon/:lang', (req, res) => {
 });
 
 app.get('/check/:uuid/:pubDate', async (req, res) => {
-	console.log(`checking for ${req.params.uuid}`);
-	//TODO: save translations by translator too
 	const uuid = req.params.uuid;
 	const translator = process.env.NEXT_TRANSLATOR;
 	const lastPubDate = req.params.pubDate;

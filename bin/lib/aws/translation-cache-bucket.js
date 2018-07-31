@@ -5,9 +5,8 @@ const cacheBucket = process.env.AWS_CACHE_BUCKET;
 
 const S3 = new AWS.S3();
 
-function getObject(fileName) {
-	//TODO: add If-Match for Etag in case of Object retrieval
-	return new Promise( (resolve, reject) => {
+function getObject(fileName, ETag = false) {
+	return new Promise((resolve, reject) => {
 		S3.getObject({
 			Bucket: cacheBucket,
 			Key: `${fileName}.json`
@@ -15,7 +14,11 @@ function getObject(fileName) {
 			if(err) {
 				reject(err);
 			} else {
-				resolve(data.Body.toString('utf-8'));
+				if(!ETag || (ETag && data.ETag === ETag)) {
+					resolve(data.Body.toString('utf-8'));	
+				} else {
+					reject({error: 'The translation is not up-to-date'});
+				}
 			}
 		});
 	});
