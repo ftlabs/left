@@ -21,10 +21,8 @@ function queryItemsInDatabase(uuid){
 	return new Promise( (resolve, reject) => {
 		database.query(query, (err, data) => {
 			if(err){
-				console.log('ERR::', err);
 				reject(err);
 			} else {
-				console.log('DATA::', data);
 				resolve(data);
 			}
 		});
@@ -62,7 +60,6 @@ function cacheTranslation({ uuid, lang, lastPubDate, translation, translator }) 
 	return new Promise ((resolve, reject) => {
 		BUCKET.save(`${uuid}_${translator}`, translationData)
 			.then(data => {
-				console.log('DATA HERE::', data);
 				params.UpdateExpression = `SET lastPubDate = :lastPubDate, S3_ETag = :etag ADD langs :lang`;
 				params.ExpressionAttributeValues = {
 					':lastPubDate': lastPubDate,

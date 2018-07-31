@@ -14,7 +14,7 @@ function checkArticleAndLimit(uuid, translator, pubDate) {
 			.then(async data => {
 				if(data[0][translator]) {
 					displayRules.displayWidget = true;
-					
+
 					if(data[1] && getLatest(pubDate, data[1].lastPubDate)) {
 						displayRules.cacheRef = data[1]['S3_ETag'];
 						displayRules.cacheFileName = `${uuid}_${translator}`;
@@ -57,8 +57,8 @@ function getWidgetLanguages(data, restricted = false) {
 					available_languages.push(language);
 				}
 			}
-
 			return available_languages;
+			
 		} else {
 			for (lang in default_languages) {
 				const isCached = cached.find(cache => cache.toUpperCase() === default_languages[lang].code);
@@ -67,8 +67,6 @@ function getWidgetLanguages(data, restricted = false) {
 		}
 		
 	}
-
-	console.log(default_languages);
 
 	return default_languages;
 }

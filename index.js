@@ -13,6 +13,7 @@ const hbs = require('hbs');
 const LIMITS = require('./bin/lib/aws/translation-api-limit');
 const CACHE = require('./bin/lib/aws/translation-cache-table');
 const CHECKS = require('./bin/lib/utils/display-checks');
+const { get: getFile} = require('./bin/lib/aws/translation-cache-bucket');
 
 const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
 const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
@@ -135,49 +136,60 @@ app.use(function(req, res, next) {
 app.post('/article/:uuid/:lang', (req, res) => {
 	const uuid = req.params.uuid;
 	const lang = req.params.lang;
-	const langFrom = req.body.from; 
+	const langFrom = req.body.from;
+	const fromCache = req.body.fromCache;
 
 	const translators = JSON.parse(req.body.translators);
+
+	if (fromCache) {
+		//TODO: iterate over translators when plugging the dashboard
+		//TODO: remember to include ETag??? > could be that there's a more up-to-date file that doesn't match the ETag?
+		return getFile(`${uuid}_${translators[0]}`)
+			.then(data => res.json(data))
+			.catch(err => console.log(err));
+	}
+
+	//TODO: re-enable "live" translation
 	
-	const firstChunkOnly =
-		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
+	// const firstChunkOnly =
+	// 	!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
 
-	CAPI.get(uuid)
-		.then(async data => {
-			const text = data.bodyXML;
-			const title = Utils.maybeAppendDot(data.title);
-			let standfirst = '';
-			if (data.standfirst) {
-				standfirst = Utils.maybeAppendDot(data.standfirst);
-			} // adding a closing . improves the translation
-			const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
-			const pubDate = data.publishedDate;
+	// CAPI.get(uuid)
+	// 	.then(async data => {
+	// 		const text = data.bodyXML;
+	// 		const title = Utils.maybeAppendDot(data.title);
+	// 		let standfirst = '';
+	// 		if (data.standfirst) {
+	// 			standfirst = Utils.maybeAppendDot(data.standfirst);
+	// 		} // adding a closing . improves the translation
+	// 		const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
+	// 		const pubDate = data.publishedDate;
 
-			generateTranslations(
-				translators,
-				combinedText,
-				lang,
-				firstChunkOnly,
-				standfirst,
-				langFrom
-			).then(translations => {
-				for(let i = 0; i < translators.length; ++i) {
-					if(translators[i] !== 'original') {
-						//TODO: check lang is from Next selection, or save as string.
-						CACHE.update({uuid: uuid, lang: lang, lastPubDate: pubDate, translation: translations.texts[translators[i]], translator: translators[i]});
-					}
-				}
-				translations.article = uuid;
-				res.json(translations);
-			});
-		})
-		.catch(err => {
-			console.log('CAPI ERROR', err);
-			res.json({
-				original: { error: `Error, cannot find article with uuid ${uuid}` },
-				outputs: ['original']
-			});
-		});
+	// 		generateTranslations(
+	// 			translators,
+	// 			combinedText,
+	// 			lang,
+	// 			firstChunkOnly,
+	// 			standfirst,
+	// 			langFrom
+	// 		).then(translations => {
+	// 			for(let i = 0; i < translators.length; ++i) {
+	// 				if(translators[i] !== 'original') {
+	// 					//TODO: check lang is from Next selection, or save as string.
+	// 					CACHE.update({uuid: uuid, lang: lang, lastPubDate: pubDate, translation: translations.texts[translators[i]], translator: translators[i]});
+	// 				}
+	// 			}
+	// 			translations.article = uuid;
+	// 			res.json(translations);
+	// 		});
+	// 	})
+	// 	.catch(err => {
+	// 		console.log('CAPI ERROR', err);
+	// 		res.json({
+	// 			original: { error: `Error, cannot find article with uuid ${uuid}` },
+	// 			outputs: ['original']
+	// 		});
+	// 	});
 });
 
 app.post('/translation/:lang', (req, res) => {
