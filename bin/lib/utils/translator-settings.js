@@ -3,15 +3,42 @@ const ALLOWED_USERS = process.env.ALLOWED_USERS.split(',');
 const PUBLIC_TRANSLATORS = process.env.PUBLIC_TRANSLATORS.split(',');
 const RESTRICTED_TRANSLATORS = process.env.RESTRICTED_TRANSLATORS.split(',');
 const DEFAULT_LANG = 'French';
+const LIMITS = require('../aws/translation-api-limit');
 
-function getAllowedTranslators(user) {
+async function getAllowedTranslators(user) {
 	let translators = PUBLIC_TRANSLATORS;
+	let byPass = false;
 
 	if(user !== null && ALLOWED_USERS.includes(user)) {
+		byPass = true;
 		translators = translators.concat(RESTRICTED_TRANSLATORS);
 	}
 
-	return translators;
+	return LIMITS.withinApiLimit(translators)
+		.then(data => {
+			let allowedTranslators = [];
+			let limits = [];
+
+			if(byPass) {
+				allowedTranslators = translators;
+			}
+			for(key in data) {
+				if(data[key]) {
+					if(!byPass) {
+						allowedTranslators.push(key);	
+					}
+				} else {
+					limits.push(key);
+				}
+			}
+
+			return {
+				translators: allowedTranslators,
+				byPass: byPass,
+				limits: limits
+			};
+		})
+		.catch(err => console.log(err));
 }
 
 function getAvailableLanguages(languages) {

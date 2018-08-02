@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>FT Labs Translation dashboard</title>
-		<link rel="stylesheet" href="https://build.origami.ft.com/v2/bundles/css?modules=o-fonts@^3.0.4,o-buttons@^5.10.3,o-forms@^5.2.4,o-table@^6.7.0,o-toggle@^1.1.10,o-loading@^2.2.1" />
+		<link rel="stylesheet" href="https://build.origami.ft.com/v2/bundles/css?modules=o-fonts@^3.0.4,o-buttons@^5.10.3,o-forms@^5.2.4,o-table@^6.7.0,o-toggle@^1.1.10,o-loading@^2.2.1,o-message@^2.3.3" />
 		<link rel="stylesheet" type="text/css" href="client/css/main.css">
 	</head>
 	<body>
@@ -12,9 +12,17 @@
 			Good enough, in fact, to be worth considering how we might use translations on FT.com or associated properties?
 			Feel free to try it out.
 		</p>
-		<p class="context">Any thoughts/comments/feedback: email or slack #ftlabs</a>.
-		</p>
-		<button class="o-buttons o-buttons-icon o-buttons-icon--arrow-down" data-o-component="o-toggle" data-o-toggle-target=".o-forms" aria-expanded="false">Show settings</button>
+		<p class="context">Any thoughts/comments/feedback: email or slack #ftlabs</a>.</p>
+		<div class="o-message o-message--alert-bleed o-message--error cape" data-o-component="o-message">
+			<div class="o-message__container">
+				<div class="o-message__content">
+					<p class="o-message__content-main">
+						
+					</p>
+				</div>
+			</div>
+		</div>
+		<button class="o-buttons o-buttons-icon o-buttons-icon--arrow-down settings" data-o-component="o-toggle" data-o-toggle-target=".o-forms" aria-expanded="false">Show settings</button>
 
 		<form class="o-forms" id="translateForm">
 			<label aria-describedby="text-box-info" for="articleUUID" class="o-forms__label">Article UUID</label>
@@ -50,7 +58,11 @@
 
 		<section id="output" class="cape"></section>
 		<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
-		<script src="https://build.origami.ft.com/v2/bundles/js?modules=o-fonts@^3.0.4,o-buttons@^5.10.3,o-forms@^5.2.4,o-table@^6.7.0,o-toggle@^1.1.10,o-loading@^2.2.1,o-utils@^1.0.4"></script>
+		<script src="https://build.origami.ft.com/v2/bundles/js?modules=o-fonts@^3.0.4,o-buttons@^5.10.3,o-forms@^5.2.4,o-table@^6.7.0,o-toggle@^1.1.10,o-loading@^2.2.1,o-utils@^1.0.4,o-message@^2.3.3"></script>
+		<script type="text/javascript">
+			window.leftLimits = "{{ limits }}";
+			window.leftByPass = "{{ byPass }}";
+		</script>
 		<script type="text/javascript" src="client/js/main.js"></script>
 	</body>
 </html>

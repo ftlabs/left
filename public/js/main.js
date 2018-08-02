@@ -3,12 +3,23 @@ var rootUrl = window.location.href;
 var Utils = Origami['o-utils'];
 
 function init() {
-	toggleSettings();
 	var form = document.getElementById('translateForm');
 	var language = document.getElementById('langSelect');
+	var toggle = document.querySelector('.o-buttons.settings');
 
-	language.addEventListener('change', updateTranslators);
-	form.addEventListener('submit', getTranslation);
+	console.log(language.children.length);
+	if(language.children.length > 0) {
+		toggleSettings();
+		language.addEventListener('change', updateTranslators);
+		form.addEventListener('submit', getTranslation);
+	} else {
+		toggle.classList.add('cape');
+		addLimitsWarning();
+	}
+
+	if(window.leftByPass === 'true') {
+		addLimitsWarning('labs');
+	}
 }
 
 function updateTranslators(e) {
@@ -243,6 +254,20 @@ function toggleLoadingState(form) {
 		loader.getAttribute('aria-hidden') === 'true' ? false : true;
 	loader.setAttribute('aria-hidden', invertVisibility);
 	loader.classList.toggle('cape');
+}
+
+function addLimitsWarning(user = 'user') {
+	var errorMessage = 'The monthly quota for translations has been reached. Please wait until next month or contact #ftlabs for a demo';
+
+	if(user === 'labs') {
+		errorMessage = 'The monthly limit is reached for ' + window.leftLimits;
+	}
+
+	var msgContainer = document.querySelector('.o-message')
+	var msg = document.querySelector('.o-message__content-main');
+	msg.textContent = errorMessage;
+
+	msgContainer.classList.remove('cape');
 }
 
 document.addEventListener('DOMContentLoaded', init);

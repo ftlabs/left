@@ -118,3 +118,7 @@ select {
 .context {
 	max-width: 800px;
 }
+
+.o-message {
+	margin-bottom: 15px;
+}

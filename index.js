@@ -143,53 +143,49 @@ app.post('/article/:uuid/:lang', (req, res) => {
 
 	if (fromCache) {
 		//TODO: iterate over translators when plugging the dashboard
-		//TODO: remember to include ETag??? > could be that there's a more up-to-date file that doesn't match the ETag?
 		return getFile(`${uuid}_${translators[0]}`)
 			.then(data => res.json(data))
 			.catch(err => console.log(err));
 	}
-
-	//TODO: re-enable "live" translation
 	
-	// const firstChunkOnly =
-	// 	!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
+	const firstChunkOnly =
+		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
 
-	// CAPI.get(uuid)
-	// 	.then(async data => {
-	// 		const text = data.bodyXML;
-	// 		const title = Utils.maybeAppendDot(data.title);
-	// 		let standfirst = '';
-	// 		if (data.standfirst) {
-	// 			standfirst = Utils.maybeAppendDot(data.standfirst);
-	// 		} // adding a closing . improves the translation
-	// 		const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
-	// 		const pubDate = data.publishedDate;
+	CAPI.get(uuid)
+		.then(async data => {
+			const text = data.bodyXML;
+			const title = Utils.maybeAppendDot(data.title);
+			let standfirst = '';
+			if (data.standfirst) {
+				standfirst = Utils.maybeAppendDot(data.standfirst);
+			} // adding a closing . improves the translation
+			const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
+			const pubDate = data.publishedDate;
 
-	// 		generateTranslations(
-	// 			translators,
-	// 			combinedText,
-	// 			lang,
-	// 			firstChunkOnly,
-	// 			standfirst,
-	// 			langFrom
-	// 		).then(translations => {
-	// 			for(let i = 0; i < translators.length; ++i) {
-	// 				if(translators[i] !== 'original') {
-	// 					//TODO: check lang is from Next selection, or save as string.
-	// 					CACHE.update({uuid: uuid, lang: lang, lastPubDate: pubDate, translation: translations.texts[translators[i]], translator: translators[i]});
-	// 				}
-	// 			}
-	// 			translations.article = uuid;
-	// 			res.json(translations);
-	// 		});
-	// 	})
-	// 	.catch(err => {
-	// 		console.log('CAPI ERROR', err);
-	// 		res.json({
-	// 			original: { error: `Error, cannot find article with uuid ${uuid}` },
-	// 			outputs: ['original']
-	// 		});
-	// 	});
+			generateTranslations(
+				translators,
+				combinedText,
+				lang,
+				firstChunkOnly,
+				standfirst,
+				langFrom
+			).then(translations => {
+				for(let i = 0; i < translators.length; ++i) {
+					if(translators[i] !== 'original') {
+						CACHE.update({uuid: uuid, lang: lang, lastPubDate: pubDate, translation: translations.texts[translators[i]], translator: translators[i]});
+					}
+				}
+				translations.article = uuid;
+				res.json(translations);
+			});
+		})
+		.catch(err => {
+			console.log('CAPI ERROR', err);
+			res.json({
+				original: { error: `Error, cannot find article with uuid ${uuid}` },
+				outputs: ['original']
+			});
+		});
 });
 
 app.post('/translation/:lang', (req, res) => {
@@ -261,9 +257,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials');
 
-app.get('/', (req, res) => {
-	const settings = Translator.settings(Utils.extractUser(req.headers.cookie));
-	res.render('index', settings);
+app.get('/', async (req, res) => {
+	const settings = await Translator.settings(Utils.extractUser(req.headers.cookie));
+	return res.render('index', settings);
 });
 
 app.get('/demo/:uuid', (req, res) => {
