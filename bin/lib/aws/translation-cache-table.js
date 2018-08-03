@@ -43,6 +43,28 @@ function checkItemExists(uuid) {
 	});
 }
 
+function checkAndGetItem(uuid, lang) {
+	return new Promise((resolve, reject) => {
+		//TODO: check lastPubDate
+		return BUCKET.get(uuid)
+				.then(data => {
+					if(data[lang]) {
+						resolve(data);
+					} else {
+						resolve(false);
+					}
+
+				})
+				.catch(err => {
+					if(err.statusCode === 404){
+						resolve(false);
+					} else {
+						reject(err);
+					}
+				});
+	});
+}
+
 function cacheTranslation({ uuid, lang, lastPubDate, translation, translator }) {
 	const params = {
 		TableName: cacheTable,
@@ -82,5 +104,6 @@ function cacheTranslation({ uuid, lang, lastPubDate, translation, translator }) 
 
 module.exports = {
 	exists    : checkItemExists,
-	update    : cacheTranslation
+	update    : cacheTranslation,
+	checkAndGet: checkAndGetItem 
 };

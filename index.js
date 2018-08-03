@@ -133,59 +133,77 @@ app.use(function(req, res, next) {
 	next();
 });
 
-app.post('/article/:uuid/:lang', (req, res) => {
-	const uuid = req.params.uuid;
-	const lang = req.params.lang;
-	const langFrom = req.body.from;
+app.post('/article/:uuid/:lang', (req, res, next) => {
+	res.uuid = req.params.uuid;
+	res.lang = req.params.lang;
+	res.langFrom = req.body.from;
 	const fromCache = req.body.fromCache;
+	const checkCache = req.body.checkCache;
 
-	const translators = JSON.parse(req.body.translators);
+	res.translators = JSON.parse(req.body.translators);
 
 	if (fromCache) {
-		//TODO: iterate over translators when plugging the dashboard
-		return getFile(`${uuid}_${translators[0]}`)
+		return getFile(`${res.uuid}_${res.translators[0]}`)
 			.then(data => res.json(data))
 			.catch(err => console.log(err));
 	}
 	
-	const firstChunkOnly =
+	res.firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
 
-	CAPI.get(uuid)
+	CAPI.get(res.uuid)
 		.then(async data => {
 			const text = data.bodyXML;
 			const title = Utils.maybeAppendDot(data.title);
-			let standfirst = '';
+			res.standfirst = '';
 			if (data.standfirst) {
-				standfirst = Utils.maybeAppendDot(data.standfirst);
+				res.standfirst = Utils.maybeAppendDot(data.standfirst);
 			} // adding a closing . improves the translation
-			const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
-			const pubDate = data.publishedDate;
+			res.combinedText = title + '\n\n' + res.standfirst + '\n\n' + text;
+			res.pubDate = data.publishedDate;
 
-			generateTranslations(
-				translators,
-				combinedText,
-				lang,
-				firstChunkOnly,
-				standfirst,
-				langFrom
-			).then(translations => {
-				for(let i = 0; i < translators.length; ++i) {
-					if(translators[i] !== 'original') {
-						CACHE.update({uuid: uuid, lang: lang, lastPubDate: pubDate, translation: translations.texts[translators[i]], translator: translators[i]});
-					}
-				}
-				translations.article = uuid;
-				res.json(translations);
-			});
+			if(checkCache) {
+				//TODO: iterate over translators when plugging the dashboard
+				//TODO: push the translators that don't have a translation into new array and generate for those
+				return CACHE.checkAndGet(`${res.uuid}_${res.translators[0]}`, res.lang)
+					.then(data => {
+						if(!data) {
+							return next();
+						} else {
+							//TODO: format data here
+							res.json(data);	
+						}
+					})
+					.catch(err => console.log('CHECK cache error', err));
+			} else {
+				return next();
+			}
 		})
 		.catch(err => {
 			console.log('CAPI ERROR', err);
 			res.json({
-				original: { error: `Error, cannot find article with uuid ${uuid}` },
+				original: { error: `Error, cannot find article with uuid ${res.uuid}` },
 				outputs: ['original']
 			});
 		});
+}, (req, res) => {
+	generateTranslations(
+		res.translators,
+		res.combinedText,
+		res.lang,
+		res.firstChunkOnly,
+		res.standfirst,
+		res.langFrom
+	).then(translations => {
+		for(let i = 0; i < res.translators.length; ++i) {
+			if(res.translators[i] !== 'original') {
+				CACHE.update({uuid: res.uuid, lang: res.lang, lastPubDate: res.pubDate, translation: translations.texts[res.translators[i]], translator: res.translators[i]});
+			}
+		}
+		translations.article = res.uuid;
+		res.json(translations);
+	})
+	.catch(err => console.log(err));
 });
 
 app.post('/translation/:lang', (req, res) => {

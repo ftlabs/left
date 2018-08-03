@@ -120,7 +120,8 @@ function getTranslation(e) {
 			})
 			.catch(err => console.log(err));
 	} else if (whichInput == 'uuid') {
-		fetchOptions.body = 'translators=' + JSON.stringify(translatorSelection) + '&from=en';
+		//TODO: save resuts to window
+		fetchOptions.body = 'translators=' + JSON.stringify(translatorSelection) + '&from=en&checkCache=true';
 
 		fetch(
 			rootUrl + 'article/' + uuidElement.value + '/' + language.value,
