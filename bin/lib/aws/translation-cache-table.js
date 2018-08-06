@@ -48,7 +48,7 @@ function checkAndGetItem(uuid, lang) {
 		//TODO: check lastPubDate
 		return BUCKET.get(uuid)
 				.then(data => {
-					if(data[lang]) {
+					if(JSON.parse(data)[lang]) {
 						resolve(data);
 					} else {
 						resolve(false);

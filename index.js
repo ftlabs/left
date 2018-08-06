@@ -15,11 +15,6 @@ const CACHE = require('./bin/lib/aws/translation-cache-table');
 const CHECKS = require('./bin/lib/utils/display-checks');
 const { get: getFile} = require('./bin/lib/aws/translation-cache-bucket');
 
-const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
-const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
-
-const MAX_CHARS_FOR_AUDIO = 1500;
-
 if (process.env.NODE_ENV === 'production') {
 	app.use(helmet());
 	app.enable('trust proxy');
@@ -35,6 +30,7 @@ fs.writeFileSync(googleTokenPath, process.env.GOOGLE_CREDS);
 const CAPI = require('./bin/lib/ft/capi').init(process.env.FT_API_KEY);
 const Translator = require('./bin/lib/translators/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
+const Audio = require('./bin/lib/utils/get-audio');
 const Lexicon = require('./bin/lib/ft/lexicon').init(process.env.LEXICON_API_KEY);
 
 async function generateTranslations(
@@ -46,7 +42,7 @@ async function generateTranslations(
 	langFrom = false
 ) {
 	const extractedText = extract(text);
-	const translations = {
+	let translations = {
 		texts: {}, // name -> text
 		translatorNames: [], // names
 		audioUrls: {}, // name -> url
@@ -64,62 +60,8 @@ async function generateTranslations(
 
 	LIMITS.updateApiLimitUsed(translatorNames, extractedText.replace(/\s/g, "").length);
 
-	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
-	translations.translatorNames.map(translatorName => {
-		let textWithParas;
-		if (translations.texts[translatorName].hasOwnProperty('error')) {
-			textWithParas = translations.texts[translatorName];
-		} else {
-			const textWithBackslashNs = translations.texts[translatorName];
-			const paras = textWithBackslashNs.split('\n\n').map((para, index) => {
-				if (index === 0) return `<h1>${para}</h1>`;
-				if (index === 1 && hasStandfirst) return `<h2>${para}</h2>`;
-				return `<p>${para}</p>`;
-			});
-			textWithParas = paras.join('\n');
-		}
-		translations.texts[translatorName] = textWithParas;
-	});
-
-	const originalVoice = 'Amy';
-	const originalLang = 'en';
-	let translationVoice = originalVoice;
-	let translationVoiceLang = originalLang;
-	let langLC = lang.toLowerCase();
-
-	if (langLC === 'fr') {
-		translationVoice = 'Celine';
-		translationVoiceLang = langLC;
-	} else if (langLC === 'de') {
-		translationVoice = 'Marlene';
-		translationVoiceLang = langLC;
-	}
-
-	// construct the audio-related info
-	translations.translatorNames.map(translatorName => {
-		let audioVoice;
-		let audioButtonDesc;
-		if (translatorName === 'original') {
-			audioVoice = originalVoice;
-			audioButtonDesc = `${originalVoice}(${originalLang}) -> en`;
-		} else {
-			audioVoice = translationVoice;
-			audioButtonDesc = `${translationVoice} (${translationVoiceLang}) -> ${langLC}`;
-		}
-		const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
-		let audioBody;
-		if (translations.texts[translatorName].hasOwnProperty('error')) {
-			audioBody = 'Je ne regrette rien';
-		} else {
-			audioBody = translations.texts[translatorName];
-		}
-		audioBody = audioBody.slice(0, MAX_CHARS_FOR_AUDIO);
-
-		translations.audioUrls[
-			translatorName
-		] = `${audioBaseUrl}${encodeURIComponent(audioBody)}`;
-		translations.audioButtonText[translatorName] = `AUDIO: ${audioButtonDesc}`;
-	});
+	translations = Utils.formatOutput(translations, hasStandfirst);
+	translations = Audio.get(translations, lang);
 
 	return translations;
 }
@@ -164,14 +106,28 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 
 			if(checkCache) {
 				//TODO: iterate over translators when plugging the dashboard
-				//TODO: push the translators that don't have a translation into new array and generate for those
-				return CACHE.checkAndGet(`${res.uuid}_${res.translators[0]}`, res.lang)
+				//TODO: push the translators that don't have a translation into new array and generate for those ??
+				return CACHE.checkAndGet(`${res.uuid}_${res.translators[0]}`, res.lang.toLowerCase())
 					.then(data => {
 						if(!data) {
 							return next();
 						} else {
-							//TODO: format data here
-							res.json(data);	
+							const names = ['original', res.translators[0]];
+
+							let formattedResult = {
+								article: res.uuid,
+								texts: {
+									'original': extract(res.combinedText)
+								},
+								translatorNames: names,
+								audioUrls: {},
+								audioButtonText: {}
+							}
+							formattedResult.texts[res.translators[0]] = JSON.parse(data)[res.lang.toLowerCase()];
+							formattedResult = Utils.formatOutput(formattedResult, !!res.standfirst, true);
+							formattedResult = Audio.get(formattedResult, res.lang);
+
+							return res.json(formattedResult);	
 						}
 					})
 					.catch(err => console.log('CHECK cache error', err));

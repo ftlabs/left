@@ -7,7 +7,6 @@ function init() {
 	var language = document.getElementById('langSelect');
 	var toggle = document.querySelector('.o-buttons.settings');
 
-	console.log(language.children.length);
 	if(language.children.length > 0) {
 		toggleSettings();
 		language.addEventListener('change', updateTranslators);
@@ -17,7 +16,7 @@ function init() {
 		addLimitsWarning();
 	}
 
-	if(window.leftByPass === 'true') {
+	if(window.leftByPass === 'true' && window.leftLimits.length > 0) {
 		addLimitsWarning('labs');
 	}
 }
@@ -163,22 +162,24 @@ function displayText(data) {
 		} else {
 			bodyText.innerHTML = sourceData;
 		}
-		const audioUrl = data.audioUrls[sourceName];
-		const audioButtonText = data.audioButtonText[sourceName];
-		const audioUrlElt = document.createElement('div');
-		audioUrlElt.innerHTML = `<a href="${audioUrl}" target="_blank" class="o-buttons o-buttons--mono">${audioButtonText}</a>`;
 
 		output.appendChild(title);
 		output.appendChild(bodyText);
-		output.appendChild(audioUrlElt);
+
+		if(data.audioUrls) {
+			const audioUrl = data.audioUrls[sourceName];
+			const audioButtonText = data.audioButtonText[sourceName];
+			const audioUrlElt = document.createElement('div');
+			audioUrlElt.innerHTML = `<a href="${audioUrl}" target="_blank" class="o-buttons o-buttons--mono">${audioButtonText}</a>`;
+			
+			output.appendChild(audioUrlElt);
+		}
 
 		container.appendChild(output);
 	}
 
 	setChildrenDataAttributes();
-
 	toggleLoadingState();
-
 
 	document.getElementById('output').classList.remove('cape');
 
