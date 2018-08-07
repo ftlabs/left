@@ -105,14 +105,19 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 			res.pubDate = data.publishedDate;
 
 			if(checkCache) {
-				//TODO: iterate over translators when plugging the dashboard
 				//TODO: push the translators that don't have a translation into new array and generate for those ??
-				return CACHE.checkAndGet(`${res.uuid}_${res.translators[0]}`, res.lang.toLowerCase())
+				const promises = [];
+				for(let i = 0; i < res.translators.length; ++i) {
+					const check = CACHE.checkAndGet(`${res.uuid}_${res.translators[i]}`, res.lang.toLowerCase());
+					promises.push(check);
+				}
+				
+				return Promise.all(promises)
 					.then(data => {
 						if(!data) {
 							return next();
 						} else {
-							const names = ['original', res.translators[0]];
+							const names = ['original'].concat(res.translators);
 
 							let formattedResult = {
 								article: res.uuid,
@@ -123,7 +128,11 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 								audioUrls: {},
 								audioButtonText: {}
 							}
-							formattedResult.texts[res.translators[0]] = JSON.parse(data)[res.lang.toLowerCase()];
+
+							for(let j = 0; j < data.length; ++j) {
+								formattedResult.texts[res.translators[j]] = JSON.parse(data[j])[res.lang.toLowerCase()];
+							}
+
 							formattedResult = Utils.formatOutput(formattedResult, !!res.standfirst, true);
 							formattedResult = Audio.get(formattedResult, res.lang);
 
@@ -131,6 +140,7 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 						}
 					})
 					.catch(err => console.log('CHECK cache error', err));
+					
 			} else {
 				return next();
 			}
