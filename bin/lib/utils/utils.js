@@ -69,9 +69,10 @@ function maybeAppendDot(text) {
 	return text + (text.endsWith('?') ? '' : '.');
 }
 
-function formatOutput(translations, hasStandfirst, sourceOnly = false) {
+function formatOutput(translations, hasStandfirst, sourceOnly = false, overrideTranslators = false) {
+	const translators = overrideTranslators ? overrideTranslators : translations.translatorNames;
 	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
-	translations.translatorNames.map(translatorName => {
+	translators.map(translatorName => {
 		let textWithParas;
 		if (translations.texts[translatorName].hasOwnProperty('error')) {
 			textWithParas = translations.texts[translatorName];

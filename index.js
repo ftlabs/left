@@ -105,7 +105,6 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 			res.pubDate = data.publishedDate;
 
 			if(checkCache) {
-				//TODO: push the translators that don't have a translation into new array and generate for those ??
 				const promises = [];
 				for(let i = 0; i < res.translators.length; ++i) {
 					const check = CACHE.checkAndGet(`${res.uuid}_${res.translators[i]}`, res.lang.toLowerCase());
@@ -114,29 +113,44 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 				
 				return Promise.all(promises)
 					.then(data => {
-						if(!data) {
+						if(data.every( item => item === data[0] )) {
+							return next();
+						}
+
+						const names = ['original'].concat(res.translators);
+						const newTranslations = [];
+						const cachedTranslations = [];
+
+						let formattedResult = {
+							article: res.uuid,
+							texts: {
+								'original': extract(res.combinedText)
+							},
+							translatorNames: names,
+							audioUrls: {},
+							audioButtonText: {}
+						}
+
+						for(let i = 0; i < data.length; ++i) {
+							if(!data[i]) {
+								newTranslations.push(res.translators[i]);
+							} else {
+								cachedTranslations.push(res.translators[i]);
+								formattedResult.texts[res.translators[i]] = JSON.parse(data[i])[res.lang.toLowerCase()];
+							}
+						}
+
+						formattedResult = Utils.formatOutput(formattedResult, !!res.standfirst, true, cachedTranslations.concat('original'));
+						formattedResult = Audio.get(formattedResult, res.lang, cachedTranslations.concat('original'));
+
+						if(newTranslations.length > 0) {
+							if(cachedTranslations.length > 0) {
+								res.translators = newTranslations;
+								res.formattedResult = formattedResult;
+							}
 							return next();
 						} else {
-							const names = ['original'].concat(res.translators);
-
-							let formattedResult = {
-								article: res.uuid,
-								texts: {
-									'original': extract(res.combinedText)
-								},
-								translatorNames: names,
-								audioUrls: {},
-								audioButtonText: {}
-							}
-
-							for(let j = 0; j < data.length; ++j) {
-								formattedResult.texts[res.translators[j]] = JSON.parse(data[j])[res.lang.toLowerCase()];
-							}
-
-							formattedResult = Utils.formatOutput(formattedResult, !!res.standfirst, true);
-							formattedResult = Audio.get(formattedResult, res.lang);
-
-							return res.json(formattedResult);	
+							return res.json(formattedResult);
 						}
 					})
 					.catch(err => console.log('CHECK cache error', err));
@@ -167,7 +181,15 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 			}
 		}
 		translations.article = res.uuid;
-		res.json(translations);
+
+		if(res.formattedResult) {
+			translations.translatorNames = res.formattedResult.translatorNames;
+			translations.texts = Object.assign(res.formattedResult.texts, translations.texts);
+			translations.audioUrls = Object.assign(res.formattedResult.audioUrls, translations.audioUrls);
+			translations.audioButtonText = Object.assign(res.formattedResult.audioButtonText, translations.audioButtonText);
+		}
+
+		return res.json(translations);
 	})
 	.catch(err => console.log(err));
 });

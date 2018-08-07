@@ -2,12 +2,13 @@ const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
 const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
 const MAX_CHARS_FOR_AUDIO = 1500;
 
-function getAudio(translations, lang) {
+function getAudio(translations, lang, overrideTranslators = false) {
 	const originalVoice = 'Amy';
 	const originalLang = 'en';
 	let translationVoice = originalVoice;
 	let translationVoiceLang = originalLang;
 	let langLC = lang.toLowerCase();
+	const translators = overrideTranslators ? overrideTranslators : translations.translatorNames;
 
 	if (langLC === 'fr') {
 		translationVoice = 'Celine';
@@ -18,7 +19,7 @@ function getAudio(translations, lang) {
 	}
 
 	// construct the audio-related info
-	translations.translatorNames.map(translatorName => {
+	translators.map(translatorName => {
 		let audioVoice;
 		let audioButtonDesc;
 		
