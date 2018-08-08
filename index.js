@@ -107,13 +107,13 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 			if(checkCache) {
 				const promises = [];
 				for(let i = 0; i < res.translators.length; ++i) {
-					const check = CACHE.checkAndGet(`${res.uuid}_${res.translators[i]}`, res.lang.toLowerCase());
+					const check = CACHE.checkAndGet(`${res.uuid}_${res.translators[i]}`, res.lang.toLowerCase(), res.pubDate);
 					promises.push(check);
 				}
 				
 				return Promise.all(promises)
 					.then(data => {
-						if(data.every( item => item === data[0] )) {
+						if(data.length !== 1 && data.every( item => item === data[0] )) {
 							return next();
 						}
 

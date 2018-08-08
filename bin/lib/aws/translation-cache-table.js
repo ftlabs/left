@@ -44,25 +44,26 @@ function checkItemExists(uuid) {
 	});
 }
 
-function checkAndGetItem(uuid, lang) {
+function checkAndGetItem(uuid, lang, pubDate) {
 	return new Promise((resolve, reject) => {
 		//TODO: check lastPubDate
 		return BUCKET.get(uuid)
-				.then(data => {
-					if(JSON.parse(data)[lang]) {
-						resolve(data);
-					} else {
-						resolve(false);
-					}
+			.then(data => {
+				const dataJSON = JSON.parse(data);
+				if(dataJSON[lang] && getLatest(pubDate, dataJSON.lastPubDate)) {
+					resolve(data);
+				} else {
+					resolve(false);
+				}
 
-				})
-				.catch(err => {
-					if(err.statusCode === 404){
-						resolve(false);
-					} else {
-						reject(err);
-					}
-				});
+			})
+			.catch(err => {
+				if(err.statusCode === 404){
+					resolve(false);
+				} else {
+					reject(err);
+				}
+			});
 	});
 }
 
