@@ -24,12 +24,17 @@ function getObject(fileName, ETag = false) {
 	});
 }
 
-function saveObject(fileName, translationData) {
+function saveObject(fileName, translationData, updateType = 'update') {
 	return new Promise((resolve, reject) => {
 		const update = getObject(fileName)
 		.then(data => {
 			const file = JSON.parse(data);
-			const newFile = Object.assign(file, translationData);
+			let newFile;
+			if(updateType === 'update') {
+				newFile = Object.assign(file, translationData);
+			} else if(updateType === 'override') {
+				newFile = translationData;
+			}
 
 			createFile(fileName, newFile)
 				.then(data => resolve(data))

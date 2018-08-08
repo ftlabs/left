@@ -100,10 +100,15 @@ function formatOutput(translations, hasStandfirst, sourceOnly = false, overrideT
 	return translations;
 }
 
+function getLatest(pubDate, cachedPubDate) {
+	return Date.parse(cachedPubDate) >= Date.parse(pubDate);
+}
+
 module.exports = {
 	extractUser: getS3OUserFromCookie,
 	splitTextIntoChunks: checkAndSplitText,
 	pauseForMillis: pauseForMillis,
 	maybeAppendDot: maybeAppendDot,
-	formatOutput: formatOutput
+	formatOutput: formatOutput,
+	getLatest: getLatest
 };

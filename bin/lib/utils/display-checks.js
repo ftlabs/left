@@ -1,5 +1,6 @@
 const LIMITS = require('../aws/translation-api-limit');
 const CACHE = require('../aws/translation-cache-table');
+const { getLatest } = require('./utils');
 
 const displayRules = {};
 
@@ -71,9 +72,7 @@ function getWidgetLanguages(data, restricted = false) {
 	return default_languages;
 }
 
-function getLatest(pubDate, cachedPubDate) {
-	return Date.parse(cachedPubDate) >= Date.parse(pubDate);
-}
+
 
 module.exports = {
 	check: checkArticleAndLimit

@@ -5,6 +5,7 @@ const region = process.env.AWS_REGION;
 
 const database = new AWS.DynamoDB.DocumentClient({ region });
 const BUCKET = require('./translation-cache-bucket');
+const { getLatest } = require('../utils/utils');
 
 function queryItemsInDatabase(uuid){
 	const query = {
@@ -65,7 +66,7 @@ function checkAndGetItem(uuid, lang) {
 	});
 }
 
-function cacheTranslation({ uuid, lang, lastPubDate, translation, translator }) {
+async function cacheTranslation({ uuid, lang, lastPubDate, translation, translator }) {
 	const params = {
 		TableName: cacheTable,
 		Key: {
@@ -79,10 +80,14 @@ function cacheTranslation({ uuid, lang, lastPubDate, translation, translator }) 
 	};
 	translationData[`${lang.toLowerCase()}`] = translation;
 
+	const checkExisting = await checkItemExists(`${uuid}_${translator}`);
+
+	const updateType = getLatest(lastPubDate, checkExisting.lastPubDate)?'update':'override';
+
 	return new Promise ((resolve, reject) => {
-		BUCKET.save(`${uuid}_${translator}`, translationData)
+		BUCKET.save(`${uuid}_${translator}`, translationData, updateType)
 			.then(data => {
-				params.UpdateExpression = `SET lastPubDate = :lastPubDate, S3_ETag = :etag ADD langs :lang`;
+				params.UpdateExpression = getUpdateExpression(updateType);
 				params.ExpressionAttributeValues = {
 					':lastPubDate': lastPubDate,
 					':lang': database.createSet([`${lang.toLowerCase()}`]),
@@ -100,6 +105,17 @@ function cacheTranslation({ uuid, lang, lastPubDate, translation, translator }) 
 				console.log('There was an error creating or updating the file');
 			});
 	});
+}
+
+function getUpdateExpression(updateType) {
+	let expression = 'SET lastPubDate = :lastPubDate, S3_ETag = :etag';
+	if (updateType === 'update') {
+		expression += ' ADD langs :lang';
+	} else if (updateType === 'override') {
+		expression += ', langs = :lang';
+	}
+
+	return expression;
 }
 
 module.exports = {
