@@ -46,7 +46,6 @@ function checkItemExists(uuid) {
 
 function checkAndGetItem(uuid, lang, pubDate) {
 	return new Promise((resolve, reject) => {
-		//TODO: check lastPubDate
 		return BUCKET.get(uuid)
 			.then(data => {
 				const dataJSON = JSON.parse(data);

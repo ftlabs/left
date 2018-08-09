@@ -6,6 +6,7 @@ function init() {
 	var form = document.getElementById('translateForm');
 	var language = document.getElementById('langSelect');
 	var toggle = document.querySelector('.o-buttons.settings');
+	window.leftTexts = {};
 
 	if(language.children.length > 0) {
 		toggleSettings();
@@ -59,7 +60,7 @@ function getTranslation(e) {
 		credentials: 'same-origin'
 	};
 
-	let whichInput = null;
+	var whichInput = null;
 	if (lexiconElement.value !== '') {
 		whichInput = 'lexicon';
 	} else if (freeTextElement.value !== '') {
@@ -119,9 +120,19 @@ function getTranslation(e) {
 			})
 			.catch(err => console.log(err));
 	} else if (whichInput == 'uuid') {
-		//TODO: save resuts to window
-		fetchOptions.body = 'translators=' + JSON.stringify(translatorSelection) + '&from=en&checkCache=true';
+		if(window.leftTexts[uuidElement.value]) {
+			if(window.leftTexts[uuidElement.value][language.value]) {
+				var existingTexts = window.leftTexts[uuidElement.value][language.value];
+				if(translatorSelection.every(t => Object.keys(existingTexts.texts).includes(t))) {
+					existingTexts.translatorNames = ['original'].concat(translatorSelection);
+					return displayText(existingTexts);	
+				}
+			}
+		} else {
+			window.leftTexts[uuidElement.value] = {};
+		}
 
+		fetchOptions.body = 'translators=' + JSON.stringify(translatorSelection) + '&from=en&checkCache=true';
 		fetch(
 			rootUrl + 'article/' + uuidElement.value + '/' + language.value,
 			fetchOptions
@@ -129,6 +140,7 @@ function getTranslation(e) {
 			.then(res => res.json())
 			.then(data => {
 				toggleSettings();
+				window.leftTexts[uuidElement.value][language.value] = data;
 				displayText(data);
 			})
 			.catch(err => console.log(err));
@@ -141,8 +153,8 @@ function displayText(data) {
 
 	for (var i = 0; i < data.translatorNames.length; ++i) {
 		var output = document.createElement('div');
-		const sourceName = data.translatorNames[i];
-		const sourceData = data.texts[sourceName];
+		var sourceName = data.translatorNames[i];
+		var sourceData = data.texts[sourceName];
 		output.setAttribute('id', sourceName);
 		var title = document.createElement('h2');
 		if (i === 0 && data.article) {
@@ -167,9 +179,9 @@ function displayText(data) {
 		output.appendChild(bodyText);
 
 		if(data.audioUrls) {
-			const audioUrl = data.audioUrls[sourceName];
-			const audioButtonText = data.audioButtonText[sourceName];
-			const audioUrlElt = document.createElement('div');
+			var audioUrl = data.audioUrls[sourceName];
+			var audioButtonText = data.audioButtonText[sourceName];
+			var audioUrlElt = document.createElement('div');
 			audioUrlElt.innerHTML = `<a href="${audioUrl}" target="_blank" class="o-buttons o-buttons--mono">${audioButtonText}</a>`;
 			
 			output.appendChild(audioUrlElt);
@@ -195,8 +207,8 @@ function setElementsHeight() {
 	var textBody = document.getElementsByClassName('text-body');
 	resetElementHeight(textBody);
 
-	for (let i = 0; i < textBody[0].children.length; i++) {
-		let largest;
+	for (var i = 0; i < textBody[0].children.length; i++) {
+		var largest;
 		applyToAllElements(i, element => {
 			if (!largest || largest.offsetHeight < element.offsetHeight) {
 				largest = element;
