@@ -1,8 +1,9 @@
 const AWS = require('aws-sdk');
+const Utils = require('../utils/utils');
 
-const limitTable = process.env.LIMIT_TABLE;
-const region = process.env.AWS_REGION;
-const apiLimits = JSON.parse(process.env.API_CHAR_LIMITS);
+const limitTable = Utils.processEnv('LIMIT_TABLE');
+const region     = Utils.processEnv('AWS_REGION', {validateString: /eu/});
+const apiLimits  = Utils.processEnv('API_CHAR_LIMITS', {validateJson: true});
 
 const database = new AWS.DynamoDB.DocumentClient({ region });
 
