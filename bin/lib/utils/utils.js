@@ -109,9 +109,13 @@ function processEnv(name, config={}){
 	//   default: ... defult value, (specify NULL if not required, otherwise barfs by default if not set),
 	//   errorMsg: ... specify an error msg, otherwise will construct a default one,
 	//   validateString: ... specify a regex if you want to check the text format of the value
-	//   validateInteger: ... specify a fn if you want to apply parseInt then test the value
-	//   validateJson: ...  specify anything to apply JSON.parse
+	//   validateInteger: ... converts to Integer. Specify true, or a fn test the integer value
+	//   validateJson: ... parses JSON. Specify true, or a fn to test the parsed JSON
 	// }
+	//
+	// defaults
+	// - value is required
+	// - value is a string
 	//
 	// e.g. Util.processEnv('AWS_REGION')
 	//   means return the env param AWS_REGION, but barf if it is not set
@@ -153,15 +157,42 @@ function processEnv(name, config={}){
 	}
 
 	if (config.hasOwnProperty('validateInteger')) {
-		value = parseInt(value);
-		if (! config.validateInteger(value)) {
-			throw new Error(config.errorMsg);
+		const configErrMsg = `The configuration for env param ${name} should be Boolean true (to ensure conversion to Integer) or a function defintion (to ensure conversion to Integer, and then validate the integer value)`;
+		// accept 'true' but not 'false', or a fn definition
+		const configType = typeof config.validateInteger;
+		value = parseInt(value); // always convert to integer
+
+		if (configType === "boolean"){ // accept 'true' but not 'false'
+			if (config.validateInteger === false) {
+				throw new Error(configErrMsg);
+			}
+		} else if (configType === 'function') {
+			if(! config.validateInteger(value)) {
+					throw new Error(config.errorMsg);
+			}
+		}	else {
+			throw new Error(configErrMsg);
 		}
 	} else if(config.hasOwnProperty('validateJson')){
+		const configErrMsg = `The configuration for env param ${name} should be Boolean true (to ensure parsing as JSON) or a function defintion (to ensure parsing JSON, and then validate the parsed value)`;
+		// accept 'true' but not 'false', or a fn definition
+		const configType = typeof config.validateJson;
 		try {
 			value = JSON.parse(value);
 		} catch(e) {
 			throw new Error(config.errorMsg + ': error during parsing JSON: ' + e.message);
+		}
+
+		if (configType === "boolean"){ // accept 'true' but not 'false'
+			if (config.validateJson === false) {
+				throw new Error(configErrMsg);
+			}
+		} else if (configType === 'function') {
+			if(! config.validateJson(value)) {
+					throw new Error(config.errorMsg);
+			}
+		}	else {
+			throw new Error(configErrMsg);
 		}
 	}
 
