@@ -158,21 +158,9 @@ function processEnv(name, config={}){
 
 	if (config.hasOwnProperty('validateInteger')) {
 		const configErrMsg = `The configuration for env param ${name} should be Boolean true (to ensure conversion to Integer) or a function defintion (to ensure conversion to Integer, and then validate the integer value)`;
-		// accept 'true' but not 'false', or a fn definition
-		const configType = typeof config.validateInteger;
 		value = parseInt(value); // always convert to integer
 
-		if (configType === 'boolean'){ // accept 'true' but not 'false'
-			if (config.validateInteger === false) {
-				throw new Error(configErrMsg);
-			}
-		} else if (configType === 'function') {
-			if(! config.validateInteger(value)) {
-					throw new Error(config.errorMsg);
-			}
-		}	else {
-			throw new Error(configErrMsg);
-		}
+		configValidation(config, 'validateInteger', value, configErrMsg);
 	} else if(config.hasOwnProperty('validateJson')){
 
 		if (!value.startsWith('{')) {
@@ -186,23 +174,31 @@ function processEnv(name, config={}){
 		}
 
 		const configErrMsg = `The configuration for env param ${name} should be Boolean true (to ensure parsing as JSON) or a function defintion (to ensure parsing JSON, and then validate the parsed value. NB, the JSON value needs to start with '{'.)`;
-		// accept 'true' but not 'false', or a fn definition
-		const configType = typeof config.validateJson;
 
-		if (configType === 'boolean'){ // accept 'true' but not 'false'
-			if (config.validateJson === false) {
-				throw new Error(configErrMsg);
-			}
-		} else if (configType === 'function') {
-			if(! config.validateJson(value)) {
-					throw new Error(config.errorMsg);
-			}
-		}	else {
-			throw new Error(configErrMsg);
-		}
+		configValidation(config, 'validateJson', value, configErrMsg);
+		
 	}
 
 	return value;
+}
+
+function configValidation(config, type, value, message) {
+	const configType = typeof config[type];
+
+	if (configType === 'boolean'){ // accept 'true' but not 'false'
+		console.log('configType boolean')
+		if (config[type] === false) {
+			throw new Error(message);
+		}
+	} else if (configType === 'function') {
+		// accept 'true' but not 'false', or a fn definition
+		console.log('configType function');
+		if(! config[type](value)) {
+			throw new Error(config.errorMsg);
+		}
+	} else {
+		throw new Error(message);
+	}
 }
 
 module.exports = {
