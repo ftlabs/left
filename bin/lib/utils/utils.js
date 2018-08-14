@@ -176,7 +176,7 @@ function processEnv(name, config={}){
 		const configErrMsg = `The configuration for env param ${name} should be Boolean true (to ensure parsing as JSON) or a function defintion (to ensure parsing JSON, and then validate the parsed value. NB, the JSON value needs to start with '{'.)`;
 
 		configValidation(config, 'validateJson', value, configErrMsg);
-		
+
 	}
 
 	return value;
@@ -186,13 +186,11 @@ function configValidation(config, type, value, message) {
 	const configType = typeof config[type];
 
 	if (configType === 'boolean'){ // accept 'true' but not 'false'
-		console.log('configType boolean')
 		if (config[type] === false) {
 			throw new Error(message);
 		}
 	} else if (configType === 'function') {
 		// accept 'true' but not 'false', or a fn definition
-		console.log('configType function');
 		if(! config[type](value)) {
 			throw new Error(config.errorMsg);
 		}

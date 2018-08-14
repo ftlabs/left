@@ -1,5 +1,7 @@
-const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
-const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
+const Utils = require('../utils/utils');
+
+const AUDIO_RENDER_URL = Utils.processEnv('AUDIO_RENDER_URL');
+const AUDIO_RENDER_TOKEN = Utils.processEnv('AUDIO_RENDER_TOKEN');
 const MAX_CHARS_FOR_AUDIO = 1500;
 
 function getAudio(translations, lang, overrideTranslators = false) {
@@ -22,7 +24,7 @@ function getAudio(translations, lang, overrideTranslators = false) {
 	translators.map(translatorName => {
 		let audioVoice;
 		let audioButtonDesc;
-		
+
 		if (translatorName === 'original') {
 			audioVoice = originalVoice;
 			audioButtonDesc = `${originalVoice}(${originalLang}) -> en`;

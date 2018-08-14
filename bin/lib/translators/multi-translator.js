@@ -1,7 +1,9 @@
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 
-const Deepl = require('./deepl').init(process.env.DEEPL_API_KEY);
-const Google = require('./google').init(process.env.GOOGLE_PROJECT_ID);
+const Utils = require('../utils/utils');
+
+const Deepl  = require('./deepl').init(Utils.processEnv('DEEPL_API_KEY'));
+const Google = require('./google').init(Utils.processEnv('GOOGLE_PROJECT_ID'));
 const AWS = require('./aws').init();
 const SETTINGS = require('../utils/translator-settings');
 

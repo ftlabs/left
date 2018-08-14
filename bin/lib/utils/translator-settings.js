@@ -1,7 +1,9 @@
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
-const ALLOWED_USERS = process.env.ALLOWED_USERS.split(',');
-const PUBLIC_TRANSLATORS = process.env.PUBLIC_TRANSLATORS.split(',');
-const RESTRICTED_TRANSLATORS = process.env.RESTRICTED_TRANSLATORS.split(',');
+const Utils = require('../utils/utils');
+
+const ALLOWED_USERS          = Utils.processEnv('ALLOWED_USERS').split(',');
+const PUBLIC_TRANSLATORS     = Utils.processEnv('PUBLIC_TRANSLATORS').split(',');
+const RESTRICTED_TRANSLATORS = Utils.processEnv('RESTRICTED_TRANSLATORS').split(',');
 const DEFAULT_LANG = 'French';
 const LIMITS = require('../aws/translation-api-limit');
 
@@ -25,7 +27,7 @@ async function getAllowedTranslators(user) {
 			for(key in data) {
 				if(data[key]) {
 					if(!byPass) {
-						allowedTranslators.push(key);	
+						allowedTranslators.push(key);
 					}
 				} else {
 					limits.push(key);
