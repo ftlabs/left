@@ -65,8 +65,50 @@ function pauseForMillis( millis ){
 	});
 }
 
+function maybeAppendDot(text) {
+	return text + (text.endsWith('?') ? '' : '.');
+}
+
+function formatOutput(translations, hasStandfirst, sourceOnly = false, overrideTranslators = false) {
+	const translators = overrideTranslators ? overrideTranslators : translations.translatorNames;
+	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
+	translators.map(translatorName => {
+		let textWithParas;
+		if (translations.texts[translatorName].hasOwnProperty('error')) {
+			textWithParas = translations.texts[translatorName];
+		} else {
+
+			if(!sourceOnly || (sourceOnly && translatorName === 'original')) {
+				const textWithBackslashNs = translations.texts[translatorName];
+				const paras = textWithBackslashNs.split('\n\n').map((para, index) => {
+					if (index === 0) {
+						return `<h1>${para}</h1>`;	
+					} 
+
+					if (index === 1 && hasStandfirst) {
+						return `<h2>${para}</h2>`;
+					}
+
+					return para.length > 0 ?`<p>${para}</p>`:'';
+				});
+				textWithParas = paras.join('\n');
+				translations.texts[translatorName] = textWithParas;
+			}
+		}
+	});
+
+	return translations;
+}
+
+function getLatest(pubDate, cachedPubDate) {
+	return Date.parse(cachedPubDate) >= Date.parse(pubDate);
+}
+
 module.exports = {
 	extractUser: getS3OUserFromCookie,
 	splitTextIntoChunks: checkAndSplitText,
 	pauseForMillis: pauseForMillis,
+	maybeAppendDot: maybeAppendDot,
+	formatOutput: formatOutput,
+	getLatest: getLatest
 };

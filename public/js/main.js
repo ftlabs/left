@@ -3,12 +3,23 @@ var rootUrl = window.location.href;
 var Utils = Origami['o-utils'];
 
 function init() {
-	toggleSettings();
 	var form = document.getElementById('translateForm');
 	var language = document.getElementById('langSelect');
+	var toggle = document.querySelector('.o-buttons.settings');
+	window.leftTexts = {};
 
-	language.addEventListener('change', updateTranslators);
-	form.addEventListener('submit', getTranslation);
+	if(language.children.length > 0) {
+		toggleSettings();
+		language.addEventListener('change', updateTranslators);
+		form.addEventListener('submit', getTranslation);
+	} else {
+		toggle.classList.add('cape');
+		addLimitsWarning();
+	}
+
+	if(window.leftByPass === 'true' && window.leftLimits.length > 0) {
+		addLimitsWarning('labs');
+	}
 }
 
 function updateTranslators(e) {
@@ -49,7 +60,7 @@ function getTranslation(e) {
 		credentials: 'same-origin'
 	};
 
-	let whichInput = null;
+	var whichInput = null;
 	if (lexiconElement.value !== '') {
 		whichInput = 'lexicon';
 	} else if (freeTextElement.value !== '') {
@@ -89,7 +100,7 @@ function getTranslation(e) {
 	toggleLoadingState();
 
 	if (whichInput == 'lexicon') {
-		fetchOptions.body = 'text=' + lexiconElement.value +'&translators=' + JSON.stringify(translatorSelection);
+		fetchOptions.body = 'text=' + lexiconElement.value +'&translators=' + JSON.stringify(translatorSelection) +'&from=en';
 
 		return fetch(rootUrl + 'lexicon/' + language.value, fetchOptions)
 			.then(res => res.json())
@@ -109,8 +120,19 @@ function getTranslation(e) {
 			})
 			.catch(err => console.log(err));
 	} else if (whichInput == 'uuid') {
-		fetchOptions.body = 'translators=' + JSON.stringify(translatorSelection);
+		if(window.leftTexts[uuidElement.value]) {
+			if(window.leftTexts[uuidElement.value][language.value]) {
+				var existingTexts = window.leftTexts[uuidElement.value][language.value];
+				if(translatorSelection.every(t => Object.keys(existingTexts.texts).includes(t))) {
+					existingTexts.translatorNames = ['original'].concat(translatorSelection);
+					return displayText(existingTexts);	
+				}
+			}
+		} else {
+			window.leftTexts[uuidElement.value] = {};
+		}
 
+		fetchOptions.body = 'translators=' + JSON.stringify(translatorSelection) + '&from=en&checkCache=true';
 		fetch(
 			rootUrl + 'article/' + uuidElement.value + '/' + language.value,
 			fetchOptions
@@ -118,6 +140,7 @@ function getTranslation(e) {
 			.then(res => res.json())
 			.then(data => {
 				toggleSettings();
+				window.leftTexts[uuidElement.value][language.value] = data;
 				displayText(data);
 			})
 			.catch(err => console.log(err));
@@ -130,8 +153,8 @@ function displayText(data) {
 
 	for (var i = 0; i < data.translatorNames.length; ++i) {
 		var output = document.createElement('div');
-		const sourceName = data.translatorNames[i];
-		const sourceData = data.texts[sourceName];
+		var sourceName = data.translatorNames[i];
+		var sourceData = data.texts[sourceName];
 		output.setAttribute('id', sourceName);
 		var title = document.createElement('h2');
 		if (i === 0 && data.article) {
@@ -151,22 +174,24 @@ function displayText(data) {
 		} else {
 			bodyText.innerHTML = sourceData;
 		}
-		const audioUrl = data.audioUrls[sourceName];
-		const audioButtonText = data.audioButtonText[sourceName];
-		const audioUrlElt = document.createElement('div');
-		audioUrlElt.innerHTML = `<a href="${audioUrl}" target="_blank" class="o-buttons o-buttons--mono">${audioButtonText}</a>`;
 
 		output.appendChild(title);
 		output.appendChild(bodyText);
-		output.appendChild(audioUrlElt);
+
+		if(data.audioUrls) {
+			var audioUrl = data.audioUrls[sourceName];
+			var audioButtonText = data.audioButtonText[sourceName];
+			var audioUrlElt = document.createElement('div');
+			audioUrlElt.innerHTML = `<a href="${audioUrl}" target="_blank" class="o-buttons o-buttons--mono">${audioButtonText}</a>`;
+			
+			output.appendChild(audioUrlElt);
+		}
 
 		container.appendChild(output);
 	}
 
 	setChildrenDataAttributes();
-
 	toggleLoadingState();
-
 
 	document.getElementById('output').classList.remove('cape');
 
@@ -182,8 +207,8 @@ function setElementsHeight() {
 	var textBody = document.getElementsByClassName('text-body');
 	resetElementHeight(textBody);
 
-	for (let i = 0; i < textBody[0].children.length; i++) {
-		let largest;
+	for (var i = 0; i < textBody[0].children.length; i++) {
+		var largest;
 		applyToAllElements(i, element => {
 			if (!largest || largest.offsetHeight < element.offsetHeight) {
 				largest = element;
@@ -243,6 +268,20 @@ function toggleLoadingState(form) {
 		loader.getAttribute('aria-hidden') === 'true' ? false : true;
 	loader.setAttribute('aria-hidden', invertVisibility);
 	loader.classList.toggle('cape');
+}
+
+function addLimitsWarning(user = 'user') {
+	var errorMessage = 'The monthly quota for translations has been reached. Please wait until next month or contact #ftlabs for a demo';
+
+	if(user === 'labs') {
+		errorMessage = 'The monthly limit is reached for ' + window.leftLimits;
+	}
+
+	var msgContainer = document.querySelector('.o-message')
+	var msg = document.querySelector('.o-message__content-main');
+	msg.textContent = errorMessage;
+
+	msgContainer.classList.remove('cape');
 }
 
 document.addEventListener('DOMContentLoaded', init);

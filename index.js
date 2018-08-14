@@ -10,11 +10,10 @@ const express_enforces_ssl = require('express-enforces-ssl');
 const PORT = process.env.PORT || 2018;
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
-
-const AUDIO_RENDER_URL = process.env.AUDIO_RENDER_URL;
-const AUDIO_RENDER_TOKEN = process.env.AUDIO_RENDER_TOKEN;
-
-const MAX_CHARS_FOR_AUDIO = 1500;
+const LIMITS = require('./bin/lib/aws/translation-api-limit');
+const CACHE = require('./bin/lib/aws/translation-cache-table');
+const CHECKS = require('./bin/lib/utils/display-checks');
+const { get: getFile} = require('./bin/lib/aws/translation-cache-bucket');
 
 if (process.env.NODE_ENV === 'production') {
 	app.use(helmet());
@@ -31,21 +30,19 @@ fs.writeFileSync(googleTokenPath, process.env.GOOGLE_CREDS);
 const CAPI = require('./bin/lib/ft/capi').init(process.env.FT_API_KEY);
 const Translator = require('./bin/lib/translators/multi-translator');
 const Utils = require('./bin/lib/utils/utils');
+const Audio = require('./bin/lib/utils/get-audio');
 const Lexicon = require('./bin/lib/ft/lexicon').init(process.env.LEXICON_API_KEY);
-
-function maybeAppendDot(text) {
-	return text + (text.endsWith('?') ? '' : '.');
-}
 
 async function generateTranslations(
 	translatorNames,
 	text,
 	lang,
 	firstChunkOnly,
-	hasStandfirst
+	hasStandfirst = false,
+	langFrom = false
 ) {
 	const extractedText = extract(text);
-	const translations = {
+	let translations = {
 		texts: {}, // name -> text
 		translatorNames: [], // names
 		audioUrls: {}, // name -> url
@@ -55,67 +52,16 @@ async function generateTranslations(
 	translations.texts = await Translator.translate(translatorNames, {
 		text: extractedText,
 		to: lang,
+		from: langFrom,
 		firstChunkOnly: firstChunkOnly
 	});
 	translations.texts['original'] = extractedText;
 	translations.translatorNames = ['original'].concat(translatorNames);
 
-	// convert \n\n-separated blocks of text into <p>-wrapped blocks of text
-	translations.translatorNames.map(translatorName => {
-		let textWithParas;
-		if (translations.texts[translatorName].hasOwnProperty('error')) {
-			textWithParas = translations.texts[translatorName];
-		} else {
-			const textWithBackslashNs = translations.texts[translatorName];
-			const paras = textWithBackslashNs.split('\n\n').map((para, index) => {
-				if (index === 0) return `<h1>${para}</h1>`;
-				if (index === 1 && hasStandfirst) return `<h2>${para}</h2>`;
-				return `<p>${para}</p>`;
-			});
-			textWithParas = paras.join('\n');
-		}
-		translations.texts[translatorName] = textWithParas;
-	});
+	LIMITS.updateApiLimitUsed(translatorNames, extractedText.replace(/\s/g, "").length);
 
-	const originalVoice = 'Amy';
-	const originalLang = 'en';
-	let translationVoice = originalVoice;
-	let translationVoiceLang = originalLang;
-	let langLC = lang.toLowerCase();
-
-	if (langLC === 'fr') {
-		translationVoice = 'Celine';
-		translationVoiceLang = langLC;
-	} else if (langLC === 'de') {
-		translationVoice = 'Marlene';
-		translationVoiceLang = langLC;
-	}
-
-	// construct the audio-related info
-	translations.translatorNames.map(translatorName => {
-		let audioVoice;
-		let audioButtonDesc;
-		if (translatorName === 'original') {
-			audioVoice = originalVoice;
-			audioButtonDesc = `${originalVoice}(${originalLang}) -> en`;
-		} else {
-			audioVoice = translationVoice;
-			audioButtonDesc = `${translationVoice} (${translationVoiceLang}) -> ${langLC}`;
-		}
-		const audioBaseUrl = `${AUDIO_RENDER_URL}?voice=${audioVoice}&wrap=no&text=`;
-		let audioBody;
-		if (translations.texts[translatorName].hasOwnProperty('error')) {
-			audioBody = 'Je ne regrette rien';
-		} else {
-			audioBody = translations.texts[translatorName];
-		}
-		audioBody = audioBody.slice(0, MAX_CHARS_FOR_AUDIO);
-
-		translations.audioUrls[
-			translatorName
-		] = `${audioBaseUrl}${encodeURIComponent(audioBody)}`;
-		translations.audioButtonText[translatorName] = `AUDIO: ${audioButtonDesc}`;
-	});
+	translations = Utils.formatOutput(translations, hasStandfirst);
+	translations = Audio.get(translations, lang);
 
 	return translations;
 }
@@ -129,47 +75,129 @@ app.use(function(req, res, next) {
 	next();
 });
 
-app.post('/article/:uuid/:lang', (req, res) => {
-	const uuid = req.params.uuid;
-	const lang = req.params.lang;
+app.post('/article/:uuid/:lang', (req, res, next) => {
+	res.uuid = req.params.uuid;
+	res.lang = req.params.lang;
+	res.langFrom = req.body.from;
+	const fromCache = req.body.fromCache;
+	const checkCache = req.body.checkCache;
 
-	const translators = JSON.parse(req.body.translators);
-	const firstChunkOnly =
+	res.translators = JSON.parse(req.body.translators);
+
+	if (fromCache) {
+		return getFile(`${res.uuid}_${res.translators[0]}`)
+			.then(data => res.json(data))
+			.catch(err => console.log(err));
+	}
+	
+	res.firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
 
-	CAPI.get(uuid)
+	CAPI.get(res.uuid)
 		.then(async data => {
 			const text = data.bodyXML;
-			const title = maybeAppendDot(data.title);
-			let standfirst = '';
+			const title = Utils.maybeAppendDot(data.title);
+			res.standfirst = '';
 			if (data.standfirst) {
-				standfirst = maybeAppendDot(data.standfirst);
+				res.standfirst = Utils.maybeAppendDot(data.standfirst);
 			} // adding a closing . improves the translation
-			const combinedText = title + '\n\n' + standfirst + '\n\n' + text;
+			res.combinedText = title + '\n\n' + res.standfirst + '\n\n' + text;
+			res.pubDate = data.publishedDate;
 
-			generateTranslations(
-				translators,
-				combinedText,
-				lang,
-				firstChunkOnly,
-				standfirst
-			).then(translations => {
-				translations.article = uuid;
-				res.json(translations);
-			});
+			if(checkCache) {
+				const promises = [];
+				for(let i = 0; i < res.translators.length; ++i) {
+					const check = CACHE.checkAndGet(`${res.uuid}_${res.translators[i]}`, res.lang.toLowerCase(), res.pubDate);
+					promises.push(check);
+				}
+				
+				return Promise.all(promises)
+					.then(data => {
+						if(data.length !== 1 && data.every( item => item === data[0] )) {
+							return next();
+						}
+
+						const names = ['original'].concat(res.translators);
+						const newTranslations = [];
+						const cachedTranslations = [];
+
+						let formattedResult = {
+							article: res.uuid,
+							texts: {
+								'original': extract(res.combinedText)
+							},
+							translatorNames: names,
+							audioUrls: {},
+							audioButtonText: {}
+						}
+
+						for(let i = 0; i < data.length; ++i) {
+							if(!data[i]) {
+								newTranslations.push(res.translators[i]);
+							} else {
+								cachedTranslations.push(res.translators[i]);
+								formattedResult.texts[res.translators[i]] = JSON.parse(data[i])[res.lang.toLowerCase()];
+							}
+						}
+
+						formattedResult = Utils.formatOutput(formattedResult, !!res.standfirst, true, cachedTranslations.concat('original'));
+						formattedResult = Audio.get(formattedResult, res.lang, cachedTranslations.concat('original'));
+
+						if(newTranslations.length > 0) {
+							if(cachedTranslations.length > 0) {
+								res.translators = newTranslations;
+								res.formattedResult = formattedResult;
+							}
+							return next();
+						} else {
+							return res.json(formattedResult);
+						}
+					})
+					.catch(err => console.log('CHECK cache error', err));
+					
+			} else {
+				return next();
+			}
 		})
 		.catch(err => {
 			console.log('CAPI ERROR', err);
 			res.json({
-				original: { error: `Error, cannot find article with uuid ${uuid}` },
+				original: { error: `Error, cannot find article with uuid ${res.uuid}` },
 				outputs: ['original']
 			});
 		});
+}, (req, res) => {
+	generateTranslations(
+		res.translators,
+		res.combinedText,
+		res.lang,
+		res.firstChunkOnly,
+		res.standfirst,
+		res.langFrom
+	).then(translations => {
+		for(let i = 0; i < res.translators.length; ++i) {
+			if(res.translators[i] !== 'original') {
+				CACHE.update({uuid: res.uuid, lang: res.lang, lastPubDate: res.pubDate, translation: translations.texts[res.translators[i]], translator: res.translators[i]});
+			}
+		}
+		translations.article = res.uuid;
+
+		if(res.formattedResult) {
+			translations.translatorNames = res.formattedResult.translatorNames;
+			translations.texts = Object.assign(res.formattedResult.texts, translations.texts);
+			translations.audioUrls = Object.assign(res.formattedResult.audioUrls, translations.audioUrls);
+			translations.audioButtonText = Object.assign(res.formattedResult.audioButtonText, translations.audioButtonText);
+		}
+
+		return res.json(translations);
+	})
+	.catch(err => console.log(err));
 });
 
 app.post('/translation/:lang', (req, res) => {
 	const text = req.body.text;
 	const lang = req.params.lang;
+
 	const translators = JSON.parse(req.body.translators);
 	const firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
@@ -190,6 +218,8 @@ app.post('/translation/:lang', (req, res) => {
 app.post('/lexicon/:lang', (req, res) => {
 	const lexQuery = req.body.text;
 	const lang = req.params.lang;
+	const langFrom = req.body.from; 
+
 	const translators = JSON.parse(req.body.translators);
 	const firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
@@ -200,7 +230,9 @@ app.post('/lexicon/:lang', (req, res) => {
 				translators,
 				combinedText,
 				lang,
-				firstChunkOnly
+				firstChunkOnly,
+				false,
+				langFrom
 			);
 			res.json(translations);
 		})
@@ -215,15 +247,25 @@ app.post('/lexicon/:lang', (req, res) => {
 		});
 });
 
+app.get('/check/:uuid/:pubDate', async (req, res) => {
+	const uuid = req.params.uuid;
+	const translator = process.env.NEXT_TRANSLATOR;
+	const lastPubDate = req.params.pubDate;
+
+	CHECKS.check(uuid, translator, lastPubDate)
+		.then(data => { return res.json(data) })
+		.catch(err => console.log(err));
+});
+
 app.use(s3o);
 app.use('/client', express.static(path.resolve(__dirname + '/public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials');
 
-app.get('/', (req, res) => {
-	const settings = Translator.settings(Utils.extractUser(req.headers.cookie));
-	res.render('index', settings);
+app.get('/', async (req, res) => {
+	const settings = await Translator.settings(Utils.extractUser(req.headers.cookie));
+	return res.render('index', settings);
 });
 
 app.get('/demo/:uuid', (req, res) => {
@@ -246,9 +288,7 @@ app.get('/demo-static/:demoType', (req, res) => {
 		res
 			.status(500)
 			.send(
-				`Demo type not recognised. The available types are: ${availableDemos.join(
-					', '
-				)}`
+				`Demo type not recognised. The available types are: ${availableDemos.join(', ')}`
 			);
 	}
 });

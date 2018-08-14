@@ -29,9 +29,9 @@ async function translate(options) {
 		textChunks = textChunks.slice(0,1);
 	}
 	const results = [];
-
+	const sourceOption = options.from ? options.from.toLowerCase() : "auto";
 	const params = {
-		SourceLanguageCode: "auto",
+		SourceLanguageCode: sourceOption,
 		TargetLanguageCode: options.to.toLowerCase()
 	};
 

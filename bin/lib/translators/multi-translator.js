@@ -43,6 +43,7 @@ async function translate(translatorNames, options) {
 				translator.durations.push({
 					numChars       : options.text.length,
 					lang           : options.to,
+					langFrom	   : options.from,
 					durationMillis : translationDurationMillis,
 					translationEventId : translationEventId,
 				});
@@ -56,8 +57,9 @@ async function translate(translatorNames, options) {
 	return results;
 }
 
-function getSettings(user) {
-	const translators = SETTINGS.translatorSettings(user);
+async function getSettings(user) {
+	const translatorSettings = await SETTINGS.translatorSettings(user);
+	const translators = translatorSettings.translators;
 
 	let mixLang = [];
 
@@ -66,7 +68,7 @@ function getSettings(user) {
 		mixLang = mixLang.concat(support);
 	}
 
-	return {translators: translators, lang: SETTINGS.languages(mixLang)};
+	return {translators: translators, lang: SETTINGS.languages(mixLang), byPass: translatorSettings.byPass, limits: translatorSettings.limits};
 }
 
 function getEntitySupport(translatorName) {
