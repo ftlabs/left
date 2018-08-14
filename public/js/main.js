@@ -210,7 +210,7 @@ function setElementsHeight() {
 	for (var i = 0; i < textBody[0].children.length; i++) {
 		var largest;
 		applyToAllElements(i, element => {
-			if (!largest || largest.offsetHeight < element.offsetHeight) {
+			if (!largest || largest.clientHeight < element.clientHeight) {
 				largest = element;
 			}
 		});
@@ -218,9 +218,11 @@ function setElementsHeight() {
 		applyToAllElements(i, element => {
 			element.setAttribute(
 				'style',
-				'min-height:' + largest.offsetHeight + 'px'
+				'min-height:' + largest.clientHeight + 'px'
 			);
 		});
+
+		largest = false;
 	}
 }
 
