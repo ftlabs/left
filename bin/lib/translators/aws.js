@@ -1,7 +1,9 @@
 const AWS = require('aws-sdk');
-AWS.config.update({region: process.env.AWS_REGION || 'eu-west-1'});
-
 const Utils = require('../utils/utils');
+
+const awsRegion = Utils.processEnv('AWS_REGION', {default: 'eu-west-1'});
+AWS.config.update({region: awsRegion});
+
 const BYTE_LIMIT = 5000;
 const THROTTLE_LIMIT = 10*1000 // 10 seconds
 

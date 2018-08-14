@@ -1,4 +1,5 @@
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
+const Utils = require('./bin/lib/utils/utils');
 const s3o = require('@financial-times/s3o-middleware');
 const express = require('express');
 const path = require('path');
@@ -7,7 +8,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const helmet = require('helmet');
 const express_enforces_ssl = require('express-enforces-ssl');
-const PORT = process.env.PORT || 2018;
+const PORT = Utils.processEnv('PORT', {validateInteger: true, default: "2018"});
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
 const LIMITS = require('./bin/lib/aws/translation-api-limit');
@@ -25,13 +26,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 const googleTokenPath = path.resolve(`${__dirname}/keyfile.json`);
-fs.writeFileSync(googleTokenPath, process.env.GOOGLE_CREDS);
+fs.writeFileSync(googleTokenPath, Utils.processEnv('GOOGLE_CREDS'));
 
-const CAPI = require('./bin/lib/ft/capi').init(process.env.FT_API_KEY);
+const CAPI = require('./bin/lib/ft/capi').init(Utils.processEnv('FT_API_KEY'));
 const Translator = require('./bin/lib/translators/multi-translator');
-const Utils = require('./bin/lib/utils/utils');
 const Audio = require('./bin/lib/utils/get-audio');
-const Lexicon = require('./bin/lib/ft/lexicon').init(process.env.LEXICON_API_KEY);
+const Lexicon = require('./bin/lib/ft/lexicon').init(Utils.processEnv('LEXICON_API_KEY'));
 
 async function generateTranslations(
 	translatorNames,
@@ -89,7 +89,7 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 			.then(data => res.json(data))
 			.catch(err => console.log(err));
 	}
-	
+
 	res.firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
 
@@ -110,7 +110,7 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 					const check = CACHE.checkAndGet(`${res.uuid}_${res.translators[i]}`, res.lang.toLowerCase(), res.pubDate);
 					promises.push(check);
 				}
-				
+
 				return Promise.all(promises)
 					.then(data => {
 						if(data.length !== 1 && data.every( item => item === data[0] )) {
@@ -154,7 +154,7 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 						}
 					})
 					.catch(err => console.log('CHECK cache error', err));
-					
+
 			} else {
 				return next();
 			}
@@ -218,7 +218,7 @@ app.post('/translation/:lang', (req, res) => {
 app.post('/lexicon/:lang', (req, res) => {
 	const lexQuery = req.body.text;
 	const lang = req.params.lang;
-	const langFrom = req.body.from; 
+	const langFrom = req.body.from;
 
 	const translators = JSON.parse(req.body.translators);
 	const firstChunkOnly =
@@ -249,7 +249,7 @@ app.post('/lexicon/:lang', (req, res) => {
 
 app.get('/check/:uuid/:pubDate', async (req, res) => {
 	const uuid = req.params.uuid;
-	const translator = process.env.NEXT_TRANSLATOR;
+	const translator = Utils.processEnv('NEXT_TRANSLATOR');
 	const lastPubDate = req.params.pubDate;
 
 	CHECKS.check(uuid, translator, lastPubDate)

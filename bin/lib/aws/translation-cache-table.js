@@ -1,11 +1,12 @@
 const AWS = require('aws-sdk');
+const Utils = require('../utils/utils');
 
-const cacheTable = process.env.CACHE_TABLE;
-const region = process.env.AWS_REGION;
+const cacheTable = Utils.processEnv('CACHE_TABLE');
+const region     = Utils.processEnv('AWS_REGION');
 
 const database = new AWS.DynamoDB.DocumentClient({ region });
 const BUCKET = require('./translation-cache-bucket');
-const { getLatest } = require('../utils/utils');
+const getLatest = Utils.getLatest;
 
 function queryItemsInDatabase(uuid){
 	const query = {
@@ -121,5 +122,5 @@ function getUpdateExpression(updateType) {
 module.exports = {
 	exists    : checkItemExists,
 	update    : cacheTranslation,
-	checkAndGet: checkAndGetItem 
+	checkAndGet: checkAndGetItem
 };

@@ -1,7 +1,8 @@
 const AWS = require('aws-sdk');
+const Utils = require('../utils/utils');
 
-const region = process.env.AWS_REGION;
-const cacheBucket = process.env.AWS_CACHE_BUCKET;
+const region = Utils.processEnv('AWS_REGION');
+const cacheBucket = Utils.processEnv('AWS_CACHE_BUCKET');
 
 const S3 = new AWS.S3();
 
@@ -15,7 +16,7 @@ function getObject(fileName, ETag = false) {
 				reject(err);
 			} else {
 				if(!ETag || (ETag && data.ETag === ETag)) {
-					resolve(data.Body.toString('utf-8'));	
+					resolve(data.Body.toString('utf-8'));
 				} else {
 					reject({error: 'The translation is not up-to-date'});
 				}
@@ -50,7 +51,7 @@ function saveObject(fileName, translationData, updateType = 'update') {
 			}
 		});
 	});
-	
+
 }
 
 function createFile(fileName, contents) {

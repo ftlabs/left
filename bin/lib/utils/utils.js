@@ -176,7 +176,7 @@ function processEnv(name, config={}){
 		const configErrMsg = `The configuration for env param ${name} should be Boolean true (to ensure parsing as JSON) or a function defintion (to ensure parsing JSON, and then validate the parsed value. NB, the JSON value needs to start with '{'.)`;
 
 		configValidation(config, 'validateJson', value, configErrMsg);
-		
+
 	}
 
 	return value;
