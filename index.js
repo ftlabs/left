@@ -15,6 +15,7 @@ const LIMITS = require('./bin/lib/aws/translation-api-limit');
 const CACHE = require('./bin/lib/aws/translation-cache-table');
 const CHECKS = require('./bin/lib/utils/display-checks');
 const { get: getFile} = require('./bin/lib/aws/translation-cache-bucket');
+const Tracking = require('./bin/lib/utils/tracking');
 
 if (process.env.NODE_ENV === 'production') {
 	app.use(helmet());
@@ -87,7 +88,7 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 	if (fromCache) {
 		return getFile(`${res.uuid}_${res.translators[0]}`)
 			.then(data => res.json(data))
-			.catch(err => console.log(err));
+			.catch(err => Tracking.splunk(`error="getFile error" message=${JSON.stringify(err)} route=/article/${res.uuid}/${res.lang}`));
 	}
 
 	res.firstChunkOnly =
@@ -153,14 +154,14 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 							return res.json(formattedResult);
 						}
 					})
-					.catch(err => console.log('CHECK cache error', err));
+					.catch(err => Tracking.splunk(`error="Check cache error" message=${JSON.stringify(err)} route=/article/${res.uuid}/${res.lang}`));
 
 			} else {
 				return next();
 			}
 		})
 		.catch(err => {
-			console.log('CAPI ERROR', err);
+			Tracking.splunk(`error="CAPI error" message=${JSON.stringify(err)} route=/article/${res.uuid}/${res.lang}`);
 			res.json({
 				original: { error: `Error, cannot find article with uuid ${res.uuid}` },
 				outputs: ['original']
@@ -191,7 +192,7 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 
 		return res.json(translations);
 	})
-	.catch(err => console.log(err));
+	.catch(err => Tracking.splunk(`error=Generate translations message=${JSON.stringify(err)} route=/article/${res.uuid}/${res.lang}`));
 });
 
 app.post('/translation/:lang', (req, res) => {
@@ -207,7 +208,7 @@ app.post('/translation/:lang', (req, res) => {
 			res.json(translations);
 		})
 		.catch(err => {
-			console.log('Translation ERROR', err);
+			Tracking.splunk(`error="Generate translation error" message=${JSON.stringify(err)} route=/translation/${lang}`);
 			res.json({
 				original: { error: `Error, cannot translate text` },
 				outputs: err
@@ -237,7 +238,7 @@ app.post('/lexicon/:lang', (req, res) => {
 			res.json(translations);
 		})
 		.catch(err => {
-			console.log('CAPI ERROR', err);
+			Tracking.splunk(`error="Lexicon error" message=${JSON.stringify(err)} route=/lexicon/${lang}`);
 			res.json({
 				original: {
 					error: `Error, cannot translate lexicon query ${lexQuery}`
@@ -254,7 +255,7 @@ app.get('/check/:uuid/:pubDate', async (req, res) => {
 
 	CHECKS.check(uuid, translator, lastPubDate)
 		.then(data => { return res.json(data) })
-		.catch(err => console.log(err));
+		.catch(err => Tracking.splunk(`error="Display check" message=${JSON.stringify(err)} route=/check/${uuid}/${lastPubDate}`));
 });
 
 app.use(s3o);
@@ -301,5 +302,5 @@ app.get('/get-translation/:uuid/:language', (req, res) => {
 	});
 });
 
-console.log(`Server is running locally on port ${PORT}`);
+if (process.env.NODE_ENV !== 'production') console.log(`Server is running locally on port ${PORT}`);
 app.listen(PORT);

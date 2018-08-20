@@ -1,5 +1,7 @@
 const fetch = require('node-fetch');
 const DEEPL_URL = 'https://api.deepl.com/v1/translate';
+const Tracking = require('../utils/tracking');
+
 const supportedLang = [
 	{code: 'EN', name: 'English'},
 	{code: 'DE', name: 'German'},
@@ -24,7 +26,7 @@ function init(apiKey) {
 async function translate(options) {
 	let textChunks = await Utils.splitTextIntoChunks(encodeURIComponent(options.text), BYTE_LIMIT, true);
 	if (options.firstChunkOnly && textChunks.length > 1) {
-		console.log(`Deepl.translate: eventId=${options.translationEventId}, firstChunkOnly, so discarding ${textChunks.length -1} (of ${textChunks.length}) chunks`);
+		Tracking.splunk(`Deepl.translate: eventId=${options.translationEventId}, firstChunkOnly, so discarding ${textChunks.length -1} (of ${textChunks.length}) chunks`);
 		textChunks = textChunks.slice(0,1);
 	}
 	let results = [];
@@ -40,7 +42,7 @@ async function translate(options) {
 
 	for(let i = 0; i < textChunks.length; ++i) {
 		if (i>0) {
-			console.log(`Deepl.translate: eventId=${options.translationEventId}, submitting chunk=${i+1} (of ${textChunks.length}).`);
+			Tracking.splunk(`Deepl.translate: eventId=${options.translationEventId}, submitting chunk=${i+1} (of ${textChunks.length}).`);
 		}
 		const formattedBody = `text=${textChunks[i]}&target_lang=${options.to.toUpperCase()}&auth_key=${this.apiKey}${options.from ? '&source_lang=' + options.from.toUpperCase():''}`;
 		postOptions.body = formattedBody;
@@ -67,7 +69,7 @@ async function sendRequest(options) {
 		})
 		.then(data => data)
 		.catch(err => {
-			console.log(`Deepl.sendRequest: Error ${err.status}: ${err.statusText}`);
+			Tracking.splunk(`Deepl.sendRequest: Error ${err.status}: ${err.statusText}`);
 			return { error: `Error ${err.status}: ${err.statusText}`};
 		});
 }

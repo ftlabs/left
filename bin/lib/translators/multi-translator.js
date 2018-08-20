@@ -6,6 +6,7 @@ const Deepl  = require('./deepl').init(Utils.processEnv('DEEPL_API_KEY'));
 const Google = require('./google').init(Utils.processEnv('GOOGLE_PROJECT_ID'));
 const AWS = require('./aws').init();
 const SETTINGS = require('../utils/translator-settings');
+const Tracking = require('../utils/tracking');
 
 const translatorEntities = [Deepl, Google, AWS];
 const translatorMap = {}; // unpack entity info into useful structure
@@ -26,12 +27,12 @@ async function translate(translatorNames, options) {
 	translationEventId++;
 	options.translationEventId = translationEventId;
 	const results = {};
-	console.log(`multi-translator: translate: eventId=${translationEventId}, names=${translatorNames}.`);
+	Tracking.splunk(`multi-translator: translate: eventId=${translationEventId}, names=${translatorNames}.`);
 
 	const promises = translatorNames.map( name => {
 		const translator = translatorMap[name];
 		if (translator.cache.hasOwnProperty(cacheKey) ) {
-			console.log(`multi-translator: translate: eventId=${translationEventId}, name=${name}, cache HIT`);
+			Tracking.splunk(`multi-translator: translate: eventId=${translationEventId}, name=${name}, cache HIT`);
 			results[name] = translator.cache[cacheKey];
 			return Promise.resolve( translator.cache[cacheKey] );
 		} else {
@@ -41,7 +42,7 @@ async function translate(translatorNames, options) {
 				translator.cache[cacheKey] = translation;
 				results[name] = translation;
 				const translationDurationMillis = Date.now() - startTranslatingMillis;
-				console.log(`multi-translator: translate: eventId=${translationEventId}, name=${name}, cache MISS, translationDurationMillis=${translationDurationMillis}`);
+				Tracking.splunk(`multi-translator: translate: eventId=${translationEventId}, name=${name}, cache MISS, translationDurationMillis=${translationDurationMillis}`);
 				translator.durations.push({
 					numChars       : options.text.length,
 					lang           : options.to,

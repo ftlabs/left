@@ -6,6 +6,7 @@ const PUBLIC_TRANSLATORS     = Utils.processEnv('PUBLIC_TRANSLATORS').split(',')
 const RESTRICTED_TRANSLATORS = Utils.processEnv('RESTRICTED_TRANSLATORS').split(',');
 const DEFAULT_LANG = 'French';
 const LIMITS = require('../aws/translation-api-limit');
+const Tracking = ('./tracking');
 
 async function getAllowedTranslators(user) {
 	let translators = PUBLIC_TRANSLATORS;
@@ -40,7 +41,7 @@ async function getAllowedTranslators(user) {
 				limits: limits
 			};
 		})
-		.catch(err => console.log(err));
+		.catch(err => Tracking.splunk(`error="Limits check error message=${JSON.stringify(err)}`));
 }
 
 function getAvailableLanguages(languages) {

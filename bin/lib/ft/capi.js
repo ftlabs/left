@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const Tracking = require('../utils/tracking');
 
 function init(apiKey) {
 	this.apiKey = apiKey;
@@ -12,7 +13,7 @@ function getArticleData(uuid) {
 	.then(data => {
 		return data;
 	})
-	.catch(err => console.log(err));
+	.catch(err => Tracking.splunk(`error="CAPI error" message=${JSON.stringify(err)}`));
 }
 
 

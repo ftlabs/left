@@ -1,4 +1,5 @@
 const Translate = require('@google-cloud/translate');
+const Tracking = require('../utils/tracking');
 let supportedLang;
 
 function init(projectId) {
@@ -21,7 +22,7 @@ async function translate(options) {
 			return translation;
 		})
 		.catch(err => {
-			console.log('Translate error', err);
+			Tracking.splunk(`error="Google translate error" message=${JSON.stringify(err)}`);
 			return { error: `Error from Google Translate, please try again later.`};
 		});
 }
@@ -33,7 +34,7 @@ function setLanguages(translator) {
 			supportedLang = results[0];
 		})
 		.catch(err => {
-			console.error('ERROR:', err);
+			Tracking.splunk(`error="Google language error" message=${JSON.stringify(err)}`);
 		});
 }
 
