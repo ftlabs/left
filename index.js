@@ -86,10 +86,13 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 	res.translators = JSON.parse(req.body.translators);
 
 	if (fromCache) {
+		Tracking.splunk(`request=article uuid=${res.uuid} language=${res.lang} type=fromCache translators=${res.translators}`);
 		return getFile(`${res.uuid}_${res.translators[0]}`)
 			.then(data => res.json(data))
 			.catch(err => Tracking.splunk(`error="getFile error" message=${JSON.stringify(err)} route=/article/${res.uuid}/${res.lang}`));
 	}
+
+	Tracking.splunk(`request=article uuid=${res.uuid} language=${res.lang} translators=${res.translators}`);
 
 	res.firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
@@ -203,6 +206,8 @@ app.post('/translation/:lang', (req, res) => {
 	const firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
 
+	Tracking.splunk(`request=freeText language=${lang} translators=${translators}`);
+
 	generateTranslations(translators, text, lang, firstChunkOnly)
 		.then(translations => {
 			res.json(translations);
@@ -224,6 +229,9 @@ app.post('/lexicon/:lang', (req, res) => {
 	const translators = JSON.parse(req.body.translators);
 	const firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
+
+	Tracking.splunk(`request=lexicon term=${lexQuery} language=${lang} translators=${translators}`);
+
 	return Lexicon.search(lexQuery)
 		.then(async text => {
 			const combinedText = 'Lexicon Search Term: ' + lexQuery + '\n\n' + extract(text);
@@ -252,6 +260,8 @@ app.get('/check/:uuid/:pubDate', async (req, res) => {
 	const uuid = req.params.uuid;
 	const translator = Utils.processEnv('NEXT_TRANSLATOR');
 	const lastPubDate = req.params.pubDate;
+
+	Tracking.splunk(`request=NextDisplay uuid=${res.uuid}`);
 
 	CHECKS.check(uuid, translator, lastPubDate)
 		.then(data => { return res.json(data) })

@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk');
 const Utils = require('../utils/utils');
+const Tracking = require('../utils/tracking');
 
 const region = Utils.processEnv('AWS_REGION');
 const cacheBucket = Utils.processEnv('AWS_CACHE_BUCKET');
@@ -7,6 +8,8 @@ const cacheBucket = Utils.processEnv('AWS_CACHE_BUCKET');
 const S3 = new AWS.S3();
 
 function getObject(fileName, ETag = false) {
+	Tracking.splunk(`action="S3 Object Retrieval" fileName=${fileName}`);
+
 	return new Promise((resolve, reject) => {
 		S3.getObject({
 			Bucket: cacheBucket,
@@ -26,6 +29,8 @@ function getObject(fileName, ETag = false) {
 }
 
 function saveObject(fileName, translationData, updateType = 'update') {
+	Tracking.splunk(`action="S3 Object Save" fileName=${fileName}`);
+	
 	return new Promise((resolve, reject) => {
 		const update = getObject(fileName)
 		.then(data => {
