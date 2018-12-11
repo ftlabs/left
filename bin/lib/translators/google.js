@@ -1,4 +1,4 @@
-const Translate = require('@google-cloud/translate');
+const { Translate } = require('@google-cloud/translate');
 let supportedLang;
 
 function init(projectId) {
