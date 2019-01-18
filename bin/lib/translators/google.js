@@ -1,5 +1,6 @@
-const Translate = require('@google-cloud/translate');
+const { Translate } = require('@google-cloud/translate');
 const Tracking = require('../utils/tracking');
+
 let supportedLang;
 
 function init(projectId) {
