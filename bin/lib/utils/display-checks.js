@@ -1,6 +1,7 @@
 const LIMITS = require('../aws/translation-api-limit');
 const CACHE = require('../aws/translation-cache-table');
 const { getLatest } = require('./utils');
+const Tracking = require('./tracking');
 
 const displayRules = {};
 
@@ -35,7 +36,7 @@ function checkArticleAndLimit(uuid, translator, pubDate) {
 				}
 				resolve(displayRules);
 			})
-			.catch(err => console.log(err));
+			.catch(err => Tracking.splunk(`error="Error checking display rules" message=${JSON.stringify(err)} uuid=${uuid} translator=${translator}`));
 	});
 }
 

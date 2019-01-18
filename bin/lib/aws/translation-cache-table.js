@@ -7,6 +7,7 @@ const region     = Utils.processEnv('AWS_REGION');
 const database = new AWS.DynamoDB.DocumentClient({ region });
 const BUCKET = require('./translation-cache-bucket');
 const getLatest = Utils.getLatest;
+const Tracking = ('../utils/tracking');
 
 function queryItemsInDatabase(uuid){
 	const query = {
@@ -103,7 +104,7 @@ async function cacheTranslation({ uuid, lang, lastPubDate, translation, translat
 				});
 			})
 			.catch(err => {
-				console.log('There was an error creating or updating the file');
+				Tracking.splunk(`error="cacheTranslation error" message="There was an error creating or updating the file" details=${JSON.stringify(err)} uuid=${uuid}`);
 			});
 	});
 }

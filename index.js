@@ -15,6 +15,7 @@ const LIMITS = require('./bin/lib/aws/translation-api-limit');
 const CACHE = require('./bin/lib/aws/translation-cache-table');
 const CHECKS = require('./bin/lib/utils/display-checks');
 const { get: getFile} = require('./bin/lib/aws/translation-cache-bucket');
+const Tracking = require('./bin/lib/utils/tracking');
 
 if (process.env.NODE_ENV === 'production') {
 	app.use(helmet());
@@ -85,10 +86,13 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 	res.translators = JSON.parse(req.body.translators);
 
 	if (fromCache) {
+		Tracking.splunk(`request=article uuid=${res.uuid} language=${res.lang} type=fromCache translators=${res.translators}`);
 		return getFile(`${res.uuid}_${res.translators[0]}`)
 			.then(data => res.json(data))
-			.catch(err => console.log(err));
+			.catch(err => Tracking.splunk(`error="getFile error" message=${JSON.stringify(err)} route=/article/${res.uuid}/${res.lang}`));
 	}
+
+	Tracking.splunk(`request=article uuid=${res.uuid} language=${res.lang} translators=${res.translators}`);
 
 	res.firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
@@ -153,14 +157,14 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 							return res.json(formattedResult);
 						}
 					})
-					.catch(err => console.log('CHECK cache error', err));
+					.catch(err => Tracking.splunk(`error="Check cache error" message=${JSON.stringify(err)} route=/article/${res.uuid}/${res.lang}`));
 
 			} else {
 				return next();
 			}
 		})
 		.catch(err => {
-			console.log('CAPI ERROR', err);
+			Tracking.splunk(`error="CAPI error" message=${JSON.stringify(err)} route=/article/${res.uuid}/${res.lang}`);
 			res.json({
 				original: { error: `Error, cannot find article with uuid ${res.uuid}` },
 				outputs: ['original']
@@ -191,7 +195,7 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 
 		return res.json(translations);
 	})
-	.catch(err => console.log(err));
+	.catch(err => Tracking.splunk(`error=Generate translations message=${JSON.stringify(err)} route=/article/${res.uuid}/${res.lang}`));
 });
 
 app.post('/translation/:lang', (req, res) => {
@@ -202,12 +206,14 @@ app.post('/translation/:lang', (req, res) => {
 	const firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
 
+	Tracking.splunk(`request=freeText language=${lang} translators=${translators}`);
+
 	generateTranslations(translators, text, lang, firstChunkOnly)
 		.then(translations => {
 			res.json(translations);
 		})
 		.catch(err => {
-			console.log('Translation ERROR', err);
+			Tracking.splunk(`error="Generate translation error" message=${JSON.stringify(err)} route=/translation/${lang}`);
 			res.json({
 				original: { error: `Error, cannot translate text` },
 				outputs: err
@@ -223,6 +229,9 @@ app.post('/lexicon/:lang', (req, res) => {
 	const translators = JSON.parse(req.body.translators);
 	const firstChunkOnly =
 		!req.query.hasOwnProperty('firstChunkOnly') || !!req.query.firstChunkOnly; // default is firstChunkOnly=true
+
+	Tracking.splunk(`request=lexicon term=${lexQuery} language=${lang} translators=${translators}`);
+
 	return Lexicon.search(lexQuery)
 		.then(async text => {
 			const combinedText = 'Lexicon Search Term: ' + lexQuery + '\n\n' + extract(text);
@@ -237,7 +246,7 @@ app.post('/lexicon/:lang', (req, res) => {
 			res.json(translations);
 		})
 		.catch(err => {
-			console.log('CAPI ERROR', err);
+			Tracking.splunk(`error="Lexicon error" message=${JSON.stringify(err)} route=/lexicon/${lang}`);
 			res.json({
 				original: {
 					error: `Error, cannot translate lexicon query ${lexQuery}`
@@ -264,9 +273,11 @@ app.get('/check/:uuid/:pubDate', async (req, res) => {
 			return clientPubDate;
 		});
 
+	Tracking.splunk(`request=NextDisplay uuid=${res.uuid}`);
+
 	CHECKS.check(uuid, translator, lastPubDate)
 		.then(data => { return res.json(data) })
-		.catch(err => console.log(err));
+		.catch(err => Tracking.splunk(`error="Display check" message=${JSON.stringify(err)} route=/check/${uuid}/${lastPubDate}`));
 });
 
 app.use(s3o);
@@ -313,5 +324,5 @@ app.get('/get-translation/:uuid/:language', (req, res) => {
 	});
 });
 
-console.log(`Server is running locally on port ${PORT}`);
+if (process.env.NODE_ENV !== 'production') console.log(`Server is running locally on port ${PORT}`);
 app.listen(PORT);

@@ -6,6 +6,7 @@ AWS.config.update({region: awsRegion});
 
 const BYTE_LIMIT = 5000;
 const THROTTLE_LIMIT = 10*1000 // 10 seconds
+const Tracking = require('../utils/tracking');
 
 const supportedLang = [
 	{code: 'EN', name: 'English'},
@@ -27,7 +28,7 @@ function init() {
 async function translate(options) {
 	let textChunks = await Utils.splitTextIntoChunks(options.text, BYTE_LIMIT);
 	if (options.firstChunkOnly && textChunks.length > 1) {
-		console.log(`AWS.translate: eventId=${options.translationEventId}, firstChunkOnly, so discarding ${textChunks.length -1} (of ${textChunks.length}) chunks`);
+		Tracking.splunk(`AWS.translate: eventId=${options.translationEventId}, firstChunkOnly, so discarding ${textChunks.length -1} (of ${textChunks.length}) chunks`);
 		textChunks = textChunks.slice(0,1);
 	}
 	const results = [];
@@ -40,7 +41,7 @@ async function translate(options) {
 	for (let i = 0; i < textChunks.length; ++i) {
 
 		if (i>0) { // pause before 2nd (and each subsequent) chunk
-			console.log(`AWS.translate: eventId=${options.translationEventId}, waiting ${THROTTLE_LIMIT} millis before submitting chunk=${i+1} (of ${textChunks.length}).`);
+			Tracking.splunk(`AWS.translate: eventId=${options.translationEventId}, waiting ${THROTTLE_LIMIT} millis before submitting chunk=${i+1} (of ${textChunks.length}).`);
 			await Utils.pauseForMillis( THROTTLE_LIMIT );
 		}
 
