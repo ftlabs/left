@@ -102,7 +102,7 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 				res.standfirst = Utils.maybeAppendDot(data.standfirst);
 			} // adding a closing . improves the translation
 			res.combinedText = title + '\n\n' + res.standfirst + '\n\n' + text;
-			res.pubDate = data.publishedDate;
+			res.pubDate = data.lastModified;
 
 			if(checkCache) {
 				const promises = [];
@@ -250,7 +250,19 @@ app.post('/lexicon/:lang', (req, res) => {
 app.get('/check/:uuid/:pubDate', async (req, res) => {
 	const uuid = req.params.uuid;
 	const translator = Utils.processEnv('NEXT_TRANSLATOR');
-	const lastPubDate = req.params.pubDate;
+	const clientPubDate = req.params.pubDate;
+
+	const lastPubDate = await CAPI.get(uuid)
+		.then(async data => {
+			if(data.lastModified) {
+				return data.lastModified;
+			}
+			return data.publishedDate;
+		})
+		.catch(err => {
+			console.log(err);
+			return clientPubDate;
+		});
 
 	CHECKS.check(uuid, translator, lastPubDate)
 		.then(data => { return res.json(data) })
