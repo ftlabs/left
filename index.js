@@ -280,7 +280,7 @@ app.get('/check/:uuid/:pubDate', async (req, res) => {
 		.catch(err => Tracking.splunk(`error="Display check" message=${JSON.stringify(err)} route=/check/${uuid}/${lastPubDate}`));
 });
 
-// app.use(s3o);
+
 app.use('/client', express.static(path.resolve(__dirname + '/public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
@@ -308,6 +308,7 @@ app.get('/content/:uuid', (req,res) => {
 	res.render('content', data);
 });
 
+app.use(s3o);
 
 app.get('/', async (req, res) => {
 	const settings = await Translator.settings(Utils.extractUser(req.headers.cookie));
