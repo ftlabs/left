@@ -210,6 +210,7 @@ function initSplitView() {
                         removeSplitView();
                         break;
                     case 'split':
+                        mobileViewClassAction('add', 'stacked');
                         window.localStorage.setItem('FT.translationStyle', element.value);
                         splitView();
                         break;

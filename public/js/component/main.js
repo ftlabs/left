@@ -182,6 +182,7 @@ function removeTranslation() {
     logComponentInteractions('translation-off');
 
     removeTranslationSplitView();
+    toggleTranslationAccordion();
 
     var articleTitle = document.querySelector('h1.topper__headline span');
 
