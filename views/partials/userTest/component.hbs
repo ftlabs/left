@@ -1,0 +1,133 @@
+<div
+    class="ftlabs-translation__accordion ftlabs-translation--hidden"
+    data-trackable="ftlabs-translations"
+    id="ftlabsTranslationContainer"
+>
+    <div class="ftlabs-translation-feedback__label ftlabs-translation-feedback__label--mobile">
+        <span>Experimental feature</span>
+    </div>
+    <div class="ftlabs-translation__accordion--collapsed">
+        <div class="ftlabs-translation__prompt">
+            Automated translations are now available for
+            <a href="https://www.ft.com/brexit" class="n-content-tag">Brexit</a> and
+            <a href="https://www.ft.com/companies/technology" class="n-content-tag">Technology</a>
+            articles on the FT
+        </div>
+        <div class="ftlabs-translation__actions">
+            <div class="ftlabs-translation__button--off ftlabs-translation--hidden">
+                <button class="o-buttons o-buttons--primary o-buttons--mono o-buttons--big">
+                    Back to English
+                </button>
+            </div>
+            <button
+                class="o-buttons o-buttons--mono o-buttons--big o-buttons-icon o-buttons-icon--arrow-down ftlabs-translation__toggle"
+                data-o-component="o-toggle"
+                data-trackable="ftlabs-translations-toggle"
+            >
+                Try it
+            </button>
+        </div>
+    </div>
+    <div class="ftlabs-translation__accordion--expanded ftlabs-translation--hidden">
+        <div class="ftlabs-translation__form--language o-forms">
+            <form>
+                <div class="ftlabs-translation--error ftlabs-translation--hidden">
+                    Something went wrong getting this translation
+                </div>
+                <div class="ftlabs-translation__selection">
+                    <div class="ftlabs-translation__selector">
+                        <select
+                            id="ftlabs-translation-select-standard"
+                            class="o-forms__select ftlabs-translation__select--language"
+                            data-trackable="ftlabs-translations-select"
+                        >
+                            <option value="" disabled selected>Choose your language</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ftlabs-translation-options ftlabs-translation--hidden">
+                    <div class="o-forms__group">
+                        <div class="ftlabs-translation__options-label">
+                            Choose translation layout:
+                        </div>
+                    </div>
+                    <div class="o-forms__group ftlabs-translation-options-selection">
+                        <div class="o-forms__group o-forms__group--inline ftlabs-translation-options__all">
+                            <input
+                                type="radio"
+                                name="mobile-split-style"
+                                value="standard"
+                                class="o-forms__radio"
+                                id="standard"
+                                checked
+                            />
+                            <label for="standard" class="o-forms__label"
+                                >Single column view (the article will be fully translated)</label
+                            >
+                        </div>
+
+                        <div class="o-forms__group o-forms__group--inline ftlabs-translation-options__desktop">
+                            <input
+                                type="radio"
+                                name="mobile-split-style"
+                                value="split"
+                                class="o-forms__radio"
+                                id="split"
+                            />
+                            <label for="split" class="o-forms__label"
+                                >Split column view (the original article will appear side-by-side with the
+                                translation)</label
+                            >
+                        </div>
+                        <div class="o-forms__group o-forms__group--inline ftlabs-translation-options__mobile">
+                            <input
+                                type="radio"
+                                name="mobile-split-style"
+                                value="stacked"
+                                class="o-forms__radio"
+                                id="stacked"
+                            />
+                            <label for="stacked" class="o-forms__label"
+                                >Stacked view (translation will appear after every paragraph)</label
+                            >
+                            <input
+                                type="radio"
+                                name="mobile-split-style"
+                                value="bubble"
+                                class="o-forms__radio"
+                                id="bubble"
+                            />
+                            <label for="bubble" class="o-forms__label"
+                                >Chat bubbles (translation will appear after every couple of sentences in chat
+                                bubbles)</label
+                            >
+                            <input type="radio" name="mobile-split-style" value="tap" class="o-forms__radio" id="tap" />
+                            <label for="tap" class="o-forms__label"
+                                >Tap to see (the translation will appear when you tap on the paragraph)</label
+                            >
+                        </div>
+                    </div>
+                </div>
+                <div class="o-forms__group o-forms__group--inline ftlabs-translation__tickbox">
+                    <input type="checkbox" name="checkbox" class="o-forms__checkbox" id="translateAll" />
+                    <label for="translateAll" class="o-forms__label">Translate other articles when available.</label>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="ftlabs-translation__disclaimer ftlabs-translation--hidden">
+        This is an experimental feature; translations may contain errors.
+    </div>
+
+    <div class="ftlabs-translation--loading ftlabs-translation--hidden">
+        <div class="o-loading o-loading--dark o-loading--medium"></div>
+    </div>
+</div>
+<div class="ftlabs-translation-feedback ftlabs-translation--hidden">
+    <div class="ftlabs-translation-feedback__label ftlabs-translation-feedback__label--desktop">
+        <span>Experimental feature</span>
+    </div>
+    <div class="ftlabs-translation-feedback__components">
+        <a href="https://financiatimescx.eu.qualtrics.com/jfe/form/SV_0HZeZ21IBHAyee9">Please provide your feedback</a>
+    </div>
+</div>
