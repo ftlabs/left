@@ -280,11 +280,34 @@ app.get('/check/:uuid/:pubDate', async (req, res) => {
 		.catch(err => Tracking.splunk(`error="Display check" message=${JSON.stringify(err)} route=/check/${uuid}/${lastPubDate}`));
 });
 
-app.use(s3o);
+// app.use(s3o);
 app.use('/client', express.static(path.resolve(__dirname + '/public')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 hbs.registerPartials(__dirname + '/views/partials');
+
+app.get('/content/:uuid', (req,res) => {
+	const uuid = req.params.uuid;
+	const exampleUUIDs = process.env.USER_TEST_UUIDS.split(',');
+	const data = {};
+
+	switch(uuid) {
+		case exampleUUIDs[1]:
+			data.partial2 = true;
+		break;
+		
+		case exampleUUIDs[2]:
+			data.partial3 = true;
+		break;
+
+		case exampleUUIDs[0]:
+		default:
+			data.partial1 = true;
+	}
+
+	res.render('content', data);
+});
+
 
 app.get('/', async (req, res) => {
 	const settings = await Translator.settings(Utils.extractUser(req.headers.cookie));
