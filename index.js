@@ -291,6 +291,8 @@ app.get('/content/:uuid', (req,res) => {
 	const exampleUUIDs = process.env.USER_TEST_UUIDS.split(',');
 	const data = {};
 
+	Tracking.splunk(`request=content uuid=${uuid}`);
+
 	switch(uuid) {
 		case exampleUUIDs[1]:
 			data.partial2 = true;
