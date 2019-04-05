@@ -1,20 +1,20 @@
 function showSplitView() {
-    if (window.localStorage.getItem('FT.translationStyle') === (null || 'null')) {
-        window.localStorage.setItem('FT.translationStyle', 'standard');
+    if (splitStyleAction('get') === (null || 'null')) {
+        splitStyleAction('set', 'standard');
     }
 
     var splitViewOptions = document.querySelector('.ftlabs-translation-options');
 
     Array.from(splitViewOptions.children).forEach(element => {
-        if (element.nodeName === 'INPUT' && element.value === window.localStorage.getItem('FT.translationStyle')) {
+        if (element.nodeName === 'INPUT' && element.value === splitStyleAction('get')) {
             element.checked = true;
-            mobileSplitViewChange(element.value);
+            mobileSplitViewChange(element.value, splitStyleAction('get'));
         }
     });
 
     splitViewOptions.classList.remove('ftlabs-translation--hidden');
 
-    if (window.localStorage.getItem('FT.translationStyle') !== 'standard') {
+    if (splitStyleAction('get') !== 'standard') {
         splitView();
     }
 }
@@ -30,7 +30,7 @@ function splitView() {
     var originalTranslation = createOriginalParagraphs(originalArticleBody);
     populateArticleBody(articleBody, originalTranslation, translatedArticleBody);
     articleBody.classList.add('ftlabs-translation--split-view-container');
-    mobileSplitViewChange(window.localStorage.getItem('FT.translationStyle'));
+    mobileSplitViewChange(splitStyleAction('get'), splitStyleAction('get'));
 }
 
 function headline() {
@@ -48,9 +48,7 @@ function headline() {
         element.innerHTML = original;
         headline.appendChild(translated);
     });
-    headline.classList.add(
-        'ftlabs-translation--split-view-style__' + window.localStorage.getItem('FT.translationStyle')
-    );
+    headline.classList.add('ftlabs-translation--split-view-style__' + splitStyleAction('get'));
 }
 
 function standFirst() {
@@ -73,15 +71,13 @@ function standFirst() {
     standFirst.appendChild(original);
     standFirst.appendChild(translated);
     standFirst.classList.add('ftlabs-translation--split-view');
-    standFirst.classList.add(
-        'ftlabs-translation--split-view-style__' + window.localStorage.getItem('FT.translationStyle')
-    );
+    standFirst.classList.add('ftlabs-translation--split-view-style__' + splitStyleAction('get'));
 }
 
 function removeTranslationSplitView() {
     var splitViewOptions = document.querySelector('.ftlabs-translation-options');
     splitViewOptions.classList.add('ftlabs-translation--hidden');
-    if (window.localStorage.getItem('FT.translationStyle') !== 'standard') {
+    if (splitStyleAction('get') !== 'standard') {
         removeSplitView();
     }
 }
@@ -203,56 +199,50 @@ function initSplitView() {
     var splitViewOptions = Array.from(splitViewSelection.children);
     splitViewOptions.forEach(element => {
         Array.from(element.children).forEach(element => {
-            if (element.value === window.localStorage.getItem('FT.translationStyle') && element.tagName === 'INPUT') {
+            if (element.value === splitStyleAction('get') && element.tagName === 'INPUT') {
                 element.checked = true;
             }
             element.addEventListener('change', () => {
-                window.localStorage.setItem('FT.translationStyle', element.value);
-
                 switch (element.value) {
                     case 'standard':
+                        mobileViewClassAction('remove', splitStyleAction('get'));
                         window.localStorage.setItem('FT.translationStyle', element.value);
                         removeSplitView();
                         break;
                     case 'split':
+                        mobileViewClassAction('add', 'stacked');
                         window.localStorage.setItem('FT.translationStyle', element.value);
                         splitView();
                         break;
                     default:
-                        mobileSplitViewChange(element.value);
+                        mobileSplitViewChange(element.value, splitStyleAction('get'));
                 }
+                window.localStorage.setItem('FT.translationStyle', element.value);
             });
         });
     });
 }
 
-function mobileSplitViewChange(style) {
+function mobileSplitViewChange(newStyle, previousStyle) {
     var articleBody = document.querySelector('.article__content-body');
-    var topperHeadline = document.querySelector('.topper__headline');
-    var topperStandfirst = document.querySelector('.topper__standfirst');
     if (!Array.from(articleBody.classList).includes('ftlabs-translation--split-view-container')) {
         splitView();
     }
-
     if (articleBody) {
-        articleBody.classList.remove(
-            'ftlabs-translation--split-view-style__' + window.localStorage.getItem('FT.translationStyle')
-        );
-        topperHeadline.classList.remove(
-            'ftlabs-translation--split-view-style__' + window.localStorage.getItem('FT.translationStyle')
-        );
-        topperStandfirst.classList.remove(
-            'ftlabs-translation--split-view-style__' + window.localStorage.getItem('FT.translationStyle')
-        );
-        window.localStorage.setItem('FT.translationStyle', style);
-        articleBody.classList.add(
-            'ftlabs-translation--split-view-style__' + window.localStorage.getItem('FT.translationStyle')
-        );
-        topperHeadline.classList.add(
-            'ftlabs-translation--split-view-style__' + window.localStorage.getItem('FT.translationStyle')
-        );
-        topperStandfirst.classList.add(
-            'ftlabs-translation--split-view-style__' + window.localStorage.getItem('FT.translationStyle')
-        );
+        mobileViewClassAction('remove', previousStyle);
+        mobileViewClassAction('add', newStyle);
     }
+}
+
+function mobileViewClassAction(action, style) {
+    var articleBody = document.querySelector('.article__content-body');
+    var topperHeadline = document.querySelector('.topper__headline');
+    var topperStandfirst = document.querySelector('.topper__standfirst');
+    articleBody.classList[action]('ftlabs-translation--split-view-style__' + style);
+    topperHeadline.classList[action]('ftlabs-translation--split-view-style__' + style);
+    topperStandfirst.classList[action]('ftlabs-translation--split-view-style__' + style);
+}
+
+function splitStyleAction(method, value) {
+    return window.localStorage[`${method}Item`]('FT.translationStyle', value);
 }
