@@ -1,0 +1,13 @@
+.core .o-share__action--share {
+  display: block;
+}
+
+.o-share-wrapper .o-share,
+.o-share-wrapper .o-share__icon,
+.o-share-wrapper .o-share .n-myft-ui--save {
+  display: block !important;
+}
+
+.o-overlay--overlay {
+  z-index: 1001 !important;
+}
