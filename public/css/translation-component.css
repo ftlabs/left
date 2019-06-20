@@ -1,13 +1,39 @@
 .core .o-share__action--share {
-  display: block;
+	display: block;
 }
 
 .o-share-wrapper .o-share,
 .o-share-wrapper .o-share__icon,
 .o-share-wrapper .o-share .n-myft-ui--save {
-  display: block !important;
+	display: block !important;
 }
 
 .o-overlay--overlay {
-  z-index: 1001 !important;
+	z-index: 1001 !important;
+}
+
+.ftlabs-translation__language-selection {
+	list-style-type: none;
+	display: flex;
+}
+
+.ftlabs-translation__flag {
+	height: 34px;
+	margin-bottom: 5px;
+}
+
+.ftlabs-translation__language-selection-element {
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	font-size: 18px;
+	margin-right: 38px;
+}
+
+.o-overlay {
+	background: #fff1e5;
+}
+
+.o-overlay__title {
+	font-weight: bold;
 }

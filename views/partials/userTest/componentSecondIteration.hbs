@@ -1,19 +1,31 @@
 <script type="text/template" id="overlay">
     <ul class="ftlabs-translation__language-selection">
         <li>
-            <div>
+            <div class="ftlabs-translation__language-selection-element">
+                <img src="https://www.ft.com/__origami/service/image/v2/images/raw/ftflag-v1:de?source=ftlabs" alt="German flag"  class="ftlabs-translation__flag">
                 German
-            </div>    
+            </div>   
         </li>
         <li>        
-             <div>
+            <div class="ftlabs-translation__language-selection-element">
+                <img src="https://www.ft.com/__origami/service/image/v2/images/raw/ftflag-v1:es?source=ftlabs" alt="Spanish flag" class="ftlabs-translation__flag">
                 Spanish
-            </div>  
+            </div> 
         </li>
         <li>
-            <div>
-                Spanish initdsadas fdsfdsf
+            <div class="ftlabs-translation__language-selection-element">
+                <img src="https://www.ft.com/__origami/service/image/v2/images/raw/ftflag-v1:fr?source=ftlabs" alt="French flag" class="ftlabs-translation__flag">
+                French
             </div> 
         </li>
     </ul>  
+    <div class="o-forms__group o-forms__group--inline">
+        <div class="o-forms__group o-forms__group--inline ftlabs-translation__tickbox">
+            <input type="checkbox" name="checkbox" class="o-forms__checkbox" id="translateAll" />
+            <label for="translateAll" class="o-forms__label">Always translate when available.</label>
+        </div>
+    </div>
+    <div>
+        Experimental feature powered by google.
+    </div>
 </script>
