@@ -1,4 +1,5 @@
 var translator;
+var Overlay = Origami['o-overlay'];
 var toggleButton = document.querySelector('.ftlabs-translation__toggle');
 var articleTitle = document.querySelector('h1.topper__headline span');
 var articleStandfirst = document.querySelector('.topper__standfirst');
@@ -11,9 +12,6 @@ var translationExpanded = document.querySelector(
 	'.ftlabs-translation__accordion--expanded'
 );
 var turnOffButton = document.querySelector('.ftlabs-translation__button--off');
-var languageSelect = document.querySelector(
-	'.ftlabs-translation__language-selection'
-);
 var translateAll = document.querySelector(
 	'.ftlabs-translation__tickbox input[type="checkbox"]'
 );
@@ -30,14 +28,17 @@ var pubDate = document
 var localTranslations = {};
 
 function init(langs) {
-	// var widget = document.querySelector('.ftlabs-translation__accordion');
-	// var feedback = document.querySelector('.ftlabs-translation-feedback');
-	// widget.classList.remove('ftlabs-translation--hidden');
-	// feedback.classList.remove('ftlabs-translation--hidden');
-	console.log('getting here', langs);
-
-	for (var i = 0; i < langs.length; ++i) {
-		console.log(languageSelect);
+	var content = Origami['o-overlay'].getOverlays().overlay.content;
+	var ihatethis = Array.from(Array.from(content.children)[0].children);
+	var languageSelect = ihatethis.find(function(element) {
+		if (element.classList !== undefined) {
+			return Array.from(element.classList).includes(
+				'ftlabs-translation__language-selection'
+			);
+		}
+		return false;
+	});
+	for (let i = 0; i < langs.length; ++i) {
 		var listItem = document.createElement('li');
 		var elementDiv = document.createElement('div');
 		elementDiv.classList.add(
@@ -47,20 +48,26 @@ function init(langs) {
 		var imageElement = document.createElement('img');
 		imageElement.setAttribute(
 			'src',
-			'https://www.ft.com/__origami/service/image/v2/images/raw/ftflag-v1:fr?source=ftlabs'
+			'https://www.ft.com/__origami/service/image/v2/images/raw/ftflag-v1:' +
+				langs[i].code +
+				'?source=ftlabs'
 		);
 		imageElement.setAttribute('alt', 'French flag');
 		imageElement.classList.add('ftlabs-translation__flag');
 		elementDiv.appendChild(imageElement);
 		var languageName = document.createElement('span');
 		languageName.innerHTML = langs[i].name;
-
-		languageSelect.appendChild(option);
+		elementDiv.appendChild(languageName);
+		listItem.addEventListener('click', function(e) {
+			console.log(i);
+			console.log(langs);
+			showTranslation(langs[i]);
+		});
+		languageSelect.appendChild(listItem);
 	}
 
 	// initSplitView();
 
-	// languageSelect.addEventListener('change', showTranslation);
 	// turnOffButton.addEventListener('click', removeTranslation);
 	// accordionButton.addEventListener('click', toggleTranslationAccordion);
 
@@ -109,8 +116,7 @@ function toggleTranslateAll(e) {
 
 function showTranslation(e) {
 	showTranslationSplitView();
-
-	e.preventDefault();
+	console.log(e);
 
 	var languageCode = e.target.value;
 	var language = e.target[e.target.selectedIndex].text;
@@ -284,11 +290,12 @@ function getAccordionCTA() {
 	return cta;
 }
 
-function toggleTranslation() {
+function opentTranslation() {
 	fetch(`https://ftlabs-left.herokuapp.com/check/${articleId}/${pubDate}`)
 		.then((res) => res.json())
 		.then((data) => {
 			if (data.displayWidget) {
+				console.log('not getting into here bitch', data);
 				translator = data.translator;
 				init(data.languages);
 			} else {
@@ -304,4 +311,4 @@ function toggleTranslation() {
 		});
 }
 
-toggleButton.addEventListener('click', toggleTranslation);
+document.addEventListener('oOverlay.ready', opentTranslation);
