@@ -1,14 +1,45 @@
-<div type="text/template" id="overlay">
-    <ul class="ftlabs-translation__language-selection">
+<div class="ftlabs-translation--hidden">
+    <div type="text/template" id="overlay">
+        <ul class="ftlabs-translation__language-selection">
 
-    </ul>
-    <div class="o-forms__group o-forms__group--inline">
-        <div class="o-forms__group o-forms__group--inline ftlabs-translation__tickbox">
-            <input type="checkbox" name="checkbox" class="o-forms__checkbox" id="translateAll" />
-            <label for="translateAll" class="o-forms__label">Always translate when available.</label>
+        </ul>
+        <div class="o-forms__group o-forms__group--inline">
+            <div class="o-forms__group o-forms__group--inline ftlabs-translation__tickbox">
+                <input type="checkbox" name="checkbox" class="o-forms__checkbox" id="translateAll" />
+                <label for="translateAll" class="o-forms__label">Always translate when available.</label>
+            </div>
+        </div>
+        <div class="ftlabs-translation-options">
+            <div class="o-forms__group ftlabs-translation-options-selection">
+                <div class="o-forms__group o-forms__group--inline ftlabs-translation-options__all">
+                    <input type="radio" name="mobile-split-style" value="standard" class="o-forms__radio" id="standard"
+                        checked />
+                    <label for="standard" class="o-forms__label">Single column view (the whole article will be
+                        translated)</label>
+                </div>
+
+                <div class="o-forms__group o-forms__group--inline ftlabs-translation-options__desktop">
+                    <input type="radio" name="mobile-split-style" value="split" class="o-forms__radio" id="split" />
+                    <label for="split" class="o-forms__label">Split column view (the original article will appear
+                        side-by-side with the
+                        translation)</label>
+                </div>
+                <div class="o-forms__group o-forms__group--inline ftlabs-translation-options__mobile">
+                    <input type="radio" name="mobile-split-style" value="stacked" class="o-forms__radio" id="stacked" />
+                    <label for="stacked" class="o-forms__label">Stacked view (translation will appear after every
+                        paragraph)</label>
+                    <input type="radio" name="mobile-split-style" value="bubble" class="o-forms__radio" id="bubble" />
+                    <label for="bubble" class="o-forms__label">Chat bubbles (translation will appear after every
+                        paragraph)</label>
+                    <input type="radio" name="mobile-split-style" value="tap" class="o-forms__radio" id="tap" />
+                    <label for="tap" class="o-forms__label">Tap to see (the translation will appear when you tap on a
+                        paragraph)</label>
+                </div>
+            </div>
         </div>
     </div>
     <div>
         Experimental feature powered by google.
     </div>
+</div>
 </div>

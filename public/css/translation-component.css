@@ -37,3 +37,8 @@
 .o-overlay__title {
 	font-weight: bold;
 }
+
+.ftlabs-translation__tickbox {
+	padding-bottom: 14px;
+	border-bottom: 1px solid #ccc1b7;
+}
