@@ -310,26 +310,40 @@ function getAccordionCTA() {
 }
 
 function opentTranslation() {
+	console.log('openTranslationCALLED!!!!!!!!!!');
 	var overlay = document.querySelector('#overlay');
 	overlay.setAttribute('class', '');
-
-	fetch(`https://ftlabs-left.herokuapp.com/check/${articleId}/${pubDate}`)
-		.then((res) => res.json())
-		.then((data) => {
-			if (data.displayWidget) {
-				translator = data.translator;
-				init(data.languages);
-			} else {
-				logComponentInteractions('no-display');
-			}
-		})
-		.catch((err) => {
-			logComponentInteractions(
-				'display-check-error',
-				'EN',
-				JSON.stringify(err)
+	var content = Origami['o-overlay'].getOverlays().overlay.content;
+	var contendChildren = Array.from(Array.from(content.children)[0].children);
+	var languageSelect = contendChildren.find(function(element) {
+		if (element.classList !== undefined) {
+			return Array.from(element.classList).includes(
+				'ftlabs-translation__language-selection'
 			);
-		});
+		}
+		return false;
+	});
+
+	console.log('languageSelect', languageSelect);
+	if (Array.from(languageSelect.children).length === 0) {
+		fetch(`https://ftlabs-left.herokuapp.com/check/${articleId}/${pubDate}`)
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.displayWidget) {
+					translator = data.translator;
+					init(data.languages);
+				} else {
+					logComponentInteractions('no-display');
+				}
+			})
+			.catch((err) => {
+				logComponentInteractions(
+					'display-check-error',
+					'EN',
+					JSON.stringify(err)
+				);
+			});
+	}
 }
 
 document.addEventListener('oOverlay.ready', opentTranslation);

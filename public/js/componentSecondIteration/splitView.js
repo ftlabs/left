@@ -50,10 +50,7 @@ function headline() {
 	var headlineBody = Array.from(headline.children);
 
 	headline.classList.add('ftlabs-translation--split-view');
-	console.log('headlineBody', headlineBody);
 	headlineBody.forEach((element) => {
-		console.log('headlineBody foreach element', element);
-
 		var translated = element.cloneNode(true);
 		translated.classList.add('ftlabs-translation__cell');
 		element.classList.add('ftlabs-translation__cell');
@@ -243,10 +240,13 @@ function populateArticleBody(
 
 function initSplitView() {
 	try {
-		var splitViewSelection = document.querySelector(
+		console.trace();
+		var splitViewSelection = document.querySelectorAll(
 			'.ftlabs-translation-options-selection'
-		);
+		)[1];
+		console.log(splitViewSelection);
 		var splitViewOptions = Array.from(splitViewSelection.children);
+		console.log('splitViewOptions', splitViewOptions);
 		splitViewOptions.forEach((element) => {
 			Array.from(element.children).forEach((element) => {
 				if (
@@ -255,8 +255,8 @@ function initSplitView() {
 				) {
 					element.checked = true;
 				}
-				console.log(element);
-				element.addEventListener('change', () => {
+				console.log('element', element);
+				element.addEventListener('click', () => {
 					console.log('radio-button-event-listener-triggered');
 					switch (element.value) {
 						case 'standard':
