@@ -45,7 +45,20 @@ function init(langs) {
 			elementDiv.classList.add(
 				'ftlabs-translation__language-selection-element'
 			);
+
+			elementDiv.classList.add(
+				'ftlabs-translation__language-selection-' + langs[i].name
+			);
 			listItem.appendChild(elementDiv);
+			var tickDiv = document.createElement('div');
+			tickDiv.classList.add('ftlabs-translation__tick-circle');
+			elementDiv.appendChild(tickDiv);
+			var tickElement = document.createElement('img');
+			tickElement.setAttribute(
+				'src',
+				'https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:tick?source=ftlabs'
+			);
+			tickDiv.appendChild(tickElement);
 			var imageElement = document.createElement('img');
 			imageElement.setAttribute(
 				'src',
@@ -53,13 +66,14 @@ function init(langs) {
 					langs[i].code +
 					'?source=ftlabs'
 			);
-			imageElement.setAttribute('alt', 'French flag');
+			imageElement.setAttribute('alt', langs[i].name + ' flag');
 			imageElement.classList.add('ftlabs-translation__flag');
 			elementDiv.appendChild(imageElement);
 			var languageName = document.createElement('span');
 			languageName.innerHTML = langs[i].name;
 			elementDiv.appendChild(languageName);
-			listItem.addEventListener('click', function(e) {
+			listItem.addEventListener('click', function() {
+				greyOutOtherElements;
 				showTranslation(langs[i]);
 			});
 			languageSelect.appendChild(listItem);
@@ -85,6 +99,8 @@ function init(langs) {
 	// }
 	// translateAll.addEventListener('change', toggleTranslateAll);
 }
+
+function greyOutOtherElements() {}
 
 function toggleTranslationAccordion() {
 	translationExpanded.classList.toggle('ftlabs-translation--hidden');
@@ -119,11 +135,6 @@ function showTranslation(language) {
 		var language = language.name;
 		var fromCache;
 
-		// translationError.classList.add('ftlabs-translation--hidden');
-		// translationCollapsed.classList.add('ftlabs-translation--blur');
-		// translationExpanded.classList.add('ftlabs-translation--blur');
-		// translationLoading.classList.remove('ftlabs-translation--hidden');
-
 		var translateSetting = window.localStorage.getItem('FT.translateAll');
 		if (translateSetting !== null) {
 			window.localStorage.setItem('FT.translateAll', languageCode);
@@ -155,7 +166,15 @@ function showTranslation(language) {
 			.then((res) => res.json())
 			.then((data) => {
 				try {
+					const translationOptions = document.querySelectorAll(
+						'.ftlabs-translation-options'
+					)[1];
+					console.log('translationOptions', translationOptions);
+					translationOptions.classList.remove(
+						'ftlabs-translation--hidden'
+					);
 					Overlay.getOverlays().overlay.close();
+					console.log('getting into here');
 					var selector;
 					localTranslations = {};
 					logComponentInteractions(
@@ -180,7 +199,7 @@ function showTranslation(language) {
 				}
 			})
 			.catch((err) => {
-				console.log(err);
+				console.error(err);
 				unsuccessfulTranslationRequest(JSON.stringify(err));
 			});
 	} catch (err) {
@@ -198,7 +217,6 @@ function unsuccessfulTranslationRequest(err) {
 
 function successfulTranslationRequest(selector, language) {
 	try {
-		console.log('getting into succesful');
 		var translation = document.createElement('div');
 		translation.innerHTML = selector.trim();
 
@@ -310,7 +328,6 @@ function getAccordionCTA() {
 }
 
 function opentTranslation() {
-	console.log('openTranslationCALLED!!!!!!!!!!');
 	var overlay = document.querySelector('#overlay');
 	overlay.setAttribute('class', '');
 	var content = Origami['o-overlay'].getOverlays().overlay.content;
@@ -324,7 +341,6 @@ function opentTranslation() {
 		return false;
 	});
 
-	console.log('languageSelect', languageSelect);
 	if (Array.from(languageSelect.children).length === 0) {
 		fetch(`https://ftlabs-left.herokuapp.com/check/${articleId}/${pubDate}`)
 			.then((res) => res.json())

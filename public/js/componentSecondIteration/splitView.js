@@ -6,9 +6,6 @@ function showSplitView() {
 	var splitViewOptions = document.querySelector(
 		'.ftlabs-translation-options'
 	);
-
-	console.log('splitViewOptions', splitViewOptions);
-
 	Array.from(splitViewOptions.children).forEach((element) => {
 		if (
 			element.nodeName === 'INPUT' &&
@@ -154,7 +151,6 @@ function removeStandfirst() {
 		element.classList.remove('ftlabs-translation__cell');
 		return element.attributes['data-original'];
 	});
-	console.log(standFirst);
 	removeChildren(standFirst);
 	standFirst.setAttribute(
 		'data-original',
@@ -240,13 +236,10 @@ function populateArticleBody(
 
 function initSplitView() {
 	try {
-		console.trace();
 		var splitViewSelection = document.querySelectorAll(
 			'.ftlabs-translation-options-selection'
 		)[1];
-		console.log(splitViewSelection);
 		var splitViewOptions = Array.from(splitViewSelection.children);
-		console.log('splitViewOptions', splitViewOptions);
 		splitViewOptions.forEach((element) => {
 			Array.from(element.children).forEach((element) => {
 				if (
@@ -255,10 +248,9 @@ function initSplitView() {
 				) {
 					element.checked = true;
 				}
-				console.log('element', element);
+
 				element.addEventListener('click', () => {
-					console.log('radio-button-event-listener-triggered');
-					switch (element.value) {
+					switch (element.getAttribute('for')) {
 						case 'standard':
 							mobileViewClassAction(
 								'remove',

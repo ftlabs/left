@@ -42,3 +42,17 @@
 	padding-bottom: 14px;
 	border-bottom: 1px solid #ccc1b7;
 }
+
+.ftlabs-translation__tick-circle {
+	height: 25px;
+	width: 25px;
+	background-color: #b6db69;
+	border-radius: 50%;
+	display: inline-block;
+	position: absolute;
+}
+
+.ftlabs-translation__grayout {
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+}
