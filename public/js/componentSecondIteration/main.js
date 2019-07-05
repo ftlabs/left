@@ -41,17 +41,17 @@ function init(langs) {
 	if (Array.from(languageSelect.children).length === 0) {
 		for (let i = 0; i < langs.length; ++i) {
 			var listItem = document.createElement('li');
+			listItem.classList.add(
+				'ftlabs-translation__language-selection-' + langs[i].name
+			);
 			var elementDiv = document.createElement('div');
 			elementDiv.classList.add(
 				'ftlabs-translation__language-selection-element'
 			);
-
-			elementDiv.classList.add(
-				'ftlabs-translation__language-selection-' + langs[i].name
-			);
 			listItem.appendChild(elementDiv);
 			var tickDiv = document.createElement('div');
 			tickDiv.classList.add('ftlabs-translation__tick-circle');
+			tickDiv.classList.add('ftlabs-translation--hidden');
 			elementDiv.appendChild(tickDiv);
 			var tickElement = document.createElement('img');
 			tickElement.setAttribute(
@@ -73,7 +73,7 @@ function init(langs) {
 			languageName.innerHTML = langs[i].name;
 			elementDiv.appendChild(languageName);
 			listItem.addEventListener('click', function() {
-				greyOutOtherElements;
+				greyOutOtherElements(langs[i].name);
 				showTranslation(langs[i]);
 			});
 			languageSelect.appendChild(listItem);
@@ -100,7 +100,33 @@ function init(langs) {
 	// translateAll.addEventListener('change', toggleTranslateAll);
 }
 
-function greyOutOtherElements() {}
+function greyOutOtherElements(language) {
+	var languageSelection = document.querySelectorAll(
+		'.ftlabs-translation__language-selection'
+	)[1];
+
+	Array.from(languageSelection.children).forEach(function(element) {
+		if (
+			Array.from(element.classList).includes(
+				'ftlabs-translation__language-selection-' + language
+			)
+		) {
+			Array.from(element.children[0].children).forEach(function(element) {
+				console.log('1', element);
+				if (
+					Array.from(element.classList).includes(
+						'ftlabs-translation__tick-circle'
+					)
+				) {
+					console.log('getting in here');
+					element.classList.remove('ftlabs-translation--hidden');
+				}
+			});
+		} else {
+			element.classList.add('ftlabs-translation__grayout');
+		}
+	});
+}
 
 function toggleTranslationAccordion() {
 	translationExpanded.classList.toggle('ftlabs-translation--hidden');
