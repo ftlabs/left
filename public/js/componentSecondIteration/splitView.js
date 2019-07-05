@@ -6,6 +6,7 @@ function showSplitView() {
 	var splitViewOptions = document.querySelector(
 		'.ftlabs-translation-options'
 	);
+
 	Array.from(splitViewOptions.children).forEach((element) => {
 		if (
 			element.nodeName === 'INPUT' &&
@@ -46,8 +47,10 @@ function headline() {
 
 	var headlineBody = Array.from(headline.children);
 
+	//Note: this is causing problems to get from splitview to normal view
+
 	headline.classList.add('ftlabs-translation--split-view');
-	headlineBody.forEach((element) => {
+	headlineBody.forEach(function(element) {
 		var translated = element.cloneNode(true);
 		translated.classList.add('ftlabs-translation__cell');
 		element.classList.add('ftlabs-translation__cell');
@@ -110,24 +113,20 @@ function showTranslationSplitView() {
 }
 
 function removeSplitView() {
-	try {
-		var articleBody = document.querySelector('.article__content-body');
-		articleBody.classList.remove(
-			'ftlabs-translation--split-view-container'
-		);
-		var originalArticleBody = restoreOriginalArticleBody(articleBody);
+	var articleBody = document.querySelector('.article__content-body');
+	articleBody.classList.remove(
+		'ftlabs-translation--split-view-container'
+	);
+	var originalArticleBody = restoreOriginalArticleBody(articleBody);
 
-		removeChildren(articleBody);
+	removeChildren(articleBody);
 
-		originalArticleBody.forEach((element) => {
-			articleBody.appendChild(element);
-		});
+	originalArticleBody.forEach((element) => {
+		articleBody.appendChild(element);
+	});
 
-		removeHeadline();
-		removeStandfirst();
-	} catch (err) {
-		console.log(err);
-	}
+	removeHeadline();
+	removeStandfirst();
 }
 
 function removeHeadline() {
@@ -234,58 +233,32 @@ function populateArticleBody(
 	});
 }
 
-function initSplitView() {
-	try {
-		var splitViewSelection = document.querySelectorAll(
-			'.ftlabs-translation-options-selection'
-		)[1];
-		var splitViewOptions = Array.from(splitViewSelection.children);
-		splitViewOptions.forEach((element) => {
-			Array.from(element.children).forEach((element) => {
-				if (
-					element.value === splitStyleAction('get') &&
-					element.tagName === 'INPUT'
-				) {
-					element.checked = true;
-				}
+function setOverlayListeners() {
+	var splitViewSelection = document.querySelector(
+		'.ftlabs-translation-options-selection'
+	);
 
-				element.addEventListener('click', () => {
-					switch (element.getAttribute('for')) {
-						case 'standard':
-							mobileViewClassAction(
-								'remove',
-								splitStyleAction('get')
-							);
-							window.localStorage.setItem(
-								'FT.translationStyle',
-								element.value
-							);
-							removeSplitView();
-							break;
-						case 'split':
-							mobileViewClassAction('add', 'stacked');
-							window.localStorage.setItem(
-								'FT.translationStyle',
-								element.value
-							);
-							splitView();
-							break;
-						default:
-							mobileSplitViewChange(
-								element.value,
-								splitStyleAction('get')
-							);
-					}
-					window.localStorage.setItem(
-						'FT.translationStyle',
-						element.value
-					);
-				});
-			});
-		});
-	} catch (err) {
-		console.log(err);
-	}
+	console.log('setOverlayListeners');
+	var splitViewOptions = splitViewSelection.querySelectorAll('input[type=radio]');
+	Array.from(splitViewOptions).forEach(function(element) {
+		element.addEventListener('change', function() {
+			 switch (element.value) {
+                case 'standard':
+                    mobileViewClassAction('remove', splitStyleAction('get'));
+                    window.localStorage.setItem('FT.translationStyle', element.value);
+                    removeSplitView();
+                    break;
+                case 'split':
+                    mobileViewClassAction('add', 'stacked');
+                    window.localStorage.setItem('FT.translationStyle', element.value);
+                    splitView();
+                    break;
+                default:
+                    mobileSplitViewChange(element.value, splitStyleAction('get'));
+            }
+            window.localStorage.setItem('FT.translationStyle', element.value);
+		})
+	})
 }
 
 function mobileSplitViewChange(newStyle, previousStyle) {
