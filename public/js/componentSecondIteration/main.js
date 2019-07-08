@@ -1,7 +1,7 @@
 var translator;
 var Overlay = Origami['o-overlay'];
 var toggleButton = document.querySelector('.ftlabs-translation__toggle');
-var articleTitle = document.querySelector('h1.topper__headline span');
+var articleTitle = document.querySelector('h1.topper__headline span:first-child');
 var articleStandfirst = document.querySelector('.topper__standfirst');
 var articleText = document.querySelectorAll('.article__content-body > p');
 var translationLoading = document.querySelector('.ftlabs-translation--loading');
@@ -32,7 +32,6 @@ function init(langs) {
 	var languageSelect = document.createElement('ul');
 	languageSelect.classList.add('ftlabs-translation__language-selection');
 
-	//Note: openTranslations is already checking that there are no children, so probably not needed here
 	//TODO: change languages into radio buttons
 	for (let i = 0; i < langs.length; ++i) {
 		var listItem = document.createElement('li');
@@ -80,7 +79,6 @@ function init(langs) {
 	document.addEventListener('oOverlay.ready', function() {
 		if(overlayShowCount === 0) {
 			var form = Overlay.getOverlays().overlay.content;
-			console.log(form);
 			form.insertBefore(languageSelect, form.firstChild);
 
 			setOverlayListeners();
@@ -139,8 +137,6 @@ function showTranslation(language) {
 	//TODO: unless the latest chosen is single column!
 	showTranslationSplitView();
 
-	console.log('showTranslation')
-
 	var languageCode = language.code;
 	var language = language.name;
 	var fromCache;
@@ -178,14 +174,9 @@ function showTranslation(language) {
 			return  res.json();
 		})
 		.then(function(data) {
-			var translationOptions = document.querySelector(
-				'.ftlabs-translation-options'
-			);
-			console.log('translationOptions', translationOptions);
-			translationOptions.classList.remove(
-				'ftlabs-translation--hidden'
-			);
-			console.log('getting into here');
+			var translationOptions = document.querySelector('.ftlabs-translation-options');
+			translationOptions.classList.remove('ftlabs-translation--hidden');
+
 			var selector;
 			localTranslations = {};
 			logComponentInteractions(
@@ -276,8 +267,6 @@ function removeTranslation() {
 	removeTranslationSplitView();
 	toggleTranslationAccordion();
 
-	var articleTitle = document.querySelector('h1.topper__headline span');
-
 	articleTitle.textContent = articleTitle.getAttribute('data-original');
 
 	if (articleStandfirst.textContent.length > 0) {
@@ -335,7 +324,6 @@ function getTranslationData(e) {
 	fetch(`https://ftlabs-left.herokuapp.com/check/${articleId}/${pubDate}`)
 		.then((res) => res.json())
 		.then((data) => {
-			console.log('DATA!')
 			if (data.displayWidget) {
 				translator = data.translator;
 				init(data.languages);

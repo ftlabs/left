@@ -44,22 +44,19 @@ function splitView() {
 
 function headline() {
 	var headline = document.querySelector('.topper__headline');
+	var headlineIndex = headline.children.length - 1;
 
-	var headlineBody = Array.from(headline.children);
-
-	//Note: this is causing problems to get from splitview to normal view
+	var headlineBody = Array.from(headline.children)[headlineIndex];
 
 	headline.classList.add('ftlabs-translation--split-view');
-	headlineBody.forEach(function(element) {
-		var translated = element.cloneNode(true);
-		translated.classList.add('ftlabs-translation__cell');
-		element.classList.add('ftlabs-translation__cell');
+	headlineBody.classList.add('ftlabs-translation__cell');
 
-		var original = element.attributes['data-original'].value;
-		element.removeAttribute('data-original');
-		element.innerHTML = original;
-		headline.appendChild(translated);
-	});
+	var original = headlineBody.cloneNode(true);
+
+	original.removeAttribute('data-original');
+	original.innerHTML = headlineBody.attributes['data-original'].value;
+	headline.insertBefore(original, headlineBody);
+
 	headline.classList.add(
 		'ftlabs-translation--split-view-style__' + splitStyleAction('get')
 	);
@@ -103,11 +100,7 @@ function removeTranslationSplitView() {
 function showTranslationSplitView() {
 	var articleBody = document.querySelector('.article__content-body');
 
-	if (
-		Array.from(articleBody.classList).includes(
-			'ftlabs-translation--split-view-container'
-		)
-	) {
+	if (Array.from(articleBody.classList).includes('ftlabs-translation--split-view-container')) {
 		removeSplitView();
 	}
 }
@@ -238,7 +231,6 @@ function setOverlayListeners() {
 		'.ftlabs-translation-options-selection'
 	);
 
-	console.log('setOverlayListeners');
 	var splitViewOptions = splitViewSelection.querySelectorAll('input[type=radio]');
 	Array.from(splitViewOptions).forEach(function(element) {
 		element.addEventListener('change', function() {
