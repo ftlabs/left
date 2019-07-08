@@ -235,7 +235,6 @@ function setOverlayListeners() {
 	
 	var action = '#' + splitStyleAction('get');
 	var selection =  splitViewSelection.querySelector(action);
-	console.log('SELECT', selection);
 	selection.checked = true;
 
 	var splitViewOptions = splitViewSelection.querySelectorAll('input[type=radio]');

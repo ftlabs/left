@@ -93,3 +93,9 @@
 	opacity: 0.6;
 	filter: alpha(opacity = 60);
 }
+
+.ftlabs-translation-options {
+	margin-bottom: 15px;
+    border-bottom: 1px solid #ccc1b7;
+    padding-bottom: 15px;
+}
