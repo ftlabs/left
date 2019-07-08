@@ -1,11 +1,9 @@
 function showSplitView() {
-	if (splitStyleAction('get') === (null || 'null')) {
+	if (splitStyleAction('get') == null) {
 		splitStyleAction('set', 'standard');
 	}
 
-	var splitViewOptions = document.querySelector(
-		'.ftlabs-translation-options'
-	);
+	var splitViewOptions = document.querySelector('.ftlabs-translation-options');
 
 	Array.from(splitViewOptions.children).forEach((element) => {
 		if (
@@ -230,6 +228,15 @@ function setOverlayListeners() {
 	var splitViewSelection = document.querySelector(
 		'.ftlabs-translation-options-selection'
 	);
+
+	if (splitStyleAction('get') == null) {
+		splitStyleAction('set', 'split');
+	}
+	
+	var action = '#' + splitStyleAction('get');
+	var selection =  splitViewSelection.querySelector(action);
+	console.log('SELECT', selection);
+	selection.checked = true;
 
 	var splitViewOptions = splitViewSelection.querySelectorAll('input[type=radio]');
 	Array.from(splitViewOptions).forEach(function(element) {

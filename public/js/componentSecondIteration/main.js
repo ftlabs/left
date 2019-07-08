@@ -103,7 +103,6 @@ function toggleTranslateAll(e) {
 }
 
 function showTranslation(language) {
-	//TODO: unless the latest chosen is single column!
 	showTranslationSplitView();
 
 	var languageCode = language.code;
