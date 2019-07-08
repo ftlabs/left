@@ -29,56 +29,49 @@ var localTranslations = {};
 var overlayShowCount = 0;
 
 function init(langs) {
-	var languageSelect = document.createElement('ul');
-	languageSelect.classList.add('ftlabs-translation__language-selection');
+	var languageSelect = document.createElement('div');
+	languageSelect.classList.add('o-forms__group');
+	languageSelect.classList.add('ftlabs-language-options-selection');
 
-	//TODO: change languages into radio buttons
 	for (let i = 0; i < langs.length; ++i) {
-		var listItem = document.createElement('li');
+		var listItem = document.createElement('input');
+		listItem.type = 'radio';
+		listItem.name = 'language-flag';
+
 		var elementDiv = document.createElement('div');
-		elementDiv.classList.add(
-			'ftlabs-translation__language-selection-element'
-		);
-
-		elementDiv.classList.add(
-			'ftlabs-translation__language-selection-' + langs[i].name
-		);
-
+		elementDiv.classList.add('o-forms__group');
+		elementDiv.classList.add('o-forms__group--inline');
+		elementDiv.classList.add('ftlabs-translation__language-selection-element');
+		// elementDiv.classList.add('ftlabs-translation__language-selection-' + langs[i].name.toLowerCase());
 		elementDiv.setAttribute('data-lang-code', langs[i].code);
 
-		listItem.appendChild(elementDiv);
-		var tickDiv = document.createElement('div');
-		tickDiv.classList.add('ftlabs-translation__tick-circle');
-		elementDiv.appendChild(tickDiv);
-		var tickElement = document.createElement('img');
-		tickElement.setAttribute(
-			'src',
-			'https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:tick?source=ftlabs'
-		);
-		tickDiv.appendChild(tickElement);
-		var imageElement = document.createElement('img');
-		imageElement.setAttribute(
-			'src',
-			'https://www.ft.com/__origami/service/image/v2/images/raw/ftflag-v1:' +
-				langs[i].code +
-				'?source=ftlabs'
-		);
-		imageElement.setAttribute('alt', langs[i].name + ' flag');
-		imageElement.classList.add('ftlabs-translation__flag');
-		elementDiv.appendChild(imageElement);
-		var languageName = document.createElement('span');
+		listItem.value = langs[i].code;
+		listItem.classList.add('o-forms__radio');
+		listItem.setAttribute('id', 'language'+ langs[i].name.toLowerCase());
+
+		elementDiv.appendChild(listItem);
+
+		var languageName = document.createElement('label');
 		languageName.innerHTML = langs[i].name;
+		languageName.setAttribute('for', 'language'+ langs[i].name.toLowerCase());
+		languageName.classList.add('o-forms__label');
+
 		elementDiv.appendChild(languageName);
-		listItem.addEventListener('click', function() {
+
+		listItem.addEventListener('change', function(e) {
 			// greyOutOtherElements;
-			showTranslation(langs[i]);
+
+			if(e.currentTarget.checked) {
+				showTranslation(langs[i]);
+			}
 		});
-		languageSelect.appendChild(listItem);
+		languageSelect.appendChild(elementDiv);
 	}
 
 	document.addEventListener('oOverlay.ready', function() {
 		if(overlayShowCount === 0) {
 			var form = Overlay.getOverlays().overlay.content;
+			form = form.querySelector('form');
 			form.insertBefore(languageSelect, form.firstChild);
 
 			setOverlayListeners();
