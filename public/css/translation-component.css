@@ -80,6 +80,10 @@
 	font-weight: bold;
 }
 
+.o-overlay-trigger {
+	position: relative;
+}
+
 .ftlabs-translation__tickbox {
 	padding-bottom: 14px;
 	border-bottom: 1px solid #ccc1b7;
