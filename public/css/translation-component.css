@@ -55,3 +55,8 @@
 	border-radius: 50%;
 	position: absolute;
 }
+
+.ftlabs-translation__share-bar-langauge {
+	font-size: 15px !important;
+	font-weight: 500 !important;
+}

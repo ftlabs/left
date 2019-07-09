@@ -73,7 +73,6 @@ function init(langs) {
 			languageName.innerHTML = langs[i].name;
 			elementDiv.appendChild(languageName);
 			listItem.addEventListener('click', function() {
-				greyOutOtherElements(langs[i].name);
 				showTranslation(langs[i]);
 			});
 			languageSelect.appendChild(listItem);
@@ -100,6 +99,10 @@ function init(langs) {
 	// translateAll.addEventListener('change', toggleTranslateAll);
 }
 
+function scrollToTop() {
+	window.scrollTo(0, 0);
+}
+
 function greyOutOtherElements(language) {
 	var languageSelection = document.querySelectorAll(
 		'.ftlabs-translation__language-selection'
@@ -112,13 +115,11 @@ function greyOutOtherElements(language) {
 			)
 		) {
 			Array.from(element.children[0].children).forEach(function(element) {
-				console.log('1', element);
 				if (
 					Array.from(element.classList).includes(
 						'ftlabs-translation__tick-circle'
 					)
 				) {
-					console.log('getting in here');
 					element.classList.remove('ftlabs-translation--hidden');
 				}
 			});
@@ -192,6 +193,10 @@ function showTranslation(language) {
 			.then((res) => res.json())
 			.then((data) => {
 				try {
+					console.log(language);
+					greyOutOtherElements(language.name);
+					scrollToTop();
+					changeShareBarLanguageCode(languageCode);
 					const translationOptions = document.querySelectorAll(
 						'.ftlabs-translation-options'
 					)[1];
@@ -290,6 +295,13 @@ function successfulTranslationRequest(selector, language) {
 	} catch (err) {
 		console.error(err);
 	}
+}
+
+function changeShareBarLanguageCode(code) {
+	var shareBarLanguage = document.querySelector(
+		'.ftlabs-translation__share-bar-langauge'
+	);
+	shareBarLanguage.innerHTML = code;
 }
 
 function removeTranslation() {
