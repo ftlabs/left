@@ -44,8 +44,8 @@
 }
 
 .ftlabs-translation__grayout {
-	opacity: 0.6;
-	filter: alpha(opacity = 60);
+	opacity: 0.2;
+	filter: alpha(opacity = 20);
 }
 
 .ftlabs-translation__tick-circle {
@@ -59,4 +59,8 @@
 .ftlabs-translation__share-bar-langauge {
 	font-size: 15px !important;
 	font-weight: 500 !important;
+}
+
+.ftlabs-translation__test-warning {
+	background-color: #fff9f5;
 }

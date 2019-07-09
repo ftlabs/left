@@ -193,24 +193,22 @@ function showTranslation(language) {
 			.then((res) => res.json())
 			.then((data) => {
 				try {
-					console.log(language);
-					greyOutOtherElements(language.name);
-					scrollToTop();
-					changeShareBarLanguageCode(languageCode);
-					const translationOptions = document.querySelectorAll(
-						'.ftlabs-translation-options'
-					)[1];
-					console.log('translationOptions', translationOptions);
-					translationOptions.classList.remove(
-						'ftlabs-translation--hidden'
-					);
 					Overlay.getOverlays().overlay.close();
-					console.log('getting into here');
 					var selector;
 					localTranslations = {};
 					logComponentInteractions(
 						'translation-successful',
 						languageCode
+					);
+
+					greyOutOtherElements(language);
+					scrollToTop();
+					changeShareBarLanguageCode(languageCode);
+					const translationOptions = document.querySelectorAll(
+						'.ftlabs-translation-options'
+					)[1];
+					translationOptions.classList.remove(
+						'ftlabs-translation--hidden'
 					);
 
 					if (fromCache === 'true') {
