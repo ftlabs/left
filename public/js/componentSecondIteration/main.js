@@ -182,6 +182,11 @@ function showTranslation(language) {
 			return  res.json();
 		})
 		.then(function(data) {
+    
+     greyOutOtherElements(language);
+		 scrollToTop();
+		 changeShareBarLanguageCode(languageCode);
+    
 			var translationOptions = document.querySelector('.ftlabs-translation-options');
 			translationOptions.classList.remove('ftlabs-translation--hidden');
 
