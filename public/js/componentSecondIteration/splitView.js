@@ -1,11 +1,10 @@
 function showSplitView() {
-	if (splitStyleAction('get') === (null || 'null')) {
+	if (splitStyleAction('get') == null) {
 		splitStyleAction('set', 'standard');
 	}
 
-	var splitViewOptions = document.querySelector(
-		'.ftlabs-translation-options'
-	);
+	var splitViewOptions = document.querySelector('.ftlabs-translation-options');
+
 	Array.from(splitViewOptions.children).forEach((element) => {
 		if (
 			element.nodeName === 'INPUT' &&
@@ -43,20 +42,19 @@ function splitView() {
 
 function headline() {
 	var headline = document.querySelector('.topper__headline');
+	var headlineIndex = headline.children.length - 1;
 
-	var headlineBody = Array.from(headline.children);
+	var headlineBody = Array.from(headline.children)[headlineIndex];
 
 	headline.classList.add('ftlabs-translation--split-view');
-	headlineBody.forEach((element) => {
-		var translated = element.cloneNode(true);
-		translated.classList.add('ftlabs-translation__cell');
-		element.classList.add('ftlabs-translation__cell');
+	headlineBody.classList.add('ftlabs-translation__cell');
 
-		var original = element.attributes['data-original'].value;
-		element.removeAttribute('data-original');
-		element.innerHTML = original;
-		headline.appendChild(translated);
-	});
+	var original = headlineBody.cloneNode(true);
+
+	original.removeAttribute('data-original');
+	original.innerHTML = headlineBody.attributes['data-original'].value;
+	headline.insertBefore(original, headlineBody);
+
 	headline.classList.add(
 		'ftlabs-translation--split-view-style__' + splitStyleAction('get')
 	);
@@ -100,34 +98,26 @@ function removeTranslationSplitView() {
 function showTranslationSplitView() {
 	var articleBody = document.querySelector('.article__content-body');
 
-	if (
-		Array.from(articleBody.classList).includes(
-			'ftlabs-translation--split-view-container'
-		)
-	) {
+	if (Array.from(articleBody.classList).includes('ftlabs-translation--split-view-container')) {
 		removeSplitView();
 	}
 }
 
 function removeSplitView() {
-	try {
-		var articleBody = document.querySelector('.article__content-body');
-		articleBody.classList.remove(
-			'ftlabs-translation--split-view-container'
-		);
-		var originalArticleBody = restoreOriginalArticleBody(articleBody);
+	var articleBody = document.querySelector('.article__content-body');
+	articleBody.classList.remove(
+		'ftlabs-translation--split-view-container'
+	);
+	var originalArticleBody = restoreOriginalArticleBody(articleBody);
 
-		removeChildren(articleBody);
+	removeChildren(articleBody);
 
-		originalArticleBody.forEach((element) => {
-			articleBody.appendChild(element);
-		});
+	originalArticleBody.forEach((element) => {
+		articleBody.appendChild(element);
+	});
 
-		removeHeadline();
-		removeStandfirst();
-	} catch (err) {
-		console.log(err);
-	}
+	removeHeadline();
+	removeStandfirst();
 }
 
 function removeHeadline() {
@@ -234,58 +224,39 @@ function populateArticleBody(
 	});
 }
 
-function initSplitView() {
-	try {
-		var splitViewSelection = document.querySelectorAll(
-			'.ftlabs-translation-options-selection'
-		)[1];
-		var splitViewOptions = Array.from(splitViewSelection.children);
-		splitViewOptions.forEach((element) => {
-			Array.from(element.children).forEach((element) => {
-				if (
-					element.value === splitStyleAction('get') &&
-					element.tagName === 'INPUT'
-				) {
-					element.checked = true;
-				}
+function setOverlayListeners() {
+	var splitViewSelection = document.querySelector(
+		'.ftlabs-translation-options-selection'
+	);
 
-				element.addEventListener('click', () => {
-					switch (element.getAttribute('for')) {
-						case 'standard':
-							mobileViewClassAction(
-								'remove',
-								splitStyleAction('get')
-							);
-							window.localStorage.setItem(
-								'FT.translationStyle',
-								element.value
-							);
-							removeSplitView();
-							break;
-						case 'split':
-							mobileViewClassAction('add', 'stacked');
-							window.localStorage.setItem(
-								'FT.translationStyle',
-								element.value
-							);
-							splitView();
-							break;
-						default:
-							mobileSplitViewChange(
-								element.value,
-								splitStyleAction('get')
-							);
-					}
-					window.localStorage.setItem(
-						'FT.translationStyle',
-						element.value
-					);
-				});
-			});
-		});
-	} catch (err) {
-		console.log(err);
+	if (splitStyleAction('get') == null) {
+		splitStyleAction('set', 'split');
 	}
+	
+	var action = '#' + splitStyleAction('get');
+	var selection =  splitViewSelection.querySelector(action);
+	selection.checked = true;
+
+	var splitViewOptions = splitViewSelection.querySelectorAll('input[type=radio]');
+	Array.from(splitViewOptions).forEach(function(element) {
+		element.addEventListener('change', function() {
+			 switch (element.value) {
+                case 'standard':
+                    mobileViewClassAction('remove', splitStyleAction('get'));
+                    window.localStorage.setItem('FT.translationStyle', element.value);
+                    removeSplitView();
+                    break;
+                case 'split':
+                    mobileViewClassAction('add', 'stacked');
+                    window.localStorage.setItem('FT.translationStyle', element.value);
+                    splitView();
+                    break;
+                default:
+                    mobileSplitViewChange(element.value, splitStyleAction('get'));
+            }
+            window.localStorage.setItem('FT.translationStyle', element.value);
+		})
+	})
 }
 
 function mobileSplitViewChange(newStyle, previousStyle) {
