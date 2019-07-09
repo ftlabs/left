@@ -67,7 +67,6 @@ function init(langs) {
 			++overlayShowCount;
 		}
 	});
-
 	
 	var overlay = Overlay.getOverlays().overlay.content;
 	var translateAll = overlay.querySelector('.ftlabs-translation__tickbox input[type="checkbox"]');
@@ -99,7 +98,35 @@ function init(langs) {
 	translateAll.addEventListener('change', toggleTranslateAll);
 }
 
-function greyOutOtherElements() {}
+function scrollToTop() {
+	window.scrollTo(0, 0);
+}
+
+function greyOutOtherElements(language) {
+	var languageSelection = document.querySelectorAll(
+		'.ftlabs-translation__language-selection'
+	)[1];
+
+	Array.from(languageSelection.children).forEach(function(element) {
+		if (
+			Array.from(element.classList).includes(
+				'ftlabs-translation__language-selection-' + language
+			)
+		) {
+			Array.from(element.children[0].children).forEach(function(element) {
+				if (
+					Array.from(element.classList).includes(
+						'ftlabs-translation__tick-circle'
+					)
+				) {
+					element.classList.remove('ftlabs-translation--hidden');
+				}
+			});
+		} else {
+			element.classList.add('ftlabs-translation__grayout');
+		}
+	});
+}
 
 
 function toggleTranslateAll(e) {
@@ -229,6 +256,13 @@ function successfulTranslationRequest(selector, language) {
 	});
 
 	showSplitView();
+}
+
+function changeShareBarLanguageCode(code) {
+	var shareBarLanguage = document.querySelector(
+		'.ftlabs-translation__share-bar-langauge'
+	);
+	shareBarLanguage.innerHTML = code;
 }
 
 function removeTranslation() {

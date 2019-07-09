@@ -94,6 +94,19 @@
 	filter: alpha(opacity = 60);
 }
 
+.ftlabs-translation__tick-circle {
+	height: 25px;
+	width: 25px;
+	background-color: #b6db69;
+	border-radius: 50%;
+	position: absolute;
+}
+
+.ftlabs-translation__share-bar-langauge {
+	font-size: 15px !important;
+	font-weight: 500 !important;
+}
+
 .ftlabs-translation-options {
 	margin-bottom: 15px;
     border-bottom: 1px solid #ccc1b7;
