@@ -23,11 +23,58 @@
 }
 
 .ftlabs-translation__language-selection-element {
-	display: flex;
+	display: inline-flex;
 	flex-direction: column;
 	text-align: center;
 	font-size: 18px;
 	margin-right: 38px;
+}
+
+.ftlabs-language-options-selection .o-forms__label:before {
+	content: '';
+	border-radius: 0;
+	height: 34px;
+	width: auto;
+	background-size: cover;
+	background-position: top;
+	background-repeat: no-repeat;
+	margin: 0 auto 10px;
+	position: relative;
+	border: none;
+	display: block;
+}
+
+.ftlabs-language-options-selection
+	.o-forms__radio:checked
+	+ .o-forms__label::before {
+	border: none;
+}
+
+.ftlabs-language-options-selection .o-forms__radio + .o-forms__label::after {
+	position: absolute;
+	height: 25px;
+	width: 25px;
+	border-radius: 50%;
+	display: inline-block;
+	background: #b6db69
+		url('https://www.ft.com/__origami/service/image/v2/images/raw/fticon-v1:tick?source=ftlabs')
+		no-repeat;
+	background-size: cover;
+	top: 20px;
+	left: 65px;
+}
+
+.ftlabs-translation__language-selection-element[data-lang-code='DE']
+	.o-forms__label:before {
+	background-image: url('https://www.ft.com/__origami/service/image/v2/images/raw/ftflag-v1:DE?source=ftlabs');
+}
+.ftlabs-translation__language-selection-element[data-lang-code='FR']
+	.o-forms__label:before {
+	background-image: url('https://www.ft.com/__origami/service/image/v2/images/raw/ftflag-v1:FR?source=ftlabs');
+}
+.ftlabs-translation__language-selection-element[data-lang-code='ES']
+	.o-forms__label:before {
+	background-image: url('https://www.ft.com/__origami/service/image/v2/images/raw/ftflag-v1:ES?source=ftlabs');
 }
 
 .o-overlay {
@@ -36,6 +83,10 @@
 
 .o-overlay__title {
 	font-weight: bold;
+}
+
+.o-overlay-trigger {
+	position: relative;
 }
 
 .ftlabs-translation__tickbox {
@@ -59,6 +110,12 @@
 .ftlabs-translation__share-bar-langauge {
 	font-size: 15px !important;
 	font-weight: 500 !important;
+}
+
+.ftlabs-translation-options {
+	margin-bottom: 15px;
+	border-bottom: 1px solid #ccc1b7;
+	padding-bottom: 15px;
 }
 
 .ftlabs-translation__test-warning {
