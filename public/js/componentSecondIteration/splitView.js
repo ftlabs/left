@@ -3,7 +3,9 @@ function showSplitView() {
 		splitStyleAction('set', 'standard');
 	}
 
-	var splitViewOptions = document.querySelector('.ftlabs-translation-options');
+	var splitViewOptions = document.querySelector(
+		'.ftlabs-translation-options'
+	);
 
 	Array.from(splitViewOptions.children).forEach((element) => {
 		if (
@@ -98,16 +100,18 @@ function removeTranslationSplitView() {
 function showTranslationSplitView() {
 	var articleBody = document.querySelector('.article__content-body');
 
-	if (Array.from(articleBody.classList).includes('ftlabs-translation--split-view-container')) {
+	if (
+		Array.from(articleBody.classList).includes(
+			'ftlabs-translation--split-view-container'
+		)
+	) {
 		removeSplitView();
 	}
 }
 
 function removeSplitView() {
 	var articleBody = document.querySelector('.article__content-body');
-	articleBody.classList.remove(
-		'ftlabs-translation--split-view-container'
-	);
+	articleBody.classList.remove('ftlabs-translation--split-view-container');
 	var originalArticleBody = restoreOriginalArticleBody(articleBody);
 
 	removeChildren(articleBody);
@@ -229,34 +233,49 @@ function setOverlayListeners() {
 		'.ftlabs-translation-options-selection'
 	);
 
-	if (splitStyleAction('get') == null) {
+	if (
+		splitStyleAction('get') == null ||
+		splitStyleAction('get') == 'undefined'
+	) {
 		splitStyleAction('set', 'split');
 	}
-	
+
 	var action = '#' + splitStyleAction('get');
-	var selection =  splitViewSelection.querySelector(action);
+	var selection = splitViewSelection.querySelector(action);
+
 	selection.checked = true;
 
-	var splitViewOptions = splitViewSelection.querySelectorAll('input[type=radio]');
+	var splitViewOptions = splitViewSelection.querySelectorAll(
+		'input[type=radio]'
+	);
 	Array.from(splitViewOptions).forEach(function(element) {
 		element.addEventListener('change', function() {
-			 switch (element.value) {
-                case 'standard':
-                    mobileViewClassAction('remove', splitStyleAction('get'));
-                    window.localStorage.setItem('FT.translationStyle', element.value);
-                    removeSplitView();
-                    break;
-                case 'split':
-                    mobileViewClassAction('add', 'stacked');
-                    window.localStorage.setItem('FT.translationStyle', element.value);
-                    splitView();
-                    break;
-                default:
-                    mobileSplitViewChange(element.value, splitStyleAction('get'));
-            }
-            window.localStorage.setItem('FT.translationStyle', element.value);
-		})
-	})
+			switch (element.value) {
+				case 'standard':
+					mobileViewClassAction('remove', splitStyleAction('get'));
+					window.localStorage.setItem(
+						'FT.translationStyle',
+						element.value
+					);
+					removeSplitView();
+					break;
+				case 'split':
+					mobileViewClassAction('add', 'stacked');
+					window.localStorage.setItem(
+						'FT.translationStyle',
+						element.value
+					);
+					splitView();
+					break;
+				default:
+					mobileSplitViewChange(
+						element.value,
+						splitStyleAction('get')
+					);
+			}
+			window.localStorage.setItem('FT.translationStyle', element.value);
+		});
+	});
 }
 
 function mobileSplitViewChange(newStyle, previousStyle) {
