@@ -91,7 +91,7 @@
 
 .ftlabs-translation__tickbox {
 	padding-bottom: 14px;
-	border-bottom: 1px solid #ccc1b7;
+	/* border-bottom: 1px solid #ccc1b7; */
 }
 
 .ftlabs-translation__grayout {
@@ -114,12 +114,22 @@
 
 .ftlabs-translation-options {
 	margin-bottom: 15px;
-	border-bottom: 1px solid #ccc1b7;
+	border-top: 1px solid #ccc1b7;
 	padding-bottom: 15px;
 }
 
 .ftlabs-translation__test-warning {
 	background-color: #fff9f5;
+}
+
+.ftlabs-translation__configuration {
+	display: flex;
+}
+
+.ftlabs-translation__button--off {
+	padding-left: 25px;
+	padding-top: 18px;
+	/* border-bottom: 1px solid #ccc1b7; */
 }
 
 @media (max-width: 1219px) {
