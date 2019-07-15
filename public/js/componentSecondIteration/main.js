@@ -336,18 +336,18 @@ function removeTranslation() {
 }
 
 function logComponentInteractions(interaction, language = 'EN', error = null) {
-	// document.body.dispatchEvent(
-	//     new CustomEvent('oTracking.event', {
-	//         detail: {
-	//             action: interaction,
-	//             category: 'ftlabs-translations',
-	//             contentID: articleId,
-	//             language: language,
-	//             error: error
-	//         },
-	//         bubbles: true
-	//     })
-	// );
+	document.body.dispatchEvent(
+		new CustomEvent('oTracking.event', {
+			detail: {
+				action: interaction,
+				category: 'ftlabs-translations',
+				contentID: articleId,
+				language: language,
+				error: error
+			},
+			bubbles: true
+		})
+	);
 }
 
 function getTranslationData(e) {
