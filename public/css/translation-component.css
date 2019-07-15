@@ -91,7 +91,6 @@
 
 .ftlabs-translation__tickbox {
 	padding-bottom: 14px;
-	/* border-bottom: 1px solid #ccc1b7; */
 }
 
 .ftlabs-translation__grayout {
@@ -129,7 +128,6 @@
 .ftlabs-translation__button--off {
 	padding-left: 25px;
 	padding-top: 18px;
-	/* border-bottom: 1px solid #ccc1b7; */
 }
 
 @media (max-width: 1219px) {
