@@ -350,11 +350,6 @@ function removeTranslation() {
 
 	turnOffButton.classList.add('ftlabs-translation--hidden');
 
-	window.localStorage.removeItem('FT.translateAll');
-	var translateAll = document.querySelector(
-		'.ftlabs-translation__tickbox input[type="checkbox"]'
-	);
-	translateAll.checked = false;
 	uncheckAllCountrySelections();
 
 	changeShareBar('EN');
