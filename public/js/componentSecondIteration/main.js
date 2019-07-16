@@ -120,10 +120,10 @@ function languageClickEvent(e, language) {
 		'.ftlabs-translation--loading'
 	);
 	translationLoading.classList.remove('ftlabs-translation--hidden');
-	var translationLoading = document.querySelector(
+	var translationLoadingForm = document.querySelector(
 		'.ftlabs-translation__form--language'
 	);
-	translationLoading.classList.add('ftlabs-translation--hidden');
+	translationLoadingForm.classList.add('ftlabs-translation__hide');
 	if (e.currentTarget.checked) {
 		showTranslation(language);
 	}
@@ -212,7 +212,7 @@ function showTranslation(language) {
 		.then(function(data) {
 			greyOutOtherElements(languageCode);
 			scrollToTop();
-			changeShareBarLanguageCode(languageCode);
+			changeShareBar(languageCode);
 
 			var translationOptions = document.querySelector(
 				'.ftlabs-translation-options'
@@ -249,7 +249,7 @@ function unsuccessfulTranslationRequest(err) {
 	var translationLoading = document.querySelector(
 		'.ftlabs-translation__form--language'
 	);
-	translationLoading.classList.remove('ftlabs-translation--hidden');
+	translationLoading.classList.remove('ftlabs-translation__hide');
 	logComponentInteractions('translation-error', languageSelect.value, err);
 }
 
@@ -300,15 +300,30 @@ function successfulTranslationRequest(selector, language) {
 	var translationLoading = document.querySelector(
 		'.ftlabs-translation__form--language'
 	);
-	translationLoading.classList.remove('ftlabs-translation--hidden');
+	translationLoading.classList.remove('ftlabs-translation__hide');
 
 	showSplitView();
 }
 
-function changeShareBarLanguageCode(code) {
+function changeShareBar(code) {
 	var shareBarLanguage = document.querySelector(
 		'.ftlabs-translation__share-bar-langauge'
 	);
+
+	var shareBar = document.querySelector('.ftlabs-translation__share-bar');
+
+	if (code === 'EN') {
+		shareBarLanguage.classList.remove(
+			'ftlabs-translation__share-bar-langauge__on'
+		);
+		shareBar.classList.remove('ftlabs-translation__share-bar__on');
+	} else {
+		shareBarLanguage.classList.add(
+			'ftlabs-translation__share-bar-langauge__on'
+		);
+		shareBar.classList.add('ftlabs-translation__share-bar__on');
+	}
+
 	shareBarLanguage.innerHTML = code;
 }
 
@@ -342,7 +357,7 @@ function removeTranslation() {
 	translateAll.checked = false;
 	uncheckAllCountrySelections();
 
-	changeShareBarLanguageCode('EN');
+	changeShareBar('EN');
 
 	languageSelect.selectedIndex = 0;
 }

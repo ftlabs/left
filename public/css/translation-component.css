@@ -123,11 +123,27 @@
 
 .ftlabs-translation__configuration {
 	display: flex;
+	justify-content: space-between;
+}
+
+
 }
 
 .ftlabs-translation__button--off {
 	padding-left: 25px;
 	padding-top: 18px;
+}
+
+.ftlabs-translation__share-bar-langauge__on {
+	color: #f2dfce;
+}
+
+.ftlabs-translation__share-bar__on {
+	background-color: #262a33;
+}
+
+.ftlabs-translation__hide {
+	visibility: hidden;
 }
 
 @media (max-width: 1219px) {
