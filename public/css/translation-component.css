@@ -174,4 +174,14 @@
 	.ftlabs-translation__language-selection-element {
 		margin-right: 10px;
 	}
+
+	.topper--opinion > .topper__content > .topper__headline > :nth-child(2) {
+		background-color: #1a8cff;
+		outline: #1a8cff solid 16px;
+	}
+
+	.topper--opinion > .topper__content > .topper__standfirst > :nth-child(2) {
+		background-color: #1a8cff;
+		outline: #1a8cff solid 16px;
+	}
 }
