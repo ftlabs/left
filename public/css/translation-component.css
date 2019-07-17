@@ -144,7 +144,8 @@
 }
 
 .ftlabs-language-options-selection {
-	align-self: center;
+	/* align-self: center; */
+	display: flex;
 }
 
 .ftlabs-translation__form {
@@ -155,5 +156,22 @@
 @media (max-width: 1219px) {
 	.ftlabs-translation__share-bar-langauge {
 		padding-left: 10px;
+	}
+
+	.ftlabs-translation__configuration {
+		flex-direction: column;
+	}
+
+	.ftlabs-translation__button--off {
+		padding: 0 0 0 0;
+		margin-bottom: 26px;
+	}
+
+	.o-forms__group--inline.ftlabs-translation__tickbox {
+		margin-bottom: 1px;
+	}
+
+	.ftlabs-translation__language-selection-element {
+		margin-right: 10px;
 	}
 }

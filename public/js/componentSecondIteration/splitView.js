@@ -99,7 +99,13 @@ function removeTranslationSplitView() {
 
 function showTranslationSplitView() {
 	var articleBody = document.querySelector('.article__content-body');
-
+	mobileViewClassAction('add', 'stacked');
+	if (screen.width < 1280 && splitStyleAction('get') !== 'standard') {
+		var stackedInput = document.querySelector(
+			'.ftlabs-translation-options__mobile > input'
+		);
+		stackedInput.checked = true;
+	}
 	if (
 		Array.from(articleBody.classList).includes(
 			'ftlabs-translation--split-view-container'
