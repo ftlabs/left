@@ -61,6 +61,7 @@ function overlayOpened(languageSelect) {
 		turnOffButton.addEventListener('click', function(e) {
 			e.preventDefault();
 			removeTranslation();
+			Overlay.getOverlays().overlay.close();
 		});
 		var form = Overlay.getOverlays().overlay.content;
 		form = form.querySelector('form');
@@ -353,8 +354,6 @@ function removeTranslation() {
 	uncheckAllCountrySelections();
 
 	changeShareBar('EN');
-
-	languageSelect.selectedIndex = 0;
 }
 
 function logComponentInteractions(interaction, language = 'EN', error = null) {
