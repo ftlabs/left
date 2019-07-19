@@ -106,7 +106,7 @@
 	position: absolute;
 }
 
-.ftlabs-translation__share-bar-langauge {
+.ftlabs-translation__share-bar-language {
 	font-size: 15px !important;
 	font-weight: 500 !important;
 }
@@ -131,7 +131,7 @@
 	padding-top: 18px;
 }
 
-.ftlabs-translation__share-bar-langauge__on {
+.ftlabs-translation__share-bar-language__on {
 	color: #f2dfce;
 }
 
@@ -154,7 +154,7 @@
 }
 
 @media (max-width: 1219px) {
-	.ftlabs-translation__share-bar-langauge {
+	.ftlabs-translation__share-bar-language {
 		padding-left: 10px;
 	}
 
