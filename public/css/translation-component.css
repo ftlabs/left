@@ -112,9 +112,10 @@
 }
 
 .ftlabs-translation-options {
-	margin-bottom: 15px;
+	margin-bottom: 20px;
 	border-top: 1px solid #ccc1b7;
-	padding-bottom: 15px;
+	border-bottom: 1px solid #ccc1b7;
+	padding-bottom: 20px;
 }
 
 .ftlabs-translation__test-warning {
@@ -127,8 +128,7 @@
 }
 
 .ftlabs-translation__button--off {
-	padding-left: 25px;
-	padding-top: 18px;
+	padding: 0 0 20px 0;
 }
 
 .ftlabs-translation__share-bar-language__on {
