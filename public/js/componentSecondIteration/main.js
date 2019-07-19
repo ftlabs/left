@@ -235,9 +235,9 @@ function showTranslation(language) {
 			Overlay.getOverlays().overlay.close();
 			return;
 		})
-		.catch((err) => {
+		.catch(function(err) {
 			console.error(err);
-			unsuccessfulTranslationRequest(JSON.stringify(err));
+			return unsuccessfulTranslationRequest(JSON.stringify(err));
 		});
 }
 
@@ -287,7 +287,7 @@ function successfulTranslationRequest(selector, language) {
 
 	var translationArray = translation.querySelectorAll('p');
 
-	Array.from(articleText).forEach((paragraph, index) => {
+	Array.from(articleText).forEach(function(paragraph, index) {
 		if (!paragraph.hasAttribute('data-original')) {
 			paragraph.setAttribute('data-original', paragraph.innerHTML);
 		}
@@ -345,7 +345,7 @@ function removeTranslation() {
 		);
 	}
 
-	Array.from(articleText).forEach((paragraph) => {
+	Array.from(articleText).forEach(function(paragraph) {
 		paragraph.innerHTML = paragraph.getAttribute('data-original');
 	});
 
@@ -377,17 +377,17 @@ function logComponentInteractions(interaction, language = 'EN', error = null) {
 
 function getTranslationData(e) {
 	fetch(`https://ftlabs-left.herokuapp.com/check/${articleId}/${pubDate}`)
-		.then((res) => res.json())
-		.then((data) => {
+		.then(function(res) { return res.json(); })
+		.then(function(data) {
 			if (data.displayWidget) {
 				translator = data.translator;
-				init(data.languages);
+				return init(data.languages);
 			} else {
-				logComponentInteractions('no-display');
+				return logComponentInteractions('no-display');
 			}
 		})
-		.catch((err) => {
-			logComponentInteractions(
+		.catch(function(err) {
+			return logComponentInteractions(
 				'display-check-error',
 				'EN',
 				JSON.stringify(err)
