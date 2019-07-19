@@ -1,5 +1,6 @@
 var translator;
 var Overlay = Origami['o-overlay'];
+var oTracking = Origami['o-tracking'];
 var toggleButton = document.querySelector('.ftlabs-translation__toggle');
 var articleTitle = document.querySelector(
 	'h1.topper__headline span:first-child'
@@ -19,6 +20,8 @@ var localTranslations = {};
 var overlayShowCount = 0;
 
 function init(langs) {
+	initTracking();
+
 	var languageSelect = document.createElement('div');
 	languageSelect.classList.add('o-forms__group');
 	languageSelect.classList.add('ftlabs-language-options-selection');
@@ -360,12 +363,28 @@ function removeTranslation() {
 	changeShareBar('EN', 'English');
 }
 
+function initTracking() {
+	var config_data = {
+        server: 'https://spoor-api.ft.com/px.gif',
+        context: {
+            product: 'ftlabs'
+        }
+    };
+
+    oTracking.init(config_data);
+    oTracking.page({
+    	content: {
+    		asset_type: 'page'
+    	}
+    });
+}
+
 function logComponentInteractions(interaction, language = 'EN', error = null) {
 	document.body.dispatchEvent(
 		new CustomEvent('oTracking.event', {
 			detail: {
 				action: interaction,
-				category: 'ftlabs-translations',
+				category: 'ftlabs-translations-test',
 				contentID: articleId,
 				language: language,
 				error: error
