@@ -1,3 +1,7 @@
+html {
+	overflow-x: hidden;
+}
+
 .core .o-share__action--share {
 	display: block;
 }
@@ -10,6 +14,11 @@
 
 .o-overlay--overlay {
 	z-index: 1001 !important;
+}
+
+.ftlabs-translations__disclaimer {
+	font-family: "MetricWeb", sans-serif;
+	font-size: 14px;
 }
 
 .ftlabs-translation__language-selection {
@@ -27,7 +36,7 @@
 	flex-direction: column;
 	text-align: center;
 	font-size: 18px;
-	margin-right: 38px;
+	margin: 0;
 }
 
 .ftlabs-language-options-selection .o-forms__label:before {
@@ -50,6 +59,10 @@
 	border: none;
 }
 
+.ftlabs-language-options-selection .o-forms__radio + .o-forms__label{
+	padding-left: 0;
+}
+
 .ftlabs-language-options-selection .o-forms__radio + .o-forms__label::after {
 	position: absolute;
 	height: 25px;
@@ -61,7 +74,7 @@
 		no-repeat;
 	background-size: cover;
 	top: 20px;
-	left: 65px;
+	left: 25px;
 }
 
 .ftlabs-translation__language-selection-element[data-lang-code='DE']
@@ -109,6 +122,9 @@
 .ftlabs-translation__share-bar-language {
 	font-size: 15px !important;
 	font-weight: 500 !important;
+	display: inline-block;
+    width: 100%;
+    text-align: center;
 }
 
 .ftlabs-translation-options {
@@ -144,8 +160,8 @@
 }
 
 .ftlabs-language-options-selection {
-	/* align-self: center; */
 	display: flex;
+	justify-content: space-between;
 }
 
 .ftlabs-translation__form {
@@ -175,10 +191,6 @@
 }
 
 @media (max-width: 1219px) {
-	.ftlabs-translation__share-bar-language {
-		padding-left: 10px;
-	}
-
 	.ftlabs-translation__configuration {
 		flex-direction: column;
 	}
@@ -190,10 +202,6 @@
 
 	.o-forms__group--inline.ftlabs-translation__tickbox {
 		margin-bottom: 1px;
-	}
-
-	.ftlabs-translation__language-selection-element {
-		margin-right: -4px;
 	}
 
 	.topper--opinion > .topper__content > .topper__headline > :nth-child(2) {
