@@ -207,7 +207,7 @@ function showTranslation(language) {
 	}
 
 	fetch(
-		`https://ftlabs-left.herokuapp.com/article/${articleId}/${languageCode.toLowerCase()}`,
+		`${window.origin}/article/${articleId}/${languageCode.toLowerCase()}`,
 		fetchOptions
 	)
 		.then(function(res) {
@@ -395,7 +395,7 @@ function logComponentInteractions(interaction, language = 'EN', error = null) {
 }
 
 function getTranslationData(e) {
-	fetch(`https://ftlabs-left.herokuapp.com/check/${articleId}/${pubDate}`)
+	fetch(`${window.origin}/check/${articleId}/${pubDate}`)
 		.then(function(res) { return res.json(); })
 		.then(function(data) {
 			if (data.displayWidget) {
