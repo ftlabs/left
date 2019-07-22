@@ -4,6 +4,9 @@ function showSplitView() {
 	}
 	
 	var action = splitStyleAction('get');
+	if(window.innerWidth < 1280 && action === 'split') {
+		action = 'stacked';
+	}
 	var splitViewOptions = document.querySelector(
 		'.ftlabs-translation-options-selection'
 	);
@@ -101,7 +104,7 @@ function removeTranslationSplitView() {
 function showTranslationSplitView() {
 	var articleBody = document.querySelector('.article__content-body');
 	mobileViewClassAction('add', 'stacked');
-	if (screen.width < 1280 && splitStyleAction('get') !== 'standard') {
+	if (window.innerWidth < 1280 && splitStyleAction('get') !== 'standard') {
 		var stackedInput = document.querySelector(
 			'.ftlabs-translation-options__mobile > input'
 		);
@@ -244,7 +247,11 @@ function setOverlayListeners() {
 		splitStyleAction('get') == null ||
 		splitStyleAction('get') == 'undefined'
 	) {
-		splitStyleAction('set', 'split');
+		var view = 'split';
+		if(window.innerWidth < 1280) {
+			view = 'stacked';
+		}
+		splitStyleAction('set', view);
 	}
 
 	var action = '#' + splitStyleAction('get');
