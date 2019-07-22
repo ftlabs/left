@@ -12,6 +12,11 @@
 	z-index: 1001 !important;
 }
 
+.ftlabs-translations__disclaimer {
+	font-family: "MetricWeb", sans-serif;
+	font-size: 14px;
+}
+
 .ftlabs-translation__language-selection {
 	list-style-type: none;
 	display: flex;
