@@ -293,18 +293,14 @@ app.get('/content/:uuid', (req,res) => {
 
 	Tracking.splunk(`request=content uuid=${uuid}`);
 
-	switch(uuid) {
-		case exampleUUIDs[1]:
-			data.partial2 = true;
-		break;
-		
-		case exampleUUIDs[2]:
-			data.partial3 = true;
-		break;
+	const contentID = exampleUUIDs.findIndex(item => {
+		return item === uuid;
+	});
 
-		case exampleUUIDs[0]:
-		default:
-			data.partial1 = true;
+	if(contentID === -1) {
+		data.partial1 = true;
+	} else {
+		data[`partial${contentID + 1}`] = true;
 	}
 
 	res.render('content', data);

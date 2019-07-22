@@ -29,14 +29,19 @@
 
 		<div class="n-layout__row n-layout__row--content">
 			{{#if partial1}}
-			{{> userTest/content1}}
+				{{> userTest/content1}}
 			{{else if partial2}}
-			{{> userTest/content2}}
+				{{> userTest/content2}}
 			{{else if partial3}}
-			{{> userTest/content3}}
+				{{> userTest/content3}}
+			{{else if partial4}}
+				{{> userTest/content4}}
+			{{else if partial5}}
+				{{> userTest/content5}}
+			{{else if partial6}}
+				{{> userTest/content6}}
 			{{/if}}
 		</div>
-		<div class="ftlabs-translation__translation-component"></div>
 		{{> footer}}
 	</div>
 	<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
