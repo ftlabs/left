@@ -160,7 +160,6 @@ html {
 }
 
 .ftlabs-language-options-selection {
-	/*align-self: center; */
 	display: flex;
 	justify-content: space-between;
 }
