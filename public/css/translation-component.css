@@ -109,6 +109,9 @@
 .ftlabs-translation__share-bar-language {
 	font-size: 15px !important;
 	font-weight: 500 !important;
+	display: inline-block;
+    width: 100%;
+    text-align: center;
 }
 
 .ftlabs-translation-options {
@@ -175,10 +178,6 @@
 }
 
 @media (max-width: 1219px) {
-	.ftlabs-translation__share-bar-language {
-		padding-left: 10px;
-	}
-
 	.ftlabs-translation__configuration {
 		flex-direction: column;
 	}
