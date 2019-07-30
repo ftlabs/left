@@ -8,7 +8,7 @@ function init(apiKey) {
 }
 
 function getArticleData(uuid) {
-	return fetch(`http://api.ft.com/content/${uuid}?apiKey=${this.apiKey}`)
+	return fetch(`https://api.ft.com/content/${uuid}?apiKey=${this.apiKey}`)
 	.then( res => res.json())
 	.then(data => {
 		return data;
