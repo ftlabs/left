@@ -13,16 +13,16 @@
 	"dependencies": {
 		"@financial-times/s3o-middleware": "^3.0.1",
 		"@google-cloud/translate": "^2.1.4",
-		"aws-sdk": "^2.438.0",
+		"aws-sdk": "^2.538.0",
 		"cheerio": "^1.0.0-rc.3",
 		"dotenv": "^5.0.1",
 		"express": "^4.16.4",
 		"express-enforces-ssl": "^1.1.0",
-		"hbs": "^4.0.4",
-		"helmet": "^3.16.0",
+		"hbs": "^4.0.5",
+		"helmet": "^3.21.1",
 		"path": "^0.12.7"
 	},
 	"devDependencies": {
-		"nodemon": "^1.19.1"
+		"nodemon": "^1.19.3"
 	}
 }
