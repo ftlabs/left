@@ -26,9 +26,6 @@ if (process.env.NODE_ENV === 'production') {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const googleTokenPath = path.resolve(`${__dirname}/keyfile.json`);
-fs.writeFileSync(googleTokenPath, Utils.processEnv('GOOGLE_CREDS'));
-
 const CAPI = require('./bin/lib/ft/capi').init(Utils.processEnv('FT_API_KEY'));
 const Translator = require('./bin/lib/translators/multi-translator');
 const Audio = require('./bin/lib/utils/get-audio');
@@ -82,7 +79,6 @@ app.post('/article/:uuid/:lang', (req, res, next) => {
 	res.langFrom = req.body.from;
 	const fromCache = req.body.fromCache;
 	const checkCache = req.body.checkCache;
-
 	res.translators = JSON.parse(req.body.translators);
 
 	if (fromCache) {

@@ -192,7 +192,7 @@ function showTranslation(language) {
 			'Content-Type': 'application/x-www-form-urlencoded'
 		},
 		method: 'POST',
-		body: `translators=${JSON.stringify([translator])}&from=en`
+		body: `translators=${JSON.stringify([translator])}&from=en&checkCache=true`
 	};
 
 	if (localTranslations[`${languageCode.toLowerCase()}`]) {
