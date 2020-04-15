@@ -13,20 +13,22 @@
   "author": "Lily2point0",
   "license": "MIT",
   "dependencies": {
-    "@financial-times/s3o-middleware": "^3.0.1",
+    "@financial-times/okta-express-middleware": "0.0.4",
     "@google-cloud/translate": "^2.1.4",
-    "aws-sdk": "^2.543.0",
+    "aws-sdk": "^2.656.0",
     "cheerio": "^1.0.0-rc.3",
+    "cookie-session": "^1.4.0",
     "dotenv": "^5.0.1",
     "express": "^4.16.4",
     "express-enforces-ssl": "^1.1.0",
-    "hbs": "^4.1.0",
-    "helmet": "^3.21.1",
+    "hbs": "^4.1.1",
+    "helmet": "^3.22.0",
+    "node-fetch": "^2.6.0",
     "path": "^0.12.7",
     "snyk": "^1.116.4"
   },
   "devDependencies": {
-    "nodemon": "^1.19.3"
+    "nodemon": "^1.19.4"
   },
   "snyk": true
 }

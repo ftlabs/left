@@ -1,16 +1,15 @@
-function getS3OUserFromCookie(cookies) {
+function getOKTAUserFromCookie(userinfo) {
 	let user = null;
 
-	const cookieList = cookies.split(';');
-
-	for(let i = 0; i < cookieList.length; ++i) {
-		let cookiePair = cookieList[i].replace(' ', '');
-		if(cookiePair.startsWith('s3o_username')) {
-			user = cookiePair.split('=')[1];
-		}
+	if(userinfo.hasOwnProperty('first_name')){
+		return `${userinfo.first_name}.${userinfo.last_name}`;
 	}
 
 	return user;
+}
+
+function getOktaUsername(userinfo) {
+	return `${userinfo.first_name}.${userinfo.last_name}`;
 }
 
 async function checkAndSplitText(text, limit, encoded = false) {
@@ -200,7 +199,7 @@ function configValidation(config, type, value, message) {
 }
 
 module.exports = {
-	extractUser: getS3OUserFromCookie,
+	extractUser: getOKTAUserFromCookie,
 	splitTextIntoChunks: checkAndSplitText,
 	pauseForMillis: pauseForMillis,
 	maybeAppendDot: maybeAppendDot,
