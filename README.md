@@ -14,13 +14,7 @@ $ npm install
 $ npm run start
 ```
 
-## .env 
-
-- Run `touch .env` to create the required **.env** file
-- Open your new **.env** file and add the following variables:
-
-
-### Configure (via the .env file, or environment params)
+## Configure (via the .env file, or environment params)
 
 ```
 ALLOWED_USERS=...          # a CSV of those who can see the extra goodies
@@ -46,7 +40,7 @@ OKTA_SECRET=...            # for OKTA authentication
 SESSION_TOKEN=...          # for OKTA authentication
 ```
 
-#### Where to find OKTA .env vars
+### Where to find OKTA .env vars
 
 - Get `SESSION_TOKEN` from LastPass
 - Get details for finding `OKTA_ISSUER`, `OKTA_CLIENT` & `OKTA_SECRET` in LastPass
