@@ -1,6 +1,5 @@
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 const Utils = require('./bin/lib/utils/utils');
-const s3o = require('@financial-times/s3o-middleware');
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -8,6 +7,8 @@ const bodyParser = require('body-parser');
 const app = express();
 const helmet = require('helmet');
 const express_enforces_ssl = require('express-enforces-ssl');
+const OktaMiddleware = require('@financial-times/okta-express-middleware');
+const session = require('cookie-session');
 const PORT = Utils.processEnv('PORT', {validateInteger: true, default: "2018"});
 const extract = require('./bin/lib/utils/extract-text');
 const hbs = require('hbs');
@@ -25,6 +26,14 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+const okta = new OktaMiddleware({
+	client_id: process.env.OKTA_CLIENT,
+	client_secret: process.env.OKTA_SECRET,
+	issuer: process.env.OKTA_ISSUER,
+	appBaseUrl: process.env.BASE_URL,
+	scope: 'openid offline_access'
+});
 
 const CAPI = require('./bin/lib/ft/capi').init(Utils.processEnv('FT_API_KEY'));
 const Translator = require('./bin/lib/translators/multi-translator');
@@ -72,6 +81,12 @@ app.use(function(req, res, next) {
 	);
 	next();
 });
+
+app.use(session({
+	secret: process.env.SESSION_TOKEN,
+	maxAge: 24 * 3600 * 1000, //24h
+	httpOnly: true
+}));
 
 app.post('/article/:uuid/:lang', (req, res, next) => {
 	res.uuid = req.params.uuid;
@@ -302,10 +317,12 @@ app.get('/content/:uuid', (req,res) => {
 	res.render('content', data);
 });
 
-app.use(s3o);
+app.use(okta.router);
+app.use(okta.ensureAuthenticated());
+app.use(okta.verifyJwts());
 
 app.get('/', async (req, res) => {
-	const settings = await Translator.settings(Utils.extractUser(req.headers.cookie));
+	const settings = await Translator.settings(Utils.extractUser(req.userContext.userinfo));
 	return res.render('index', settings);
 });
 

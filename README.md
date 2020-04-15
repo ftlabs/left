@@ -14,7 +14,13 @@ $ npm install
 $ npm run start
 ```
 
-## Configure (via the .env file, or environment params)
+## .env 
+
+- Run `touch .env` to create the required **.env** file
+- Open your new **.env** file and add the following variables:
+
+
+### Configure (via the .env file, or environment params)
 
 ```
 ALLOWED_USERS=...          # a CSV of those who can see the extra goodies
@@ -32,4 +38,16 @@ AUDIO_RENDER_URL=...       # for generating the audio version of the translation
 AUDIO_RENDER_TOKEN=...     # ditto (lifted from the renderer's settings)
 LIMIT_TABLE=...            # table for checking api limits have not been breached
 API_CHAR_LIMITS=...        # JSON object with providers (lowerCase) as key and char limits as (Int) values
+PORT=...                   # 3010
+BASE_URL=...               # http://localhost:3010
+OKTA_CLIENT=...            # for OKTA authentication
+OKTA_ISSUER=...            # for OKTA authentication
+OKTA_SECRET=...            # for OKTA authentication
+SESSION_TOKEN=...          # for OKTA authentication
 ```
+
+#### Where to find OKTA .env vars
+
+- Get `SESSION_TOKEN` from LastPass
+- Get details for finding `OKTA_ISSUER`, `OKTA_CLIENT` & `OKTA_SECRET` in LastPass
+
